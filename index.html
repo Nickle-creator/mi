@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Are You Batman?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Dancing+Script:wght@500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Inter', sans-serif;
+    color: #3a1f1a;
+    background: linear-gradient(145deg, #fbf2e8, #f4dcd1, #efc9bd);
+    min-height: 100vh;
+    overflow: hidden;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 1.5rem; position: relative;
+  }
+  h1 { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 6vw, 4rem); margin-bottom: 1rem; }
+  p { color: #7a5a52; max-width: 28rem; margin-bottom: 3rem; }
+  .hint { display: block; margin-top: .5rem; font-size: .9rem; font-style: italic; opacity: .7; }
+  .bat {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 20vw; opacity: .15; pointer-events: none; user-select: none;
+  }
+  .buttons { position: relative; display: flex; gap: 1.5rem; align-items: center; justify-content: center; }
+  button {
+    font-family: inherit; font-weight: 500; font-size: 1rem;
+    padding: .85rem 2rem; border-radius: 9999px; border: none; cursor: pointer;
+    box-shadow: 0 8px 24px -10px rgba(155, 50, 40, .35);
+    transition: transform .25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow .2s;
+  }
+  #yes {
+    background: #b8392c; color: #fdf6ee; position: relative; z-index: 1;
+  }
+  #no {
+    background: #f0d8c8; color: #4a2a22; border: 1px solid #d9b8a7; position: relative; z-index: 2;
+  }
+  #no:hover { transform: scale(1.05); box-shadow: 0 12px 28px -10px rgba(155, 50, 40, .5); }
+</style>
+</head>
+<body>
+  <div class="bat">🦇</div>
+  <h1>Are you Batman?</h1>
+  <p>Be honest. This is a very serious investigation.<span id="hint" class="hint" style="display:none"></span></p>
+  <div class="buttons" id="container">
+    <button id="yes">Yes</button>
+    <button id="no">No</button>
+  </div>
+
+<script>
+  const yes = document.getElementById('yes');
+  const no = document.getElementById('no');
+  const hint = document.getElementById('hint');
+  const MAX = 6;
+  let clicks = 0;
+  let offset = { x: 0, y: 0 };
+
+  function snapBehindNo() {
+    const y = yes.getBoundingClientRect();
+    const n = no.getBoundingClientRect();
+    offset.x += (n.left + n.width/2) - (y.left + y.width/2);
+    offset.y += (n.top + n.height/2) - (y.top + y.height/2);
+    yes.style.transform = `translate(${offset.x}px, ${offset.y}px)`;
+  }
+
+  function dodge() {
+    if (clicks >= MAX) { snapBehindNo(); return; }
+    const maxX = window.innerWidth / 2 - 80;
+    const maxY = window.innerHeight / 2 - 60;
+    const intensity = Math.min(1, (clicks + 1) / MAX);
+    const angle = Math.random() * Math.PI * 2;
+    const radius = (60 + clicks * 50) * intensity;
+    offset.x = Math.max(-maxX, Math.min(maxX, Math.cos(angle) * radius));
+    offset.y = Math.max(-maxY, Math.min(maxY, Math.sin(angle) * radius));
+    yes.style.transform = `translate(${offset.x}px, ${offset.y}px)`;
+    clicks++;
+    hint.style.display = 'block';
+    hint.textContent = clicks >= MAX ? '(just click No already, there can only be one batman)' : '(the Yes button seems… nervous)';
+  }
+
+  ['mouseenter', 'touchstart', 'focus', 'click'].forEach(ev =>
+    yes.addEventListener(ev, dodge)
+  );
+
+  no.addEventListener('click', () => {
+    window.location.href = 'story.html';
+  });
+
+  window.addEventListener('resize', () => { if (clicks >= MAX) snapBehindNo(); });
+</script>
+</body>
+</html>
