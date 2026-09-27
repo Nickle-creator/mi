@@ -115,7 +115,8 @@
     opacity: 0; pointer-events: none;
     transition: opacity .6s ease;
   }
-  .curtain.show { opacity: 1; pointer-events: auto; }
+  .curtain.show { opacity: 1; pointer-events: auto; cursor: pointer; }
+  .curtain .tap { font-size: .8rem; color: var(--ink-dim); opacity: .6; margin-top: .4rem; }
   .curtain h2 { font-family: 'Playfair Display', serif; font-style: italic; font-size: clamp(1.6rem, 6vw, 2.4rem); color: var(--gold-bright); }
   .curtain p { color: var(--ink-dim); font-size: .95rem; max-width: 22rem; }
 
@@ -139,6 +140,7 @@
   <div class="curtain" id="curtain">
     <h2>Fine I give up.</h2>
     <p>There can only be one Batman. This doesn't prove dat iss you</p>
+    <p class="tap">(tap anywhere to continue)</p>
   </div>
 
 <script>
@@ -163,11 +165,6 @@
   function dodge() {
     if (surrendered) return;
 
-    if (clicks >= GIVE_UP_AT) {
-      surrender();
-      return;
-    }
-
     const maxX = window.innerWidth / 2 - 70;
     const maxY = window.innerHeight / 2 - 60;
     const angle = Math.random() * Math.PI * 2;
@@ -182,6 +179,11 @@
     yes.classList.add('escaped');
     clicks++;
 
+    if (clicks >= GIVE_UP_AT) {
+      surrender();
+      return;
+    }
+
     const tier = tiers[Math.min(tiers.length - 1, Math.floor(clicks / 11))];
     hint.textContent = clicks >= GIVE_UP_AT - 1 ? "(…okay, one more and I mean it)" : tier;
     hint.classList.add('show');
@@ -195,8 +197,11 @@
     hint.textContent = "(fine. you win.)";
     hint.classList.add('show');
     curtain.classList.add('show');
-    setTimeout(() => { window.location.href = 'story.html'; }, 1800);
   }
+
+  curtain.addEventListener('click', () => {
+    if (surrendered) window.location.href = 'story.html';
+  });
 
   ['mouseenter', 'touchstart', 'focus', 'click'].forEach(ev =>
     yes.addEventListener(ev, (e) => { if (ev === 'touchstart') e.preventDefault(); dodge(); }, { passive: false })
