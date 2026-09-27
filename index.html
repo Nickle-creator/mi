@@ -31,7 +31,6 @@
     position: relative;
   }
 
-  /* static atmosphere — no color motion, just a fixed vignette + glow */
   .signal {
     position: absolute; inset: 0;
     background: radial-gradient(ellipse 60% 55% at 50% 108%, rgba(184,147,63,0.14), transparent 65%);
@@ -117,13 +116,10 @@
     transition: opacity .6s ease;
   }
   .curtain.show { opacity: 1; pointer-events: auto; }
-  .curtain .mark { font-size: 3.2rem; animation: pulse-mark 1.8s ease-in-out infinite; }
-  @keyframes pulse-mark { 0%,100% { transform: scale(1); opacity: .9; } 50% { transform: scale(1.08); opacity: 1; } }
   .curtain h2 { font-family: 'Playfair Display', serif; font-style: italic; font-size: clamp(1.6rem, 6vw, 2.4rem); color: var(--gold-bright); }
   .curtain p { color: var(--ink-dim); font-size: .95rem; max-width: 22rem; }
 
   @media (prefers-reduced-motion: reduce) {
-    .curtain .mark { animation: none; }
     #yes, #no { transition-duration: .05s; }
   }
 </style>
@@ -141,7 +137,6 @@
   </div>
 
   <div class="curtain" id="curtain">
-    <div class="mark">🦇</div>
     <h2>Fine I give up.</h2>
     <p>There can only be one Batman. This doesn't prove dat iss you</p>
   </div>
@@ -199,7 +194,8 @@
     yes.classList.add('surrendered');
     hint.textContent = "(fine. you win.)";
     hint.classList.add('show');
-    setTimeout(() => curtain.classList.add('show'), 550);
+    curtain.classList.add('show');
+    setTimeout(() => { window.location.href = 'story.html'; }, 1800);
   }
 
   ['mouseenter', 'touchstart', 'focus', 'click'].forEach(ev =>
