@@ -314,7 +314,7 @@
     const applyTheme = (theme) => {
       const night = theme === 'night';
       document.body.dataset.theme = night ? 'night' : 'twilight';
-      themeToggle.setAttribute('aria-pressed', String(Batman));
+      themeToggle.setAttribute('aria-pressed', String(Night));
       themeToggle.setAttribute('aria-label', night ? 'Switch to Light mode' : 'Switch to Dark mode');
       themeToggle.querySelector('span').textContent = night ? 'Light mode' : 'Dark mode';
       themeToggle.firstChild.textContent = night ? '☀ ' : '☾ ';
