@@ -2,95 +2,213 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Are You Batman?</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Dancing+Script:wght@500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
+  :root {
+    --bg-deep: #06070c;
+    --bg-mid: #0e111c;
+    --gold: #b8933f;
+    --gold-bright: #e8c979;
+    --ink: #ece6d6;
+    --ink-dim: #8b8578;
+    --danger: #7a2620;
+  }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; }
   body {
     font-family: 'Inter', sans-serif;
-    color: #3a1f1a;
-    background: linear-gradient(145deg, #fbf2e8, #f4dcd1, #efc9bd);
-    min-height: 100vh;
+    color: var(--ink);
+    background: var(--bg-deep);
+    min-height: 100%;
     overflow: hidden;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    text-align: center; padding: 1.5rem; position: relative;
+    text-align: center;
+    padding: max(1.5rem, env(safe-area-inset-top)) 1.5rem max(1.5rem, env(safe-area-inset-bottom));
+    position: relative;
   }
-  h1 { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 6vw, 4rem); margin-bottom: 1rem; }
-  p { color: #7a5a52; max-width: 28rem; margin-bottom: 3rem; }
-  .hint { display: block; margin-top: .5rem; font-size: .9rem; font-style: italic; opacity: .7; }
-  .bat {
-    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-    font-size: 20vw; opacity: .15; pointer-events: none; user-select: none;
+
+  /* static atmosphere — no color motion, just a fixed vignette + glow */
+  .signal {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 55% at 50% 108%, rgba(184,147,63,0.14), transparent 65%);
+    pointer-events: none;
   }
-  .buttons { position: relative; display: flex; gap: 1.5rem; align-items: center; justify-content: center; }
+
+  .bat-mark {
+    position: absolute; top: 8%; left: 50%; transform: translateX(-50%);
+    font-size: clamp(2.5rem, 10vw, 4rem);
+    opacity: .5;
+    filter: drop-shadow(0 0 18px rgba(232,201,121,.2));
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: clamp(2.1rem, 7vw, 3.6rem);
+    letter-spacing: .01em;
+    margin-bottom: .9rem;
+    text-shadow: 0 0 30px rgba(232,201,121,.15);
+    position: relative;
+  }
+  p.sub {
+    color: var(--ink-dim);
+    font-size: .95rem; font-weight: 300;
+    max-width: 24rem; margin: 0 auto 3.2rem;
+    line-height: 1.6;
+    position: relative;
+  }
+  .hint {
+    display: block; margin-top: .75rem;
+    font-size: .85rem; font-style: italic; color: var(--gold);
+    min-height: 1.2em;
+    opacity: 0; transition: opacity .3s ease;
+  }
+  .hint.show { opacity: .85; }
+
+  .buttons {
+    position: relative; z-index: 3;
+    display: flex; gap: 1.4rem; align-items: center; justify-content: center;
+    width: 100%; max-width: 22rem;
+  }
   button {
-    font-family: inherit; font-weight: 500; font-size: 1rem;
-    padding: .85rem 2rem; border-radius: 9999px; border: none; cursor: pointer;
-    box-shadow: 0 8px 24px -10px rgba(155, 50, 40, .35);
-    transition: transform .25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow .2s;
+    font-family: 'Inter', sans-serif; font-weight: 500; font-size: 1rem;
+    padding: .9rem 2.2rem; border-radius: 9999px; border: 1px solid transparent;
+    cursor: pointer; -webkit-tap-highlight-color: transparent;
+    will-change: transform;
   }
   #yes {
-    background: #b8392c; color: #fdf6ee; position: relative; z-index: 1;
+    background: linear-gradient(160deg, #8a3128, var(--danger));
+    color: #f4e9dc;
+    box-shadow: 0 10px 28px -12px rgba(122,38,32,.7);
+    position: relative; z-index: 4;
+    transition: transform .38s cubic-bezier(.2,1.4,.4,1), box-shadow .25s ease;
+  }
+  #yes.escaped { box-shadow: 0 4px 14px -8px rgba(122,38,32,.5); }
+  #yes.surrendered {
+    background: linear-gradient(160deg, var(--gold-bright), var(--gold));
+    color: #241a06;
+    animation: none;
+    box-shadow: 0 0 34px rgba(232,201,121,.55);
   }
   #no {
-    background: #f0d8c8; color: #4a2a22; border: 1px solid #d9b8a7; position: relative; z-index: 2;
+    background: transparent;
+    color: var(--ink);
+    border-color: rgba(236,230,214,.28);
+    position: relative; z-index: 2;
+    transition: transform .25s ease, background .25s ease, border-color .25s ease;
   }
-  #no:hover { transform: scale(1.05); box-shadow: 0 12px 28px -10px rgba(155, 50, 40, .5); }
+  #no:hover, #no:focus-visible {
+    transform: scale(1.06);
+    background: rgba(236,230,214,.06);
+    border-color: var(--gold);
+  }
+
+  .curtain {
+    position: fixed; inset: 0; z-index: 10;
+    background: radial-gradient(ellipse at 50% 50%, var(--bg-mid), var(--bg-deep) 75%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 1rem; text-align: center; padding: 2rem;
+    opacity: 0; pointer-events: none;
+    transition: opacity .6s ease;
+  }
+  .curtain.show { opacity: 1; pointer-events: auto; }
+  .curtain .mark { font-size: 3.2rem; animation: pulse-mark 1.8s ease-in-out infinite; }
+  @keyframes pulse-mark { 0%,100% { transform: scale(1); opacity: .9; } 50% { transform: scale(1.08); opacity: 1; } }
+  .curtain h2 { font-family: 'Playfair Display', serif; font-style: italic; font-size: clamp(1.6rem, 6vw, 2.4rem); color: var(--gold-bright); }
+  .curtain p { color: var(--ink-dim); font-size: .95rem; max-width: 22rem; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .curtain .mark { animation: none; }
+    #yes, #no { transition-duration: .05s; }
+  }
 </style>
 </head>
 <body>
-  <div class="bat">🦇</div>
+  <div class="signal"></div>
+  <div class="bat-mark">🦇</div>
+
   <h1>Are you Batman?</h1>
-  <p>Be honest. This is a very serious investigation.<span id="hint" class="hint" style="display:none"></span></p>
-  <div class="buttons" id="container">
-    <button id="yes">Yes</button>
-    <button id="no">No</button>
+  <p class="sub">Be honest. This is a very serious investigation.<span id="hint" class="hint"></span></p>
+
+  <div class="buttons">
+    <button id="yes" type="button">Yes</button>
+    <button id="no" type="button">No</button>
+  </div>
+
+  <div class="curtain" id="curtain">
+    <div class="mark">🦇</div>
+    <h2>Fine I give up.</h2>
+    <p>There can only be one Batman. This doesn't prove dat iss you</p>
   </div>
 
 <script>
   const yes = document.getElementById('yes');
   const no = document.getElementById('no');
   const hint = document.getElementById('hint');
-  const MAX = 6;
+  const curtain = document.getElementById('curtain');
+  const GIVE_UP_AT = 50;
+
+  const tiers = [
+    "(the Yes button seems… nervous)",
+    "(it's not you, obviously cause iss me)",
+    "(this is getting suspicious)",
+    "(you really wanna keep going)",
+    "(Don't you dare click once more)"
+  ];
+
   let clicks = 0;
   let offset = { x: 0, y: 0 };
-
-  function snapBehindNo() {
-    const y = yes.getBoundingClientRect();
-    const n = no.getBoundingClientRect();
-    offset.x += (n.left + n.width/2) - (y.left + y.width/2);
-    offset.y += (n.top + n.height/2) - (y.top + y.height/2);
-    yes.style.transform = `translate(${offset.x}px, ${offset.y}px)`;
-  }
+  let surrendered = false;
 
   function dodge() {
-    if (clicks >= MAX) { snapBehindNo(); return; }
-    const maxX = window.innerWidth / 2 - 80;
+    if (surrendered) return;
+
+    if (clicks >= GIVE_UP_AT) {
+      surrender();
+      return;
+    }
+
+    const maxX = window.innerWidth / 2 - 70;
     const maxY = window.innerHeight / 2 - 60;
-    const intensity = Math.min(1, (clicks + 1) / MAX);
     const angle = Math.random() * Math.PI * 2;
-    const radius = (60 + clicks * 50) * intensity;
+    const intensity = Math.min(1, (clicks + 6) / GIVE_UP_AT);
+    const radius = 40 + intensity * 90;
+
     offset.x = Math.max(-maxX, Math.min(maxX, Math.cos(angle) * radius));
     offset.y = Math.max(-maxY, Math.min(maxY, Math.sin(angle) * radius));
-    yes.style.transform = `translate(${offset.x}px, ${offset.y}px)`;
+    const wobble = (Math.random() - 0.5) * 14;
+
+    yes.style.transform = `translate(${offset.x}px, ${offset.y}px) rotate(${wobble}deg)`;
+    yes.classList.add('escaped');
     clicks++;
-    hint.style.display = 'block';
-    hint.textContent = clicks >= MAX ? '(just click No already, there can only be one batman)' : '(the Yes button seems… nervous)';
+
+    const tier = tiers[Math.min(tiers.length - 1, Math.floor(clicks / 11))];
+    hint.textContent = clicks >= GIVE_UP_AT - 1 ? "(…okay, one more and I mean it)" : tier;
+    hint.classList.add('show');
+  }
+
+  function surrender() {
+    surrendered = true;
+    yes.style.transform = 'translate(0, 0) rotate(0)';
+    yes.classList.remove('escaped');
+    yes.classList.add('surrendered');
+    hint.textContent = "(fine. you win.)";
+    hint.classList.add('show');
+    setTimeout(() => curtain.classList.add('show'), 550);
   }
 
   ['mouseenter', 'touchstart', 'focus', 'click'].forEach(ev =>
-    yes.addEventListener(ev, dodge)
+    yes.addEventListener(ev, (e) => { if (ev === 'touchstart') e.preventDefault(); dodge(); }, { passive: false })
   );
 
   no.addEventListener('click', () => {
     window.location.href = 'story.html';
   });
-
-  window.addEventListener('resize', () => { if (clicks >= MAX) snapBehindNo(); });
 </script>
 </body>
 </html>
