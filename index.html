@@ -771,7 +771,7 @@
 
   <!-- ===================== 02 / STORY ===================== -->
   <section id="story" data-sec="02" data-name="mwah.">
-    <figure class="art-inlay art-inlay--almond" aria-hidden="true"><img src="art/almond-blossom-lite.webp" alt="" loading="lazy" decoding="async"></figure>
+    <figure class="art-inlay art-inlay--almond" data-art="almond" aria-hidden="true"></figure>
     <div class="wrap">
       <div class="sec-top reveal"><span class="label"><b>02</b>&nbsp;/&nbsp;04&nbsp;&nbsp;mwah.</span><span class="label">The archive</span><div class="hair"></div></div>
       <h2 class="head reveal">For all the times you were <em class="wavy">way too noob</em></h2>
@@ -781,7 +781,7 @@
 
   <!-- ===================== 03 / REASONS ===================== -->
   <section id="reasons" data-sec="03" data-name="And I love you">
-    <figure class="art-inlay art-inlay--kiss" aria-hidden="true"><img src="art/the-kiss-lite.webp" alt="" loading="lazy" decoding="async"></figure>
+    <figure class="art-inlay art-inlay--kiss" data-art="kiss" aria-hidden="true"></figure>
     <div class="wrap">
       <div class="sec-top reveal"><span class="label"><b>03</b>&nbsp;/&nbsp;04&nbsp;&nbsp;The reasons</span><span class="label">Tap to open</span><div class="hair"></div></div>
       <div class="grid split">
@@ -798,7 +798,7 @@
 
   <!-- ===================== 04 / SNAPSHOTS ===================== -->
   <section id="snaps" data-sec="04" data-name="Snapshots">
-    <figure class="art-inlay art-inlay--almond art-inlay--snap" aria-hidden="true"><img src="art/almond-blossom-lite.webp" alt="" loading="lazy" decoding="async"></figure>
+    <figure class="art-inlay art-inlay--almond art-inlay--snap" data-art="almond" aria-hidden="true"></figure>
     <figure class="cut px snap-cut" data-cut="wheat" data-shape="d" data-speed="-.12" aria-hidden="true"></figure>
     <div class="wrap">
       <div class="sec-top reveal"><span class="label"><b>04</b>&nbsp;/&nbsp;04&nbsp;&nbsp;Snapshots</span><span class="label">Plates</span><div class="hair"></div></div>
@@ -882,11 +882,11 @@
     { front: "Just You", back: "YHBMBASAILILILY" },
   ];
   const GALLERY = [
-    { src: "nine.jpeg", caption: "Mimi, caught mid-laugh" },
-    { src: "ten.jpeg", caption: "Have you met my girlfriend?" },
-    { src: "five.jpeg", caption: "That should not be here" },
-    { src: "eleven.jpeg", caption: "Ever met this couple?" },
-    { src: "twelve.jpeg", caption: "Absolutely gorgeous" },
+    { image: "nine.jpeg", caption: "Mimi, caught mid-laugh" },
+    { image: "ten.jpeg", caption: "Have you met my girlfriend?" },
+    { image: "five.jpeg", caption: "That should not be here" },
+    { image: "eleven.jpeg", caption: "Ever met this couple?" },
+    { image: "twelve.jpeg", caption: "Absolutely gorgeous" },
   ];
 
   /* ---------- artwork registry ----------
@@ -894,12 +894,17 @@
      Personal photographs remain local files beside this page.
      Full artwork source records are listed in README.txt. */
   const ART = {
-    starry: { src: "art/starry-night-lite.webp",   paint: "night", credit: "Vincent van Gogh, The Starry Night, 1889" },
-    lilies: { src: "art/water-lilies-lite.webp",   paint: "haze",  credit: "Claude Monet, Water Lilies, 1906" },
-    supper: { src: "art/supper-at-emmaus-lite.webp", paint: "umber", credit: "Caravaggio, The Supper at Emmaus, 1601" },
-    wheat:  { src: "art/wheat-field-lite.webp",    paint: "field", credit: "Vincent van Gogh, Wheat Field with Cypresses, 1889" },
-    haze:   { src: "art/water-lilies-lite.webp",     paint: "haze",  credit: "Claude Monet, Water Lilies, 1906" },
-    umber:  { src: "art/supper-at-emmaus-lite.webp", paint: "umber", credit: "Caravaggio, The Supper at Emmaus, 1601" },
+    starry:    { image: "art/starry-night-lite.webp",       paint: "night",  credit: "Vincent van Gogh, The Starry Night, 1889" },
+    lilies:    { image: "art/water-lilies-lite.webp",       paint: "haze",   credit: "Claude Monet, Water Lilies, 1906" },
+    supper:    { image: "art/supper-at-emmaus-lite.webp",   paint: "umber",  credit: "Caravaggio, The Supper at Emmaus, 1601" },
+    wheat:     { image: "art/wheat-field-lite.webp",        paint: "field",  credit: "Vincent van Gogh, Wheat Field with Cypresses, 1889" },
+    haze:      { image: "art/water-lilies-lite.webp",       paint: "haze",   credit: "Claude Monet, Water Lilies, 1906" },
+    umber:     { image: "art/supper-at-emmaus-lite.webp",   paint: "umber",  credit: "Caravaggio, The Supper at Emmaus, 1601" },
+    almond:    { image: "art/almond-blossom-lite.webp" },
+    kiss:      { image: "art/the-kiss-lite.webp" },
+    irises:    { image: "art/irises-lite.webp" },
+    footbridge:{ image: "art/japanese-footbridge-lite.webp" },
+    sisters:   { image: "art/two-sisters-lite.webp" },
   };
 
   document.getElementById('heroCounts').textContent =
@@ -932,16 +937,16 @@
   });
 
   const PAPER_CUTOUTS = [
-    { after: 0, name: 'irises', src: 'art/irises-lite.webp', caption: 'Irises · van Gogh · 1889' },
-    { after: 2, name: 'footbridge', src: 'art/japanese-footbridge-lite.webp', caption: 'The Japanese Footbridge · Monet · 1899' },
-    { after: 3, name: 'sisters', src: 'art/two-sisters-lite.webp', caption: 'Two Sisters · Renoir · 1881' },
+    { after: 0, name: 'irises', image: ART.irises.image, caption: 'Irises · van Gogh · 1889' },
+    { after: 2, name: 'footbridge', image: ART.footbridge.image, caption: 'The Japanese Footbridge · Monet · 1899' },
+    { after: 3, name: 'sisters', image: ART.sisters.image, caption: 'Two Sisters · Renoir · 1881' },
   ];
   const spreadPages = [...tEl.querySelectorAll('.spread')];
   PAPER_CUTOUTS.forEach(piece => {
     const gap = document.createElement('div');
     gap.className = `collage-break collage-break--${piece.name}`;
     gap.setAttribute('aria-hidden', 'true');
-    gap.innerHTML = `<figure class="collage-paper"><img src="${piece.src}" alt="" loading="lazy" decoding="async"><figcaption>${piece.caption}</figcaption></figure>`;
+    gap.innerHTML = `<figure class="collage-paper"><img src="${piece.image}" alt="" loading="lazy" decoding="async"><figcaption>${piece.caption}</figcaption></figure>`;
     spreadPages[piece.after].after(gap);
   });
 
@@ -987,7 +992,7 @@
   GALLERY.forEach((g, i) => {
     const s = document.createElement('div');
     s.className = 'slide' + (i === 0 ? ' active' : '');
-    s.innerHTML = `<img src="${g.src}" alt="${g.caption}" loading="lazy">`;
+    s.innerHTML = `<img src="${g.image}" alt="${g.caption}" loading="lazy">`;
     s.querySelector('img').addEventListener('error', () => s.classList.add('missing'), { once: true });
     stage.appendChild(s);
     const b = document.createElement('button');
@@ -1025,7 +1030,7 @@
     el.innerHTML = `
       <div class="cut-fx"><div class="cut-in shape-${shape}">
         <i class="paint paint--${a.paint}"></i>
-        <img src="${a.src}" alt="" decoding="async" loading="${el.classList.contains('hero-a') ? 'eager' : 'lazy'}" fetchpriority="${el.classList.contains('hero-a') ? 'high' : 'auto'}">
+        <img src="${a.image}" alt="" decoding="async" loading="${el.classList.contains('hero-a') ? 'eager' : 'lazy'}" fetchpriority="${el.classList.contains('hero-a') ? 'high' : 'auto'}">
       </div></div>
       <figcaption class="credit"><b>Pl. ${pad(plate)}</b><span class="ct">Oil-on-paper study</span></figcaption>`;
     const img = el.querySelector('img');
@@ -1034,6 +1039,17 @@
     img.addEventListener('error', () => img.remove());
     if (img.complete && img.naturalWidth) ok();
     if (el.getAttribute('aria-hidden') === 'true') el.querySelector('.credit').hidden = true;
+  });
+
+  document.querySelectorAll('[data-art]').forEach(el => {
+    const asset = ART[el.dataset.art];
+    if (!asset) return;
+    const img = document.createElement('img');
+    img.src = asset.image;
+    img.alt = '';
+    img.loading = 'lazy';
+    img.decoding = 'async';
+    el.appendChild(img);
   });
 
   /* ---------- scroll progress + one-time picture reveals ---------- */
