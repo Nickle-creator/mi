@@ -656,6 +656,71 @@
   .cut-in img.ok{opacity:1!important}
   .collage-paper img{opacity:1!important;filter:none!important;mix-blend-mode:normal!important}
 </style>
+<style id="open-artwork-washes">
+  /* Paintings should feel printed into the paper, not mounted in a photo frame. */
+  .art-inlay{
+    clip-path:none!important;filter:none!important;mix-blend-mode:normal!important;
+    overflow:visible!important;opacity:1!important;
+  }
+  .art-inlay img{
+    opacity:1!important;filter:none!important;mix-blend-mode:normal!important;
+    -webkit-mask-image:radial-gradient(ellipse at center,#000 48%,rgba(0,0,0,.92) 67%,transparent 100%);
+    mask-image:radial-gradient(ellipse at center,#000 48%,rgba(0,0,0,.92) 67%,transparent 100%);
+  }
+  .cut-fx{filter:none!important}
+  .cut-in{padding:0!important;background:transparent!important;box-shadow:none!important}
+  .cut-in img{
+    inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;
+    filter:none!important;mix-blend-mode:normal!important;
+    -webkit-mask-image:radial-gradient(ellipse at center,#000 48%,rgba(0,0,0,.92) 67%,transparent 100%);
+    mask-image:radial-gradient(ellipse at center,#000 48%,rgba(0,0,0,.92) 67%,transparent 100%);
+  }
+  .cut:not(.hero-a)::before{content:none!important;display:none!important}
+  .cut .credit{display:none!important}
+  .spread-cut{z-index:1!important}
+  .hero-strip{
+    display:block!important;left:-10vw!important;top:43vh!important;width:68vw!important;height:25vh!important;
+    opacity:.78!important;
+  }
+  .painting-bleed{
+    position:absolute;top:-4rem;width:clamp(12rem,26vw,24rem);aspect-ratio:1.2;margin:0;z-index:1;
+    overflow:visible;filter:none;transform:rotate(-3deg);
+    clip-path:polygon(4% 5%,22% 1%,43% 4%,65% 0,96% 4%,94% 27%,100% 51%,96% 75%,98% 96%,74% 94%,51% 100%,27% 96%,3% 99%,5% 74%,0 50%,3% 27%);
+  }
+  .painting-bleed img{
+    position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+    opacity:1;filter:none;mix-blend-mode:normal;
+    -webkit-mask-image:radial-gradient(ellipse at center,#000 47%,rgba(0,0,0,.9) 66%,transparent 100%);
+    mask-image:radial-gradient(ellipse at center,#000 47%,rgba(0,0,0,.9) 66%,transparent 100%);
+  }
+  .painting-bleed figcaption{
+    position:absolute;left:8%;bottom:9%;max-width:78%;z-index:2;
+    color:#fff;font:500 .48rem/1.1 var(--sans);letter-spacing:.1em;text-transform:uppercase;
+    text-shadow:0 1px 7px rgba(0,0,0,.8);pointer-events:none;
+  }
+  .collage-break--irises .painting-bleed{right:13%;aspect-ratio:1.23;transform:rotate(-4deg)}
+  .collage-break--footbridge .painting-bleed{left:12%;aspect-ratio:1.22;transform:rotate(3deg)}
+  .collage-break--sisters .painting-bleed{right:12%;aspect-ratio:.84;transform:rotate(-3deg)}
+  .art-inlay--almond{top:18%;right:-4vw;width:min(57vw,54rem);aspect-ratio:1.2;transform:rotate(2deg)}
+  .art-inlay--kiss{top:13%;right:-5vw;width:min(58vw,56rem);aspect-ratio:1.08;transform:rotate(-2deg)}
+  #snaps .art-inlay--snap{top:27%;left:-6vw;right:auto;width:min(60vw,58rem);aspect-ratio:1.35;transform:rotate(-2deg)}
+  @media(max-width:900px){
+    .hero-strip{left:-19vw!important;top:57vh!important;width:96vw!important;height:20vh!important;opacity:.62!important}
+    .art-inlay--almond{top:26%!important;right:-18vw!important;width:100vw!important;aspect-ratio:1.15}
+    .art-inlay--kiss{top:17%!important;right:-20vw!important;width:103vw!important;aspect-ratio:1.05}
+    #snaps .art-inlay--snap{top:37%!important;left:-18vw!important;width:100vw!important;aspect-ratio:1.25}
+    .painting-bleed{top:-2.8rem;width:min(46vw,13rem)}
+    .collage-break--irises .painting-bleed{right:4%}
+    .collage-break--footbridge .painting-bleed{left:4%}
+    .collage-break--sisters .painting-bleed{right:4%}
+  }
+  @media(max-width:430px){
+    .mast{grid-template-columns:auto minmax(0,1fr)!important;gap:.45rem!important;padding-inline:.65rem!important}
+    .sec-now .n{min-width:3.3rem;text-align:left}
+    .controls{min-width:0;gap:.25rem}
+    .controls .ctl{min-height:30px;padding-inline:.38rem;font-size:.54rem;letter-spacing:.055em}
+  }
+</style>
 </head>
 <body data-theme="night">
 
@@ -752,7 +817,7 @@
 
   <!-- ===================== 01 / HERO ===================== -->
   <section class="hero" id="top" data-sec="01" data-name="Opening" style="padding-bottom:2.5rem">
-    <figure class="cut px hero-strip" data-cut="haze" data-shape="c" data-speed="-.05" aria-hidden="true"></figure>
+    <figure class="cut px hero-strip" data-cut="lilies" data-shape="c" data-speed="-.05" aria-hidden="true"></figure>
     <figure class="cut px hero-a"     data-cut="starry" data-shape="a" data-speed=".09"></figure>
 
     <div class="wrap hero-in">
@@ -783,7 +848,6 @@
       </div>
     </div>
 
-    <figure class="cut px hero-b" data-cut="supper" data-shape="d" data-speed="-.14" aria-hidden="true"></figure>
   </section>
 
   <!-- ===================== 02 / STORY ===================== -->
@@ -806,8 +870,7 @@
           <h2>AND <em class="wavy">I love you</em></h2>
           <span class="label">You are the prettiest woman I've ever met</span>
           <button class="reveal-all" id="revealAll" type="button" aria-expanded="false">Reveal all</button>
-          <figure class="cut px reasons-cut" data-cut="lilies" data-shape="b" data-speed="-.04"></figure>
-        </div>
+                </div>
         <div class="ledger" id="reasons-list"></div>
       </div>
     </div>
@@ -815,8 +878,7 @@
 
   <!-- ===================== 04 / SNAPSHOTS ===================== -->
   <section id="snaps" data-sec="04" data-name="Snapshots">
-    <figure class="art-inlay art-inlay--almond art-inlay--snap" data-art="almond" aria-hidden="true"></figure>
-    <figure class="cut px snap-cut" data-cut="wheat" data-shape="d" data-speed="-.12" aria-hidden="true"></figure>
+    <figure class="art-inlay art-inlay--snap" data-art="wheat" aria-hidden="true"></figure>
     <div class="wrap">
       <div class="sec-top reveal"><span class="label"><b>04</b>&nbsp;/&nbsp;04&nbsp;&nbsp;Snapshots</span><span class="label">Plates</span><div class="hair"></div></div>
       <h2 class="reveal" style="margin-top:clamp(2rem,5vw,4rem);max-width:14ch">A little gallery filled with <em>mostly you</em></h2>
@@ -834,7 +896,6 @@
 </main>
 
 <footer>
-  <figure class="cut px foot-band" data-cut="haze" data-shape="c" data-speed=".07" aria-hidden="true"></figure>
   <div class="wrap">
     <p class="big reveal"><em class="wavy">Yours,</em> always.</p>
     <div class="row2">
@@ -882,11 +943,11 @@
   /* ---------- content ---------- */
   const pad = n => String(n).padStart(2, '0');
   const TIMELINE = [
-    { date: "The big idea", title: "Albert Einstein, apparently", text: "Apparently I was the clever one all along.", image: "memoryone.jpeg", cut: "umber" },
+    { date: "The big idea", title: "Albert Einstein, apparently", text: "Apparently I was the clever one all along.", image: "memoryone.jpeg", cut: "supper" },
     { date: "The little ones", title: "Two pufferfishes", text: "You are still the sharper one.", image: "two.jpeg" },
-    { date: "Real homie", title: "Wassup, beeyach", text: "From the wrong side of town.", image: "three.jpeg", cut: "wheat" },
+    { date: "Real homie", title: "Wassup, beeyach", text: "From the wrong side of town.", image: "three.jpeg" },
     { date: "Our first hello", title: "Still the man, of course", text: "Still got the gangsta in me, you know.", image: "four.jpeg" },
-    { date: "Future plans", title: "Our future honeymoon", text: "(We've been married for 17 years. Whoa.)", image: "eight.jpeg", cut: "lilies" },
+    { date: "Future plans", title: "Our future honeymoon", text: "(We've been married for 17 years. Whoa.)", image: "eight.jpeg" },
   ];
   const REASONS = [
     { front: "Your Smile", back: "I'll MELTTTT!" },
@@ -915,8 +976,6 @@
     lilies:    { image: "water-lilies-lite.webp",       paint: "haze",   credit: "Claude Monet, Water Lilies, 1906" },
     supper:    { image: "supper-at-emmaus-lite.webp",   paint: "umber",  credit: "Caravaggio, The Supper at Emmaus, 1601" },
     wheat:     { image: "wheat-field-lite.webp",        paint: "field",  credit: "Vincent van Gogh, Wheat Field with Cypresses, 1889" },
-    haze:      { image: "water-lilies-lite.webp",       paint: "haze",   credit: "Claude Monet, Water Lilies, 1906" },
-    umber:     { image: "supper-at-emmaus-lite.webp",   paint: "umber",  credit: "Caravaggio, The Supper at Emmaus, 1601" },
     almond:    { image: "almond-blossom-lite.webp" },
     kiss:      { image: "the-kiss-lite.webp" },
     irises:    { image: "irises-lite.webp" },
@@ -953,17 +1012,17 @@
     tEl.appendChild(art);
   });
 
-  const PAPER_CUTOUTS = [
+  const ARTWORK_CUTOUTS = [
     { after: 0, name: 'irises', image: ART.irises.image, caption: 'Irises · van Gogh · 1889' },
     { after: 2, name: 'footbridge', image: ART.footbridge.image, caption: 'The Japanese Footbridge · Monet · 1899' },
     { after: 3, name: 'sisters', image: ART.sisters.image, caption: 'Two Sisters · Renoir · 1881' },
   ];
   const spreadPages = [...tEl.querySelectorAll('.spread')];
-  PAPER_CUTOUTS.forEach(piece => {
+  ARTWORK_CUTOUTS.forEach(piece => {
     const gap = document.createElement('div');
     gap.className = `collage-break collage-break--${piece.name}`;
     gap.setAttribute('aria-hidden', 'true');
-    gap.innerHTML = `<figure class="collage-paper"><img src="${piece.image}" alt="" loading="lazy" decoding="async"><figcaption>${piece.caption}</figcaption></figure>`;
+    gap.innerHTML = `<figure class="painting-bleed"><img src="${piece.image}" alt="" loading="lazy" decoding="async"><figcaption>${piece.caption}</figcaption></figure>`;
     spreadPages[piece.after].after(gap);
   });
 
