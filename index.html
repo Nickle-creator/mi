@@ -6,7 +6,15 @@
 <title>For You, Mimi — The Scrapbook</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="image" href="art/starry-night-lite.webp" fetchpriority="high">
+<link rel="preload" as="image" href="starry-night-lite.webp" fetchpriority="high">
+<link rel="preload" as="image" href="water-lilies-lite.webp" fetchpriority="high">
+<link rel="preload" as="image" href="supper-at-emmaus-lite.webp" fetchpriority="high">
+<link rel="preload" as="image" href="wheat-field-lite.webp" fetchpriority="high">
+<link rel="preload" as="image" href="almond-blossom-lite.webp" fetchpriority="high">
+<link rel="preload" as="image" href="the-kiss-lite.webp" fetchpriority="high">
+<link rel="preload" as="image" href="irises-lite.webp" fetchpriority="high">
+<link rel="preload" as="image" href="japanese-footbridge-lite.webp" fetchpriority="high">
+<link rel="preload" as="image" href="two-sisters-lite.webp" fetchpriority="high">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   /* =========================================================
@@ -639,6 +647,15 @@
   }
 </style>
 
+<style id="full-color-artworks">
+  /* Preserve the cut-paper shapes and shadows without tinting or dimming the paintings. */
+  .art-inlay,
+  body[data-theme="night"] .art-inlay{mix-blend-mode:normal!important}
+  .art-inlay img{opacity:1!important;filter:none!important;mix-blend-mode:normal!important}
+  .cut-in img{filter:none!important;mix-blend-mode:normal!important}
+  .cut-in img.ok{opacity:1!important}
+  .collage-paper img{opacity:1!important;filter:none!important;mix-blend-mode:normal!important}
+</style>
 </head>
 <body data-theme="night">
 
@@ -890,21 +907,21 @@
   ];
 
   /* ---------- artwork registry ----------
-     Bundled public-domain reproductions live in /art.
+     Bundled public-domain reproductions live beside this page.
      Personal photographs remain local files beside this page.
      Full artwork source records are listed in README.txt. */
   const ART = {
-    starry:    { image: "art/starry-night-lite.webp",       paint: "night",  credit: "Vincent van Gogh, The Starry Night, 1889" },
-    lilies:    { image: "art/water-lilies-lite.webp",       paint: "haze",   credit: "Claude Monet, Water Lilies, 1906" },
-    supper:    { image: "art/supper-at-emmaus-lite.webp",   paint: "umber",  credit: "Caravaggio, The Supper at Emmaus, 1601" },
-    wheat:     { image: "art/wheat-field-lite.webp",        paint: "field",  credit: "Vincent van Gogh, Wheat Field with Cypresses, 1889" },
-    haze:      { image: "art/water-lilies-lite.webp",       paint: "haze",   credit: "Claude Monet, Water Lilies, 1906" },
-    umber:     { image: "art/supper-at-emmaus-lite.webp",   paint: "umber",  credit: "Caravaggio, The Supper at Emmaus, 1601" },
-    almond:    { image: "art/almond-blossom-lite.webp" },
-    kiss:      { image: "art/the-kiss-lite.webp" },
-    irises:    { image: "art/irises-lite.webp" },
-    footbridge:{ image: "art/japanese-footbridge-lite.webp" },
-    sisters:   { image: "art/two-sisters-lite.webp" },
+    starry:    { image: "starry-night-lite.webp",       paint: "night",  credit: "Vincent van Gogh, The Starry Night, 1889" },
+    lilies:    { image: "water-lilies-lite.webp",       paint: "haze",   credit: "Claude Monet, Water Lilies, 1906" },
+    supper:    { image: "supper-at-emmaus-lite.webp",   paint: "umber",  credit: "Caravaggio, The Supper at Emmaus, 1601" },
+    wheat:     { image: "wheat-field-lite.webp",        paint: "field",  credit: "Vincent van Gogh, Wheat Field with Cypresses, 1889" },
+    haze:      { image: "water-lilies-lite.webp",       paint: "haze",   credit: "Claude Monet, Water Lilies, 1906" },
+    umber:     { image: "supper-at-emmaus-lite.webp",   paint: "umber",  credit: "Caravaggio, The Supper at Emmaus, 1601" },
+    almond:    { image: "almond-blossom-lite.webp" },
+    kiss:      { image: "the-kiss-lite.webp" },
+    irises:    { image: "irises-lite.webp" },
+    footbridge:{ image: "japanese-footbridge-lite.webp" },
+    sisters:   { image: "two-sisters-lite.webp" },
   };
 
   document.getElementById('heroCounts').textContent =
