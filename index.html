@@ -15,6 +15,9 @@
 <link rel="preload" as="image" href="irises-lite.webp" fetchpriority="high">
 <link rel="preload" as="image" href="japanese-footbridge-lite.webp" fetchpriority="high">
 <link rel="preload" as="image" href="two-sisters-lite.webp" fetchpriority="high">
+<link rel="preload" as="image" href="great-wave-lite.webp" fetchpriority="high">
+<link rel="preload" as="image" href="la-grande-jatte-lite.webp" fetchpriority="high">
+<link rel="preload" as="image" href="childs-bath-lite.webp" fetchpriority="high">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   /* =========================================================
@@ -721,6 +724,66 @@
     .controls .ctl{min-height:30px;padding-inline:.38rem;font-size:.54rem;letter-spacing:.055em}
   }
 </style>
+<style id="torn-visible-artwork">
+  /* Irregular edges, paper depth, and unfiltered color keep each painting readable. */
+  .art-inlay{
+    z-index:1!important;overflow:hidden!important;
+    clip-path:polygon(5% 4%,18% 1%,33% 5%,48% 1%,62% 4%,79% 0,96% 5%,94% 22%,100% 39%,96% 55%,99% 72%,94% 96%,76% 93%,59% 100%,42% 96%,24% 99%,3% 94%,6% 76%,0 59%,4% 42%,1% 24%);
+    filter:drop-shadow(10px 14px 14px rgba(0,0,0,.22))!important;
+  }
+  .art-inlay--almond{clip-path:polygon(4% 5%,23% 1%,38% 4%,54% 0,72% 4%,96% 2%,94% 20%,100% 40%,96% 59%,99% 78%,94% 96%,72% 93%,54% 100%,35% 96%,18% 99%,2% 92%,5% 71%,0 52%,4% 31%)!important}
+  .art-inlay--kiss{clip-path:polygon(5% 3%,26% 0,43% 4%,60% 1%,78% 5%,96% 1%,94% 24%,100% 45%,96% 63%,99% 79%,94% 96%,75% 92%,56% 100%,38% 96%,20% 99%,3% 94%,5% 74%,0 55%,4% 34%)!important}
+  #snaps .art-inlay--snap{clip-path:polygon(3% 5%,18% 0,35% 4%,52% 1%,68% 5%,96% 2%,93% 20%,100% 40%,96% 59%,99% 78%,94% 96%,74% 92%,57% 100%,39% 95%,21% 99%,2% 94%,5% 72%,0 54%,4% 33%)!important}
+  .art-inlay img,.cut-in img,.painting-bleed img{
+    opacity:1!important;filter:none!important;mix-blend-mode:normal!important;
+    -webkit-mask-image:none!important;mask-image:none!important;
+  }
+  #story .art-inlay--almond{top:7%!important;right:-9vw!important;width:min(43vw,40rem)!important;aspect-ratio:1.2}
+  #reasons .art-inlay--kiss{top:8%!important;right:-10vw!important;width:min(44vw,42rem)!important;aspect-ratio:1.08}
+  #snaps .art-inlay--snap{top:5%!important;right:-8vw!important;left:auto!important;width:min(42vw,39rem)!important;aspect-ratio:1.35}
+
+  /* Give each story gap its own space so art sits above, not underneath, the photo spreads. */
+  .collage-break{height:clamp(10rem,16vw,14rem)!important;z-index:4!important}
+  .painting-bleed{
+    top:50%!important;width:clamp(11rem,23vw,21rem)!important;z-index:5!important;
+    transform:translateY(-50%) rotate(-2deg);filter:drop-shadow(0 10px 13px rgba(0,0,0,.34))!important;
+    clip-path:polygon(4% 5%,18% 2%,34% 4%,49% 1%,65% 4%,82% 1%,97% 5%,95% 22%,100% 39%,97% 55%,100% 71%,96% 89%,98% 97%,80% 95%,63% 100%,47% 97%,31% 100%,14% 96%,2% 99%,4% 80%,0 64%,3% 48%,0 31%,3% 15%);
+  }
+  .painting-bleed img{object-fit:cover!important}
+  .collage-break--irises .painting-bleed{right:13%;aspect-ratio:1.23;transform:translateY(-50%) rotate(-4deg)}
+  .collage-break--grande-jatte .painting-bleed{left:13%;aspect-ratio:1.42;transform:translateY(-50%) rotate(3deg)}
+  .collage-break--footbridge .painting-bleed{right:12%;left:auto;aspect-ratio:1.22;transform:translateY(-50%) rotate(-3deg)}
+  .collage-break--sisters .painting-bleed{left:12%;right:auto;aspect-ratio:.84;transform:translateY(-50%) rotate(3deg)}
+  .collage-break--childs-bath .painting-bleed{right:14%;aspect-ratio:.86;width:clamp(10rem,16vw,15rem)!important;transform:translateY(-50%) rotate(-3deg)}
+
+  /* Restore the original Monet strip under the closing words. */
+  .foot-band{left:-6vw;right:-6vw;top:clamp(1.5rem,4vw,3.5rem);height:clamp(12rem,32vw,25rem);width:auto;--r:-1deg;z-index:1!important;opacity:.9}
+  .foot-band::after{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;background:linear-gradient(180deg,var(--paper) 0%,transparent 54%);opacity:.52}
+
+  @media(max-width:900px){
+    #story .art-inlay--almond{top:4%!important;right:-24vw!important;width:84vw!important;aspect-ratio:1.15}
+    #reasons .art-inlay--kiss{top:4%!important;right:-22vw!important;width:82vw!important;aspect-ratio:1.05}
+    #snaps .art-inlay--snap{top:4%!important;right:-24vw!important;left:auto!important;width:84vw!important;aspect-ratio:1.25}
+    .collage-break{height:clamp(8.5rem,44vw,10rem)!important}
+    .painting-bleed{width:min(52vw,12rem)!important}
+    .collage-break--irises .painting-bleed{right:4%;left:auto}
+    .collage-break--grande-jatte .painting-bleed{left:4%;right:auto}
+    .collage-break--footbridge .painting-bleed{right:4%;left:auto}
+    .collage-break--sisters .painting-bleed{left:4%;right:auto}
+    .collage-break--childs-bath .painting-bleed{right:6%;left:auto;width:min(36vw,9rem)!important}
+    .painting-bleed figcaption{font-size:.42rem;letter-spacing:.07em}
+    .foot-band{left:-18vw;right:-18vw;top:4%;height:clamp(10rem,62vw,16rem)}
+  }
+  @media(max-width:430px){
+    .mast{grid-template-columns:minmax(0,1fr) auto!important;gap:.45rem!important;padding-inline:.65rem!important}
+    .mast .brand{display:none!important}
+    .mast .sec-now{grid-column:1;grid-row:1;min-width:0;gap:.32rem}
+    .mast .sec-now .n{min-width:3.3rem;text-align:left}
+    .mast .controls{grid-column:2;grid-row:1;min-width:0;gap:.25rem;justify-self:end}
+    .mast .controls .ctl{min-height:30px;padding-inline:.38rem;font-size:.50rem;letter-spacing:.04em}
+  }
+  html{overflow-x:clip!important}
+</style>
 </head>
 <body data-theme="night">
 
@@ -817,7 +880,7 @@
 
   <!-- ===================== 01 / HERO ===================== -->
   <section class="hero" id="top" data-sec="01" data-name="Opening" style="padding-bottom:2.5rem">
-    <figure class="cut px hero-strip" data-cut="lilies" data-shape="c" data-speed="-.05" aria-hidden="true"></figure>
+    <figure class="cut px hero-strip" data-cut="wave" data-shape="c" data-speed="-.05" aria-hidden="true"></figure>
     <figure class="cut px hero-a"     data-cut="starry" data-shape="a" data-speed=".09"></figure>
 
     <div class="wrap hero-in">
@@ -896,6 +959,7 @@
 </main>
 
 <footer>
+  <figure class="cut px foot-band" data-cut="lilies" data-shape="c" aria-hidden="true"></figure>
   <div class="wrap">
     <p class="big reveal"><em class="wavy">Yours,</em> always.</p>
     <div class="row2">
@@ -943,7 +1007,7 @@
   /* ---------- content ---------- */
   const pad = n => String(n).padStart(2, '0');
   const TIMELINE = [
-    { date: "The big idea", title: "Albert Einstein, apparently", text: "Apparently I was the clever one all along.", image: "memoryone.jpeg", cut: "supper" },
+    { date: "The big idea", title: "Albert Einstein, apparently", text: "Apparently I was the clever one all along.", image: "memoryone.jpeg" },
     { date: "The little ones", title: "Two pufferfishes", text: "You are still the sharper one.", image: "two.jpeg" },
     { date: "Real homie", title: "Wassup, beeyach", text: "From the wrong side of town.", image: "three.jpeg" },
     { date: "Our first hello", title: "Still the man, of course", text: "Still got the gangsta in me, you know.", image: "four.jpeg" },
@@ -970,7 +1034,7 @@
   /* ---------- artwork registry ----------
      Bundled public-domain reproductions live beside this page.
      Personal photographs remain local files beside this page.
-     Full artwork source records are listed in README.txt. */
+     Full artwork source records are listed in ARTWORK-SOURCES.md. */
   const ART = {
     starry:    { image: "starry-night-lite.webp",       paint: "night",  credit: "Vincent van Gogh, The Starry Night, 1889" },
     lilies:    { image: "water-lilies-lite.webp",       paint: "haze",   credit: "Claude Monet, Water Lilies, 1906" },
@@ -981,6 +1045,9 @@
     irises:    { image: "irises-lite.webp" },
     footbridge:{ image: "japanese-footbridge-lite.webp" },
     sisters:   { image: "two-sisters-lite.webp" },
+    wave:      { image: "great-wave-lite.webp", paint: "night", credit: "Katsushika Hokusai, Under the Wave off Kanagawa (The Great Wave), ca. 1830–32" },
+    grandeJatte: { image: "la-grande-jatte-lite.webp", paint: "field", credit: "Georges Seurat, A Sunday on La Grande Jatte, 1884–86" },
+    childsBath: { image: "childs-bath-lite.webp", paint: "haze", credit: "Mary Cassatt, The Child’s Bath, 1893" },
   };
 
   document.getElementById('heroCounts').textContent =
@@ -1014,8 +1081,10 @@
 
   const ARTWORK_CUTOUTS = [
     { after: 0, name: 'irises', image: ART.irises.image, caption: 'Irises · van Gogh · 1889' },
+    { after: 1, name: 'grande-jatte', image: ART.grandeJatte.image, caption: 'A Sunday on La Grande Jatte · Seurat · 1884–86' },
     { after: 2, name: 'footbridge', image: ART.footbridge.image, caption: 'The Japanese Footbridge · Monet · 1899' },
     { after: 3, name: 'sisters', image: ART.sisters.image, caption: 'Two Sisters · Renoir · 1881' },
+    { after: 4, name: 'childs-bath', image: ART.childsBath.image, caption: 'The Child’s Bath · Mary Cassatt · 1893' },
   ];
   const spreadPages = [...tEl.querySelectorAll('.spread')];
   ARTWORK_CUTOUTS.forEach(piece => {
