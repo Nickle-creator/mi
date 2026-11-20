@@ -1,0 +1,34 @@
+.ascii-jellyfish {
+  position: fixed;
+  inset: 0 auto auto 0;
+  z-index: 101;
+  width: min(38vw, 390px);
+  pointer-events: none;
+  user-select: none;
+  touch-action: none;
+  opacity: .99;
+  transform: translate3d(55vw, 8vh, 0) scale(1);
+  transform-origin: center center;
+  will-change: transform;
+}
+
+.ascii-jellyfish canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: none;
+  background: transparent;
+}
+
+@media (max-width: 600px) {
+  .ascii-jellyfish {
+    width: min(78vw, 300px);
+    opacity: .99;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ascii-jellyfish {
+    will-change: auto;
+  }
+}
