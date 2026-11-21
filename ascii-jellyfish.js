@@ -57,6 +57,7 @@
     const delta = ((b - a + 540) % 360) - 180;
     return (a + delta * amount + 360) % 360;
   };
+  const mixv = (night, paper) => night + (paper - night) * paletteMix;
   function themedHue(value) {
     const hue = ((value % 360) + 360) % 360;
     let paperHue = hue;
@@ -361,17 +362,17 @@
       ctx.globalAlpha = clamp(1 - f * f, 0, 1) * (1 - 0.35 * sleepy);
       if (p.kind === 'bubble') {
         const gl = f > 0.9 ? '*' : f > 0.55 ? 'O' : f > 0.25 ? 'o' : '.';
-        ctx.fillStyle = `hsl(${themedHue(195 + p.seed * 30)} 90% 78%)`;
+        ctx.fillStyle = `hsl(${themedHue(195 + p.seed * 30)} 90% ${mixv(66, 40).toFixed(0)}%)`;
         ctx.fillText(gl, (col + 0.5) * CELL_W, (row + 0.5) * CELL_H);
       } else if (p.kind === 'heart') {
-        ctx.fillStyle = `hsl(${themedHue(335)} 95% 72%)`;
+        ctx.fillStyle = `hsl(${themedHue(335)} 90% ${mixv(62, 42).toFixed(0)}%)`;
         ctx.fillText('<', (col + 0.5) * CELL_W, (row + 0.5) * CELL_H);
         ctx.fillText('3', (col + 1.5) * CELL_W, (row + 0.5) * CELL_H);
       } else if (p.kind === 'zzz') {
-        ctx.fillStyle = `hsl(${themedHue(215)} 80% 80%)`;
+        ctx.fillStyle = `hsl(${themedHue(215)} 75% ${mixv(68, 38).toFixed(0)}%)`;
         ctx.fillText(f > 0.5 ? 'Z' : 'z', (col + 0.5) * CELL_W, (row + 0.5) * CELL_H);
       } else {
-        ctx.fillStyle = `hsl(${themedHue(180 + p.seed * 140)} 100% 80%)`;
+        ctx.fillStyle = `hsl(${themedHue(180 + p.seed * 140)} 95% ${mixv(68, 40).toFixed(0)}%)`;
         ctx.fillText('.+*+.'[Math.min(4, Math.floor(f * 5))], (col + 0.5) * CELL_W, (row + 0.5) * CELL_H);
       }
     }
@@ -522,9 +523,10 @@
         if (rainbow > 0) hue = hue * (1 - rainbow) + ((col * 5 + row * 6 + t * 100) % 360) * rainbow;
         hue = themedHue(hue);
         hueSum += hue; n++;
-        const light = clamp(lights[i] + 7, 34, 92) * (1 - 0.12 * sleepy);
-        ctx.fillStyle = `hsl(${hue.toFixed(0)} 100% ${light.toFixed(0)}%)`;
-        ctx.globalAlpha = clamp(0.5 + intensities[i] * 0.5, 0.5, 1) * (1 - 0.35 * sleepy);
+        // darker palette: deep sea-glass on night, ink-on-paper on the paper theme
+        const light = clamp(mixv(lights[i] * 0.86 + 3, lights[i] * 0.5 - 4), mixv(26, 14), mixv(74, 44)) * (1 - 0.12 * sleepy);
+        ctx.fillStyle = `hsl(${hue.toFixed(0)} ${mixv(92, 72).toFixed(0)}% ${light.toFixed(0)}%)`;
+        ctx.globalAlpha = clamp(mixv(0.5 + intensities[i] * 0.5, 0.68 + intensities[i] * 0.32), 0.5, 1) * (1 - 0.35 * sleepy);
         ctx.fillText(glyph, (col + 0.5) * CELL_W, (row + 0.5) * CELL_H);
       }
     }
@@ -534,9 +536,11 @@
     // cheap soft halo (CSS filter instead of per-glyph shadowBlur)
     if (++frameCount % 6 === 0) {
       const h = Math.round((n ? hueSum / n : 195) / 10) * 10;
-      if (h !== lastHalo) {
-        lastHalo = h;
-        canvas.style.filter = `drop-shadow(0 0 7px hsla(${h}, 100%, 62%, .5))`;
+      const haloKey = h + ':' + Math.round(paletteMix * 8);
+      if (haloKey !== lastHalo) {
+        lastHalo = haloKey;
+        const a = 0.3 * (1 - paletteMix);   // softer, deeper glow at night; none on paper
+        canvas.style.filter = a < 0.03 ? 'none' : `drop-shadow(0 0 6px hsla(${h}, 100%, 46%, ${a.toFixed(2)}))`;
       }
     }
   }

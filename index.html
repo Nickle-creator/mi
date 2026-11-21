@@ -784,8 +784,14 @@
   }
   html{overflow-x:clip!important}
 </style>
-<link rel="stylesheet" href="ascii-jellyfish.css?v=ascii-corners-blue-5">
-<script src="ascii-jellyfish.js?v=ascii-corners-blue-5" defer></script>
+<style id="night-grain-boost">
+  /* richer film grain in the dark theme */
+  body[data-theme="night"] .grain{opacity:.46;filter:contrast(1.25)}
+  @media (max-width:700px){ body[data-theme="night"] .grain{opacity:.28} }
+</style>
+<link rel="stylesheet" href="ascii-jellyfish.css?v=ascii-corners-blue-6">
+<script src="ascii-jellyfish.js?v=ascii-corners-blue-6" defer></script>
+<script src="fish-school.js?v=colorful-1" defer></script>
 </head>
 <body data-theme="night">
 
