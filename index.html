@@ -789,9 +789,9 @@
   body[data-theme="night"] .grain{opacity:.46;filter:contrast(1.25)}
   @media (max-width:700px){ body[data-theme="night"] .grain{opacity:.28} }
 </style>
-<link rel="stylesheet" href="ascii-jellyfish.css?v=ascii-corners-blue-6">
-<script src="ascii-jellyfish.js?v=ascii-corners-blue-6" defer></script>
-<script src="fish-school.js?v=colorful-1" defer></script>
+<link rel="stylesheet" href="ascii-jellyfish.css?v=ascii-corners-blue-7">
+<script src="ascii-jellyfish.js?v=ascii-corners-blue-7" defer></script>
+<script src="fish-school.js?v=colorful-2" defer></script>
 </head>
 <body data-theme="night">
 
@@ -880,7 +880,6 @@
   </div>
   <div class="controls" aria-label="Page controls">
     <button id="musicToggle" class="ctl" type="button" aria-pressed="false" title="Play the original music"><span>Play Music</span></button>
-    <button id="themeToggle" class="ctl" type="button" aria-label="Switch to paper theme" aria-pressed="true"><span>Paper theme</span></button>
   </div>
   <div class="progress" aria-hidden="true"><span id="readingProgress"></span></div>
 </header>
@@ -984,7 +983,6 @@
   /* ---------- audio + theme (unchanged behaviour) ---------- */
   const bgMusic = document.getElementById('bgMusic');
   const musicToggle = document.getElementById('musicToggle');
-  const themeToggle = document.getElementById('themeToggle');
   const setAudioButton = (button, isPlaying, label) => {
     button.setAttribute('aria-pressed', String(isPlaying));
     button.querySelector('span').textContent = isPlaying ? 'Pause ' + label : label;
@@ -1003,17 +1001,9 @@
   };
   bindAudioToggle(bgMusic, musicToggle, 'Play Music');
 
-  const applyTheme = (theme) => {
-    const night = theme === 'night';
-    document.body.dataset.theme = night ? 'night' : 'twilight';
-    themeToggle.setAttribute('aria-pressed', String(night));
-    themeToggle.setAttribute('aria-label', night ? 'Switch to paper theme' : 'Switch to night theme');
-    themeToggle.querySelector('span').textContent = night ? 'Paper theme' : 'Night theme';
-    try { localStorage.setItem('mimi-reading-theme-v2', night ? 'night' : 'twilight'); } catch (_) {}
-  };
-  try { applyTheme(localStorage.getItem('mimi-reading-theme-v2') === 'twilight' ? 'twilight' : 'night'); }
-  catch (_) { applyTheme('night'); }
-  themeToggle.addEventListener('click', () => applyTheme(document.body.dataset.theme === 'night' ? 'twilight' : 'night'));
+  /* the site is night-only now: lock the theme and clear any saved paper preference */
+  document.body.dataset.theme = 'night';
+  try { localStorage.removeItem('mimi-reading-theme-v2'); } catch (_) {}
 
   /* ---------- content ---------- */
   const pad = n => String(n).padStart(2, '0');
