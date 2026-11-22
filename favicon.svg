@@ -1,8 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <rect width="64" height="64" rx="14" fill="#111820"/>
-  <path d="M13 31a19 19 0 0 1 38 0v3H13z" fill="#66c8e8" stroke="#c3f2fb" stroke-width="1.5"/>
-  <path d="M13 34c3 4 6 4 9 0s6-4 9 0 6 4 9 0 6-4 9 0 6 4 9 0" fill="none" stroke="#d7f7fc" stroke-width="2" stroke-linecap="round"/>
-  <path d="M21 39c-2 4 2 6 0 11m7-10c1 5-1 7 1 12m7-12c-2 5 2 7 0 12m8-13c2 4-2 7 0 11" fill="none" stroke="#81d9ef" stroke-width="2.2" stroke-linecap="round"/>
-  <circle cx="23" cy="26" r="1.5" fill="#effcff" opacity=".9"/>
-  <circle cx="41" cy="23" r="1" fill="#effcff" opacity=".8"/>
+  <circle cx="32" cy="32" r="24" fill="#171b22" stroke="#d5c5a2" stroke-width="1.4"/>
+  <circle cx="32" cy="32" r="20" fill="none" stroke="#8995a7" stroke-opacity=".28" stroke-width=".7"/>
+  <circle cx="32" cy="32" r="16.5" fill="none" stroke="#c5cedb" stroke-opacity=".24" stroke-width=".7"/>
+  <circle cx="32" cy="32" r="13" fill="none" stroke="#8995a7" stroke-opacity=".3" stroke-width=".8"/>
+  <circle cx="32" cy="32" r="9.5" fill="#d29a82" stroke="#f0cbb7" stroke-width="1"/>
+  <text x="32" y="37.3" text-anchor="middle" font-family="Georgia,serif" font-size="14" font-style="italic" font-weight="700" fill="#20212a">M</text>
+  <circle cx="32" cy="32" r="1.4" fill="#f1e6d8"/>
 </svg>

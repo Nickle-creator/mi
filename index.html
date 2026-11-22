@@ -6,7 +6,7 @@
 <title>For You, Mimi — The Scrapbook</title>
 <meta name="description" content="A handmade scrapbook for Mimi—love notes, snapshots, and paintings collected into one little place." />
 <meta name="theme-color" content="#14130F" />
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=mimi-blue-1" />
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=mimi-record-2" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="For You, Mimi" />
 <meta property="og:title" content="For You, Mimi — The Scrapbook" />
@@ -813,16 +813,16 @@
 <link rel="stylesheet" href="ascii-jellyfish.css?v=ascii-corners-blue-10">
 <script src="ascii-jellyfish.js?v=ascii-corners-blue-10" defer></script>
 <script src="fish-school.js?v=colorful-2" defer></script>
-<link rel="stylesheet" href="site-polish.css?v=ambient-collage-4">
-<script src="site-polish.js?v=ambient-collage-4" defer></script>
+<link rel="stylesheet" href="site-polish.css?v=collage-vinyl-5">
+<script src="site-polish.js?v=collage-vinyl-5" defer></script>
 <style id="additional-collage-art">
-  #story .art-inlay--supper{top:54%;left:-9vw;right:auto;width:min(31vw,28rem);aspect-ratio:1.41;transform:rotate(2deg)}
-  #reasons .art-inlay--cliff-walk{top:53%;left:-10vw;right:auto;width:min(34vw,31rem);aspect-ratio:1.23;transform:rotate(-3deg)}
-  #snaps .art-inlay--pissarro{top:55%;left:-10vw;right:auto;width:min(34vw,32rem);aspect-ratio:1.48;transform:rotate(2deg)}
-  @media(max-width:900px){
-    #story .art-inlay--supper{top:58%!important;left:-19vw!important;right:auto!important;width:60vw!important;aspect-ratio:1.4}
-    #reasons .art-inlay--cliff-walk{top:55%!important;left:-21vw!important;right:auto!important;width:62vw!important;aspect-ratio:1.23}
-    #snaps .art-inlay--pissarro{top:54%!important;left:-18vw!important;right:auto!important;width:60vw!important;aspect-ratio:1.48}
+  #story .art-inlay--supper{top:43%;left:-9vw;right:auto;width:min(31vw,28rem);aspect-ratio:1.41;transform:rotate(2deg);clip-path:polygon(4% 6%,18% 2%,33% 5%,48% 1%,65% 3%,80% 0,96% 5%,94% 21%,100% 37%,96% 53%,99% 71%,95% 94%,79% 92%,62% 100%,43% 96%,25% 99%,4% 93%,6% 76%,0 58%,4% 40%,1% 23%)}
+  #reasons .art-inlay--cliff-walk{top:67%;left:auto;right:-9vw;width:min(34vw,31rem);aspect-ratio:1.23;transform:rotate(-3deg);clip-path:polygon(6% 3%,20% 0,38% 4%,55% 1%,70% 5%,95% 2%,92% 18%,100% 39%,96% 58%,98% 75%,92% 96%,74% 93%,59% 100%,40% 96%,21% 99%,2% 93%,5% 74%,0 56%,4% 35%,1% 18%)}
+  #snaps .art-inlay--pissarro{top:38%;left:-10vw;right:auto;width:min(34vw,32rem);aspect-ratio:1.48;transform:rotate(2deg);clip-path:polygon(3% 4%,21% 1%,37% 5%,52% 0,69% 4%,96% 2%,94% 23%,100% 43%,96% 62%,99% 79%,93% 97%,73% 93%,56% 100%,39% 96%,18% 99%,2% 92%,5% 72%,0 53%,4% 33%)}
+@media(max-width:900px){
+    #story .art-inlay--supper{top:46%!important;left:-19vw!important;right:auto!important;width:60vw!important;aspect-ratio:1.4}
+    #reasons .art-inlay--cliff-walk{top:70%!important;left:auto!important;right:-20vw!important;width:62vw!important;aspect-ratio:1.23}
+    #snaps .art-inlay--pissarro{top:37%!important;left:-18vw!important;right:auto!important;width:60vw!important;aspect-ratio:1.48}
   }
 </style>
 </head>
@@ -913,10 +913,15 @@
   </div>
   <div class="controls" aria-label="Page controls">
     <button id="musicToggle" class="ctl music-ctl" type="button" aria-pressed="false" aria-label="Play Dexys Midnight Runners" title="Play Dexys Midnight Runners">
-      <span class="turntable" aria-hidden="true"><pre class="ascii-record"></pre></span>
-      <span class="music-meta" aria-hidden="true"><strong>Dexys Midnight Runners</strong><small>From the mixtape</small></span>
-      <span class="ascii-meter" aria-hidden="true">[......]</span>
-      <span class="music-action" aria-hidden="true">Play</span>
+      <span class="turntable" aria-hidden="true">
+        <span class="vinyl-disc"><span class="vinyl-label"><span class="vinyl-spindle"></span></span></span>
+        <span class="record-tonearm"></span>
+      </span>
+      <span class="music-meta" aria-hidden="true">
+        <strong>Dexys Midnight Runners</strong>
+        <small><span class="music-eq"><i></i><i></i><i></i><i></i></span> Mixtape · Side A</small>
+      </span>
+      <span class="music-status" aria-hidden="true"><i class="music-status__dot"></i><span class="music-action">Play</span></span>
     </button>
   </div>
   <div class="progress" aria-hidden="true"><span id="readingProgress"></span></div>
