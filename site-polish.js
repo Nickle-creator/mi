@@ -26,16 +26,34 @@
     const maxSparks = 42;
     let lastPointer = { x: -100, y: -100, at: 0 };
 
+    // pre-rendered soft glow dots (cheap to draw, clearly visible)
+    const glowSprites = {};
+    const glowSprite = (hue) => {
+      if (glowSprites[hue]) return glowSprites[hue];
+      const c = document.createElement('canvas');
+      c.width = c.height = 48;
+      const g = c.getContext('2d');
+      const grad = g.createRadialGradient(24, 24, 0, 24, 24, 24);
+      grad.addColorStop(0, `hsla(${hue},100%,90%,1)`);
+      grad.addColorStop(.22, `hsla(${hue},100%,72%,.62)`);
+      grad.addColorStop(1, `hsla(${hue},100%,60%,0)`);
+      g.fillStyle = grad;
+      g.fillRect(0, 0, 48, 48);
+      return (glowSprites[hue] = c);
+    };
+    const planktonHues = [188, 188, 176, 200, 168, 292];
+
     const makeFloater = (kind, startAtBottom = false) => ({
       kind,
+      hue: planktonHues[Math.floor(Math.random() * planktonHues.length)],
       x: random(0, Math.max(1, width)),
-      y: startAtBottom ? height + random(4, 32) : random(0, Math.max(1, height)),
-      radius: kind === 'bubble' ? random(1.3, 3.0) : random(.65, 1.55),
-      alpha: kind === 'bubble' ? random(.055, .13) : random(.07, .19),
-      rise: kind === 'bubble' ? random(7, 15) : random(1.5, 4.5),
-      drift: random(2, 7),
+      y: startAtBottom ? height + random(8, 40) : random(0, Math.max(1, height)),
+      radius: kind === 'bubble' ? random(3, 9) : random(1.3, 2.9),
+      alpha: kind === 'bubble' ? random(.42, .78) : random(.5, 1),
+      rise: kind === 'bubble' ? random(16, 34) : random(4, 10),
+      drift: random(4, 12),
       phase: random(0, Math.PI * 2),
-      twinkle: random(.35, .95)
+      twinkle: random(.5, 1.3)
     });
 
     function resizeCanvas() {
@@ -47,8 +65,8 @@
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const targetDots = coarsePointer.matches ? 11 : 19;
-      const targetBubbles = coarsePointer.matches ? 3 : 6;
+      const targetDots = coarsePointer.matches ? 24 : 40;
+      const targetBubbles = coarsePointer.matches ? 7 : 13;
       floaters.length = 0;
       for (let i = 0; i < targetDots; i++) floaters.push(makeFloater('plankton'));
       for (let i = 0; i < targetBubbles; i++) floaters.push(makeFloater('bubble'));
@@ -88,24 +106,28 @@
       for (const particle of floaters) {
         particle.y -= particle.rise * dt;
         particle.x += Math.sin(elapsed * particle.twinkle + particle.phase) * particle.drift * dt;
-        if (particle.y < -8) Object.assign(particle, makeFloater(particle.kind, true));
+        if (particle.y < -16) Object.assign(particle, makeFloater(particle.kind, true));
         if (particle.x < -6) particle.x = width + 5;
         if (particle.x > width + 6) particle.x = -5;
         const shimmer = .78 + .22 * Math.sin(elapsed * particle.twinkle + particle.phase);
         context.globalAlpha = particle.alpha * shimmer;
-        context.lineWidth = .8;
         if (particle.kind === 'bubble') {
-          context.strokeStyle = 'rgba(127,215,236,.78)';
+          const r = particle.radius;
+          context.fillStyle = 'rgba(120,205,232,.16)';
           context.beginPath();
-          context.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
-          context.stroke();
-          context.fillStyle = 'rgba(218,250,255,.55)';
-          context.fillRect(particle.x - particle.radius * .35, particle.y - particle.radius * .55, .8, .8);
-        } else {
-          context.fillStyle = 'rgba(131,221,241,.86)';
-          context.beginPath();
-          context.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+          context.arc(particle.x, particle.y, r, 0, Math.PI * 2);
           context.fill();
+          context.lineWidth = 1.2;
+          context.strokeStyle = 'rgba(160,230,246,.95)';
+          context.stroke();
+          context.lineWidth = 1.1;
+          context.strokeStyle = 'rgba(240,253,255,.95)';
+          context.beginPath();
+          context.arc(particle.x, particle.y, r * .66, Math.PI * 1.08, Math.PI * 1.46);
+          context.stroke();
+        } else {
+          const size = particle.radius * 8;
+          context.drawImage(glowSprite(particle.hue), particle.x - size / 2, particle.y - size / 2, size, size);
         }
       }
 
