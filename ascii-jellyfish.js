@@ -524,9 +524,9 @@
         hue = themedHue(hue);
         hueSum += hue; n++;
         // darker palette: deep sea-glass on night, ink-on-paper on the paper theme
-        const light = clamp(mixv(lights[i] * 0.86 + 3, lights[i] * 0.5 - 4), mixv(26, 14), mixv(74, 44)) * (1 - 0.12 * sleepy);
-        ctx.fillStyle = `hsl(${hue.toFixed(0)} ${mixv(92, 72).toFixed(0)}% ${light.toFixed(0)}%)`;
-        ctx.globalAlpha = clamp(mixv(0.5 + intensities[i] * 0.5, 0.68 + intensities[i] * 0.32), 0.5, 1) * (1 - 0.35 * sleepy);
+        const light = clamp(mixv(lights[i] + 16, lights[i] * 0.5 - 4), mixv(50, 14), mixv(96, 44)) * (1 - 0.12 * sleepy);
+        ctx.fillStyle = `hsl(${hue.toFixed(0)} ${mixv(100, 72).toFixed(0)}% ${light.toFixed(0)}%)`;
+        ctx.globalAlpha = clamp(mixv(0.74 + intensities[i] * 0.26, 0.68 + intensities[i] * 0.32), 0.5, 1) * (1 - 0.35 * sleepy);
         ctx.fillText(glyph, (col + 0.5) * CELL_W, (row + 0.5) * CELL_H);
       }
     }
@@ -536,11 +536,15 @@
     // cheap soft halo (CSS filter instead of per-glyph shadowBlur)
     if (++frameCount % 6 === 0) {
       const h = Math.round((n ? hueSum / n : 195) / 10) * 10;
-      const haloKey = h + ':' + Math.round(paletteMix * 8);
+      const haloKey = h + ':' + Math.round(pulse * 6);
       if (haloKey !== lastHalo) {
         lastHalo = haloKey;
-        const a = 0.32;   // soft light glow, no dark halo
-        canvas.style.filter = a < 0.03 ? 'none' : `drop-shadow(0 0 6px hsla(${h}, 100%, 64%, ${a.toFixed(2)}))`;
+        // bioluminescent glow: tight bright core + wide coloured bloom, swelling with each swim stroke
+        const k = 0.72 + 0.28 * pulse;
+        canvas.style.filter =
+          `drop-shadow(0 0 2px hsla(${h}, 100%, 82%, ${(0.95 * k).toFixed(2)})) ` +
+          `drop-shadow(0 0 9px hsla(${h}, 100%, 66%, ${(0.8 * k).toFixed(2)})) ` +
+          `drop-shadow(0 0 22px hsla(${h}, 100%, 58%, ${(0.6 * k).toFixed(2)}))`;
       }
     }
   }
