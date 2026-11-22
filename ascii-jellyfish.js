@@ -591,6 +591,29 @@
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('pointermove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; wake(); }, { passive: true });
   window.addEventListener('keydown', wake, { passive: true });
+  // fish rush past -> the jellyfish flinches: light ripple, bubbles, then a quick jet away from the school
+  let lastFlinch = 0;
+  window.addEventListener('ascii-fish-rush', (e) => {
+    if (reducedMotion) return;
+    const now = performance.now();
+    if (now - lastFlinch < 3200) return;          // don't get jittery
+    lastFlinch = now;
+    const rect = root.getBoundingClientRect();
+    const cx = rect.left + rect.width * 0.5, cy = rect.top + rect.height * 0.31;
+    const fx = e.detail && Number.isFinite(e.detail.x) ? e.detail.x : cx - 1;
+    const fy = e.detail && Number.isFinite(e.detail.y) ? e.detail.y : cy;
+    let dx = cx - fx, dy = cy - fy;
+    const len = Math.hypot(dx, dy) || 1;
+    dx /= len; dy /= len;
+    excite = 1;
+    glow = 1;
+    ripples.push({ age: 0 }, { age: -0.35 });
+    dartVX = dx * 430;
+    dartVY = dy * 430 - 70;                        // always a little upward, like a startled swim stroke
+    for (let i = 0; i < 6; i++) addParticle('bubble', i * 0.06);
+    nextTrick = Math.max(nextTrick, 4);            // let the flinch play out before the next trick
+  });
+
   window.addEventListener('pointerdown', (e) => {
     wake();
     if (reducedMotion) return;
