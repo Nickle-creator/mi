@@ -738,27 +738,30 @@
   .art-inlay{
     z-index:1!important;overflow:hidden!important;
     clip-path:polygon(5% 4%,18% 1%,33% 5%,48% 1%,62% 4%,79% 0,96% 5%,94% 22%,100% 39%,96% 55%,99% 72%,94% 96%,76% 93%,59% 100%,42% 96%,24% 99%,3% 94%,6% 76%,0 59%,4% 42%,1% 24%);
-    filter:drop-shadow(10px 14px 14px rgba(0,0,0,.22))!important;
+    filter:drop-shadow(0 4px 9px rgba(0,0,0,.16))!important;
   }
   .art-inlay--almond{clip-path:polygon(4% 5%,23% 1%,38% 4%,54% 0,72% 4%,96% 2%,94% 20%,100% 40%,96% 59%,99% 78%,94% 96%,72% 93%,54% 100%,35% 96%,18% 99%,2% 92%,5% 71%,0 52%,4% 31%)!important}
   .art-inlay--kiss{clip-path:polygon(5% 3%,26% 0,43% 4%,60% 1%,78% 5%,96% 1%,94% 24%,100% 45%,96% 63%,99% 79%,94% 96%,75% 92%,56% 100%,38% 96%,20% 99%,3% 94%,5% 74%,0 55%,4% 34%)!important}
   #snaps .art-inlay--snap{clip-path:polygon(3% 5%,18% 0,35% 4%,52% 1%,68% 5%,96% 2%,93% 20%,100% 40%,96% 59%,99% 78%,94% 96%,74% 92%,57% 100%,39% 95%,21% 99%,2% 94%,5% 72%,0 54%,4% 33%)!important}
-  .art-inlay img,.cut-in img,.painting-bleed img{
+  .art-inlay img,.painting-bleed img{
     opacity:1!important;filter:none!important;mix-blend-mode:normal!important;
-    -webkit-mask-image:none!important;mask-image:none!important;
+    -webkit-mask-image:radial-gradient(ellipse at 50% 48%,#000 43%,rgba(0,0,0,.96) 58%,rgba(0,0,0,.7) 76%,transparent 100%)!important;
+    mask-image:radial-gradient(ellipse at 50% 48%,#000 43%,rgba(0,0,0,.96) 58%,rgba(0,0,0,.7) 76%,transparent 100%)!important;
   }
+  .cut-in img{opacity:1!important;filter:none!important;mix-blend-mode:normal!important;-webkit-mask-image:none!important;mask-image:none!important}
   #story .art-inlay--almond{top:7%!important;right:-9vw!important;width:min(43vw,40rem)!important;aspect-ratio:1.2}
   #reasons .art-inlay--kiss{top:8%!important;right:-10vw!important;width:min(44vw,42rem)!important;aspect-ratio:1.08}
   #snaps .art-inlay--snap{top:5%!important;right:-8vw!important;left:auto!important;width:min(42vw,39rem)!important;aspect-ratio:1.35}
 
   /* Give each story gap its own space so art sits above, not underneath, the photo spreads. */
-  .collage-break{height:clamp(10rem,16vw,14rem)!important;z-index:4!important}
+  .collage-break{height:clamp(12rem,20vw,18rem)!important;z-index:4!important}
   .painting-bleed{
-    top:50%!important;width:clamp(11rem,23vw,21rem)!important;z-index:5!important;
-    transform:translateY(-50%) rotate(-2deg);filter:drop-shadow(0 10px 13px rgba(0,0,0,.34))!important;
+    top:50%!important;width:clamp(10rem,19vw,18rem)!important;z-index:5!important;
+    transform:translateY(-50%) rotate(-2deg);filter:drop-shadow(0 5px 9px rgba(0,0,0,.2))!important;
     clip-path:polygon(4% 5%,18% 2%,34% 4%,49% 1%,65% 4%,82% 1%,97% 5%,95% 22%,100% 39%,97% 55%,100% 71%,96% 89%,98% 97%,80% 95%,63% 100%,47% 97%,31% 100%,14% 96%,2% 99%,4% 80%,0 64%,3% 48%,0 31%,3% 15%);
   }
   .painting-bleed img{object-fit:cover!important}
+  .collage-break--sisters .painting-bleed{width:clamp(9rem,15vw,14.5rem)!important}
   .collage-break--irises .painting-bleed{right:13%;aspect-ratio:1.23;transform:translateY(-50%) rotate(-4deg)}
   .collage-break--grande-jatte .painting-bleed{left:13%;aspect-ratio:1.42;transform:translateY(-50%) rotate(3deg)}
   .collage-break--footbridge .painting-bleed{right:12%;left:auto;aspect-ratio:1.22;transform:translateY(-50%) rotate(-3deg)}
@@ -773,13 +776,14 @@
     #story .art-inlay--almond{top:4%!important;right:-24vw!important;width:84vw!important;aspect-ratio:1.15}
     #reasons .art-inlay--kiss{top:4%!important;right:-22vw!important;width:82vw!important;aspect-ratio:1.05}
     #snaps .art-inlay--snap{top:4%!important;right:-24vw!important;left:auto!important;width:84vw!important;aspect-ratio:1.25}
-    .collage-break{height:clamp(8.5rem,44vw,10rem)!important}
-    .painting-bleed{width:min(52vw,12rem)!important}
+    .collage-break{height:clamp(11rem,45vw,13rem)!important}
+    .painting-bleed{width:min(48vw,11rem)!important}
     .collage-break--irises .painting-bleed{right:4%;left:auto}
     .collage-break--grande-jatte .painting-bleed{left:4%;right:auto}
     .collage-break--footbridge .painting-bleed{right:4%;left:auto}
     .collage-break--sisters .painting-bleed{left:4%;right:auto}
     .collage-break--childs-bath .painting-bleed{right:6%;left:auto;width:min(36vw,9rem)!important}
+    .collage-break--sisters .painting-bleed{width:min(36vw,9rem)!important}
     .painting-bleed figcaption{font-size:.42rem;letter-spacing:.07em}
     .foot-band{left:-18vw;right:-18vw;top:4%;height:clamp(10rem,62vw,16rem)}
   }
