@@ -4,6 +4,25 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>For You, Mimi — The Scrapbook</title>
+<meta name="description" content="A handmade scrapbook for Mimi—love notes, snapshots, and paintings collected into one little place." />
+<meta name="theme-color" content="#14130F" />
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=mimi-blue-1" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="For You, Mimi" />
+<meta property="og:title" content="For You, Mimi — The Scrapbook" />
+<meta property="og:description" content="A handmade scrapbook for Mimi—love notes, snapshots, and paintings collected into one little place." />
+<meta property="og:url" content="https://nickle-creator.github.io/mi/" />
+<meta property="og:image" content="https://nickle-creator.github.io/mi/og-preview.jpg" />
+<meta property="og:image:type" content="image/jpeg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="807" />
+<meta property="og:image:alt" content="For You, Mimi scrapbook preview" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="For You, Mimi — The Scrapbook" />
+<meta name="twitter:description" content="A handmade scrapbook for Mimi—love notes, snapshots, and paintings collected into one little place." />
+<meta name="twitter:image" content="https://nickle-creator.github.io/mi/og-preview.jpg" />
+<meta name="twitter:image:alt" content="For You, Mimi scrapbook preview" />
+<link rel="canonical" href="https://nickle-creator.github.io/mi/" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="image" href="starry-night-lite.webp" fetchpriority="high">
@@ -792,6 +811,8 @@
 <link rel="stylesheet" href="ascii-jellyfish.css?v=ascii-corners-blue-9">
 <script src="ascii-jellyfish.js?v=ascii-corners-blue-9" defer></script>
 <script src="fish-school.js?v=colorful-2" defer></script>
+<link rel="stylesheet" href="site-polish.css?v=ambient-vinyl-1">
+<script src="site-polish.js?v=ambient-vinyl-1" defer></script>
 </head>
 <body data-theme="night">
 
@@ -879,7 +900,11 @@
     <span class="label" id="secName">Opening</span>
   </div>
   <div class="controls" aria-label="Page controls">
-    <button id="musicToggle" class="ctl" type="button" aria-pressed="false" title="Play the original music"><span>Play Music</span></button>
+    <button id="musicToggle" class="ctl music-ctl" type="button" aria-pressed="false" aria-label="Play Dexys Midnight Runners" title="Play Dexys Midnight Runners">
+      <span class="vinyl-record" aria-hidden="true"></span>
+      <span class="music-meta" aria-hidden="true"><strong>Dexys Midnight Runners</strong><small>From the mixtape</small></span>
+      <span class="music-action" aria-hidden="true">Play</span>
+    </button>
   </div>
   <div class="progress" aria-hidden="true"><span id="readingProgress"></span></div>
 </header>
@@ -980,28 +1005,32 @@
 </footer>
 
 <script>
-  /* ---------- audio + theme (unchanged behaviour) ---------- */
+  /* ---------- audio; the live site is fixed to night mode ---------- */
   const bgMusic = document.getElementById('bgMusic');
   const musicToggle = document.getElementById('musicToggle');
   const setAudioButton = (button, isPlaying, label) => {
+    button.classList.toggle('is-playing', isPlaying);
     button.setAttribute('aria-pressed', String(isPlaying));
-    button.querySelector('span').textContent = isPlaying ? 'Pause ' + label : label;
+    button.setAttribute('aria-label', `${isPlaying ? 'Pause' : 'Play'} ${label}`);
+    button.title = `${isPlaying ? 'Pause' : 'Play'} ${label}`;
+    button.querySelector('.music-action').textContent = isPlaying ? 'Pause' : 'Play';
   };
   const bindAudioToggle = (audio, button, label) => {
     button.addEventListener('click', async () => {
       if (!audio.paused) { audio.pause(); setAudioButton(button, false, label); return; }
       try { await audio.play(); setAudioButton(button, true, label); }
       catch (error) {
-        button.querySelector('span').textContent = 'Audio unavailable';
+        button.classList.remove('is-playing');
+        button.querySelector('.music-action').textContent = 'Unavailable';
+        button.setAttribute('aria-label', 'Music playback unavailable');
         button.setAttribute('aria-pressed', 'false');
         window.setTimeout(() => setAudioButton(button, false, label), 2200);
       }
     });
     audio.addEventListener('pause', () => setAudioButton(button, false, label));
+    audio.addEventListener('play', () => setAudioButton(button, true, label));
   };
-  bindAudioToggle(bgMusic, musicToggle, 'Play Music');
-
-  /* the site is night-only now: lock the theme and clear any saved paper preference */
+  bindAudioToggle(bgMusic, musicToggle, 'Dexys Midnight Runners');
   document.body.dataset.theme = 'night';
   try { localStorage.removeItem('mimi-reading-theme-v2'); } catch (_) {}
 

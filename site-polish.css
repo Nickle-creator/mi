@@ -1,0 +1,73 @@
+/* Small, low-contrast enhancements for the temporary scrapbook preview. */
+#siteAtmosphere{
+  position:fixed;inset:0;width:100vw;height:100vh;z-index:1;
+  pointer-events:none;user-select:none;contain:strict;opacity:.9;
+}
+
+/* Keep scroll depth visible without turning the masthead into a neon bar. */
+.mast .progress{height:2px;bottom:-1px;overflow:visible}
+.mast .progress span{
+  height:2px;
+  background:linear-gradient(90deg,#63c8e6 0%,var(--accent) 68%,#c7edf2 100%);
+  box-shadow:0 0 5px rgba(103,211,239,.48),0 0 11px rgba(103,211,239,.22);
+  will-change:transform;
+}
+
+/* Parallax is driven only on desktop pointers; mobile scroll stays still and calm. */
+.cut[data-speed],.art-inlay,.painting-bleed{translate:0 var(--parallax-y,0px)}
+
+/* Compact record player reuses the existing audio button and audio element. */
+.mast .controls .music-ctl{
+  min-width:13.4rem;justify-content:flex-start;gap:.55rem;padding-inline:.55rem;
+  text-align:left;letter-spacing:normal;overflow:hidden;
+}
+.vinyl-record{
+  position:relative;display:block;flex:0 0 25px;width:25px;height:25px;border-radius:50%;
+  border:1px solid rgba(135,218,237,.52);
+  background:repeating-radial-gradient(circle at center,#0b1118 0 2px,#253846 2.4px 3px,#0c131a 3.4px 4.7px);
+  box-shadow:0 0 0 2px rgba(95,190,218,.08),inset 0 0 5px rgba(130,221,243,.24);
+}
+.vinyl-record::before{
+  content:"";position:absolute;inset:8px;border-radius:50%;background:var(--accent);
+  box-shadow:0 0 0 1px rgba(239,249,248,.38);
+}
+.vinyl-record::after{
+  content:"";position:absolute;left:11px;top:11px;width:3px;height:3px;border-radius:50%;background:#e5f3f0;
+}
+.music-ctl.is-playing .vinyl-record{animation:record-spin 2.8s linear infinite}
+@keyframes record-spin{to{transform:rotate(360deg)}}
+.music-meta{display:grid;gap:.13rem;min-width:0;flex:1;line-height:1.05}
+.music-meta strong{
+  display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font:500 .59rem/1.05 var(--sans);letter-spacing:.045em;
+}
+.music-meta small{
+  display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  color:var(--ink2);font:500 .45rem/1.05 var(--sans);letter-spacing:.12em;text-transform:uppercase;
+}
+.music-action{flex:none;font:600 .5rem/1 var(--sans);letter-spacing:.12em;text-transform:uppercase}
+.mast .controls .music-ctl:hover .vinyl-record{box-shadow:0 0 0 2px rgba(95,190,218,.15),0 0 10px rgba(95,190,218,.27)}
+
+@media(max-width:900px){
+  #siteAtmosphere{opacity:.7}
+}
+@media(max-width:500px){
+  .mast .controls .music-ctl{width:min(10rem,42vw);min-width:0;gap:.34rem;padding-inline:.34rem}
+  .vinyl-record{flex-basis:22px;width:22px;height:22px}
+  .vinyl-record::before{inset:7px}
+  .vinyl-record::after{left:9.5px;top:9.5px}
+  .music-meta strong{font-size:.52rem;letter-spacing:.015em}
+  .music-meta small{display:none}
+  .music-action{font-size:.45rem;letter-spacing:.07em}
+}
+@media(max-width:360px){
+  .mast .controls .music-ctl{width:8.2rem;gap:.25rem;padding-inline:.28rem}
+  .music-meta strong{font-size:.48rem}
+}
+@media(max-width:759px),(prefers-reduced-motion:reduce){
+  .cut[data-speed],.art-inlay,.painting-bleed{translate:none!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .music-ctl.is-playing .vinyl-record{animation:none}
+  .mast .progress span{will-change:auto}
+}
