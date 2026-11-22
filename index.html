@@ -37,6 +37,8 @@
 <link rel="preload" as="image" href="great-wave-lite.webp" fetchpriority="high">
 <link rel="preload" as="image" href="la-grande-jatte-lite.webp" fetchpriority="high">
 <link rel="preload" as="image" href="childs-bath-lite.webp" fetchpriority="high">
+<link rel="preload" as="image" href="cliff-walk-pourville-lite.webp" fetchpriority="high">
+<link rel="preload" as="image" href="landscape-ile-de-france-lite.webp" fetchpriority="high">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   /* =========================================================
@@ -811,8 +813,18 @@
 <link rel="stylesheet" href="ascii-jellyfish.css?v=ascii-corners-blue-10">
 <script src="ascii-jellyfish.js?v=ascii-corners-blue-10" defer></script>
 <script src="fish-school.js?v=colorful-2" defer></script>
-<link rel="stylesheet" href="site-polish.css?v=ambient-vinyl-3">
-<script src="site-polish.js?v=ambient-vinyl-3" defer></script>
+<link rel="stylesheet" href="site-polish.css?v=ambient-collage-4">
+<script src="site-polish.js?v=ambient-collage-4" defer></script>
+<style id="additional-collage-art">
+  #story .art-inlay--supper{top:54%;left:-9vw;right:auto;width:min(31vw,28rem);aspect-ratio:1.41;transform:rotate(2deg)}
+  #reasons .art-inlay--cliff-walk{top:53%;left:-10vw;right:auto;width:min(34vw,31rem);aspect-ratio:1.23;transform:rotate(-3deg)}
+  #snaps .art-inlay--pissarro{top:55%;left:-10vw;right:auto;width:min(34vw,32rem);aspect-ratio:1.48;transform:rotate(2deg)}
+  @media(max-width:900px){
+    #story .art-inlay--supper{top:58%!important;left:-19vw!important;right:auto!important;width:60vw!important;aspect-ratio:1.4}
+    #reasons .art-inlay--cliff-walk{top:55%!important;left:-21vw!important;right:auto!important;width:62vw!important;aspect-ratio:1.23}
+    #snaps .art-inlay--pissarro{top:54%!important;left:-18vw!important;right:auto!important;width:60vw!important;aspect-ratio:1.48}
+  }
+</style>
 </head>
 <body data-theme="night">
 
@@ -952,6 +964,7 @@
   <!-- ===================== 02 / STORY ===================== -->
   <section id="story" data-sec="02" data-name="mwah.">
     <figure class="art-inlay art-inlay--almond" data-art="almond" aria-hidden="true"></figure>
+    <figure class="art-inlay art-inlay--supper" data-art="supper" aria-hidden="true"></figure>
     <div class="wrap">
       <div class="sec-top reveal"><span class="label"><b>02</b>&nbsp;/&nbsp;04&nbsp;&nbsp;mwah.</span><span class="label">The archive</span><div class="hair"></div></div>
       <h2 class="head reveal">For all the times you were <em class="wavy">way too noob</em></h2>
@@ -962,6 +975,7 @@
   <!-- ===================== 03 / REASONS ===================== -->
   <section id="reasons" data-sec="03" data-name="And I love you">
     <figure class="art-inlay art-inlay--kiss" data-art="kiss" aria-hidden="true"></figure>
+    <figure class="art-inlay art-inlay--cliff-walk" data-art="cliffWalk" aria-hidden="true"></figure>
     <div class="wrap">
       <div class="sec-top reveal"><span class="label"><b>03</b>&nbsp;/&nbsp;04&nbsp;&nbsp;The reasons</span><span class="label">Tap to open</span><div class="hair"></div></div>
       <div class="grid split">
@@ -978,6 +992,7 @@
   <!-- ===================== 04 / SNAPSHOTS ===================== -->
   <section id="snaps" data-sec="04" data-name="Snapshots">
     <figure class="art-inlay art-inlay--snap" data-art="wheat" aria-hidden="true"></figure>
+    <figure class="art-inlay art-inlay--pissarro" data-art="pissarro" aria-hidden="true"></figure>
     <div class="wrap">
       <div class="sec-top reveal"><span class="label"><b>04</b>&nbsp;/&nbsp;04&nbsp;&nbsp;Snapshots</span><span class="label">Plates</span><div class="hair"></div></div>
       <h2 class="reveal" style="margin-top:clamp(2rem,5vw,4rem);max-width:14ch">A little gallery filled with <em>mostly you</em></h2>
@@ -1079,6 +1094,8 @@
     wave:      { image: "great-wave-lite.webp", paint: "night", credit: "Katsushika Hokusai, Under the Wave off Kanagawa (The Great Wave), ca. 1830–32" },
     grandeJatte: { image: "la-grande-jatte-lite.webp", paint: "field", credit: "Georges Seurat, A Sunday on La Grande Jatte, 1884–86" },
     childsBath: { image: "childs-bath-lite.webp", paint: "haze", credit: "Mary Cassatt, The Child’s Bath, 1893" },
+    cliffWalk: { image: "cliff-walk-pourville-lite.webp", credit: "Claude Monet, Cliff Walk at Pourville, 1882" },
+    pissarro: { image: "landscape-ile-de-france-lite.webp", credit: "Camille Pissarro, Landscape, Ile-de-France, 1873" },
   };
 
   document.getElementById('heroCounts').textContent =

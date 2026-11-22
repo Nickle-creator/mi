@@ -326,10 +326,7 @@
 
   function placeParticle(p) {
     p.placed = true;
-    if (p.kind === 'bubble') {
-      const a = anchor(); p.col = a.col + (Math.random() - 0.5) * 14; p.row = a.row + Math.random() * 3;
-      p.vx = (Math.random() - 0.5) * 1.5; p.vy = -(2.5 + Math.random() * 3); p.life = 2.6 + Math.random() * 1.6;
-    } else if (p.kind === 'heart') {
+    if (p.kind === 'heart') {
       const a = anchor(0, 1.1); p.col = a.col + (Math.random() - 0.5) * 8; p.row = a.row;
       p.vx = (Math.random() - 0.5) * 3; p.vy = -(3 + Math.random() * 2); p.life = 2.6;
     } else if (p.kind === 'zzz') {
@@ -347,7 +344,7 @@
       p.age += dt;
       if (p.age < 0) continue;
       if (!p.placed) placeParticle(p);
-      p.col += (p.vx + (p.kind === 'bubble' ? Math.sin(p.age * 4 + p.seed * 6) * 1.6 : 0)) * dt;
+      p.col += p.vx * dt;
       p.row += p.vy * dt;
       if (p.age > p.life) particles.splice(i, 1);
     }
@@ -360,11 +357,7 @@
       const col = Math.round(p.col), row = Math.round(p.row);
       if (col < 0 || col >= COLS - 1 || row < 0 || row >= ROWS) continue;
       ctx.globalAlpha = clamp(1 - f * f, 0, 1) * (1 - 0.35 * sleepy);
-      if (p.kind === 'bubble') {
-        const gl = f > 0.9 ? '*' : f > 0.55 ? 'O' : f > 0.25 ? 'o' : '.';
-        ctx.fillStyle = `hsl(${themedHue(195 + p.seed * 30)} 90% ${mixv(66, 40).toFixed(0)}%)`;
-        ctx.fillText(gl, (col + 0.5) * CELL_W, (row + 0.5) * CELL_H);
-      } else if (p.kind === 'heart') {
+      if (p.kind === 'heart') {
         ctx.fillStyle = `hsl(${themedHue(335)} 90% ${mixv(62, 42).toFixed(0)}%)`;
         ctx.fillText('<', (col + 0.5) * CELL_W, (row + 0.5) * CELL_H);
         ctx.fillText('3', (col + 1.5) * CELL_W, (row + 0.5) * CELL_H);
@@ -384,17 +377,15 @@
     spin() { spinAnim = { t: 0, dur: 2.3 }; excite = Math.max(excite, 0.5); },
     flip() { flipAnim = { t: 0, dur: 2.7, dir: Math.random() < 0.5 ? 1 : -1 }; excite = Math.max(excite, 0.8); },
     flash() { for (let i = 0; i < 3; i++) ripples.push({ age: -i * 0.65 }); glow = 1; },
-    bubbles() { for (let i = 0; i < 10; i++) addParticle('bubble', i * 0.12); excite = Math.max(excite, 0.6); },
     rainbow() { rainbowT = 5; },
     hearts() { for (let i = 0; i < 5; i++) addParticle('heart', i * 0.3); },
-    dart() { dartVX = (Math.random() - 0.5) * 900; dartVY = (Math.random() - 0.5) * 600; excite = 1; for (let i = 0; i < 4; i++) addParticle('bubble', i * 0.08); },
+    dart() { dartVX = (Math.random() - 0.5) * 900; dartVY = (Math.random() - 0.5) * 600; excite = 1; },
     ruffle() { ruffle = 1; excite = Math.max(excite, 0.4); },
     sparkle() { for (let i = 0; i < 18; i++) addParticle('spark', Math.random() * 1.2); },
     corkscrew() {
       spinAnim = { t: 0, dur: 3.2 };
       flipAnim = { t: 0, dur: 3.2, dir: Math.random() < 0.5 ? 1 : -1 };
       ruffle = 1; excite = 1;
-      for (let i = 0; i < 10; i++) addParticle('bubble', i * 0.09);
     },
     bellBloom() {
       bellBloom = 1; glow = 1; ruffle = 0.75;
@@ -403,10 +394,6 @@
     pulseWave() {
       for (let i = 0; i < 5; i++) ripples.push({ age: -i * 0.38 });
       excite = Math.max(excite, 0.8); ruffle = 0.8;
-    },
-    bubbleCurtain() {
-      for (let i = 0; i < 22; i++) addParticle('bubble', i * 0.075);
-      excite = Math.max(excite, 0.65);
     },
     currentSurge() {
       dartVX = (Math.random() < 0.5 ? -1 : 1) * 430;
@@ -419,7 +406,6 @@
       flipAnim = { t: 0, dur: 2.8, dir: Math.random() < 0.5 ? 1 : -1 };
       corkscrew = Math.random() < 0.5 ? -0.55 : 0.55;
       ruffle = 1.2; excite = 1;
-      for (let i = 0; i < 8; i++) addParticle('bubble', i * 0.1);
     },
     tentacleFan() {
       fan = 1; ruffle = 1; glow = 0.8; excite = Math.max(excite, 0.7);
@@ -455,11 +441,9 @@
     if (rainbowT > 0) { rainbowT -= dt; rainbow = Math.min(1, rainbow + dt * 2); }
     else rainbow = Math.max(0, rainbow - dt * 1.2);
 
-    const prevPhase = Math.floor(swimPhase);
     const rate = (0.62 + 0.9 * excite + (diving ? 0.35 : 0)) * (1 - 0.6 * sleepy);
     swimPhase += rate * dt;
     pulse = pulseShape(fract(swimPhase));
-    if (Math.floor(swimPhase) !== prevPhase && excite > 0.5 && Math.random() < 0.6) addParticle('bubble');
 
     for (let i = ripples.length - 1; i >= 0; i--) {
       ripples[i].age += dt;
@@ -591,7 +575,7 @@
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('pointermove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; wake(); }, { passive: true });
   window.addEventListener('keydown', wake, { passive: true });
-  // fish rush past -> the jellyfish flinches: light ripple, bubbles, then a quick jet away from the school
+  // Fish rush past -> the jellyfish flinches with a light ripple, then jets away from the school.
   let lastFlinch = 0;
   window.addEventListener('ascii-fish-rush', (e) => {
     if (reducedMotion) return;
@@ -610,7 +594,6 @@
     ripples.push({ age: 0 }, { age: -0.35 });
     dartVX = dx * 430;
     dartVY = dy * 430 - 70;                        // always a little upward, like a startled swim stroke
-    for (let i = 0; i < 6; i++) addParticle('bubble', i * 0.06);
     nextTrick = Math.max(nextTrick, 4);            // let the flinch play out before the next trick
   });
 
@@ -625,7 +608,6 @@
       dartVX = dx / d * 560; dartVY = dy / d * 560 - 120;
       glow = Math.max(glow, 0.7);
       ripples.push({ age: 0 });
-      for (let i = 0; i < 6; i++) addParticle('bubble', i * 0.07);
       if (Math.random() < 0.45) randomTrick();
       nextTrick = 8;
     }

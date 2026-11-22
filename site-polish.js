@@ -28,23 +28,21 @@
 
     const pick = (list) => list[Math.floor(Math.random() * list.length)];
     const planktonHues = [188, 188, 176, 200, 168, 292];
-    const BUBBLE_GLYPHS = ['o', 'o', 'O', '.'];
     const PLANKTON_GLYPHS = ['.', '.', '*', '+', ':'];
 
-    // Particles live in the PAGE, not on the glass: bubbles drift up the page and scroll away with it
-    // (factor 1), plankton sit a little deeper and scroll more slowly (factor .45).
-    const makeFloater = (kind, startAtBottom = false) => {
-      const factor = kind === 'bubble' ? 1 : .45;
+    // Plankton sits a little deeper in the page and scrolls more slowly (factor .45).
+    const makeFloater = (startAtBottom = false) => {
+      const factor = .45;
       const screenY = startAtBottom ? height + random(10, height * .55) : random(0, height);
       return {
-        kind, factor,
-        glyph: pick(kind === 'bubble' ? BUBBLE_GLYPHS : PLANKTON_GLYPHS),
+        factor,
+        glyph: pick(PLANKTON_GLYPHS),
         hue: pick(planktonHues),
-        size: kind === 'bubble' ? random(10, 17) : random(8, 12),
+        size: random(8, 12),
         x: random(0, Math.max(1, width)),
         y: screenY + (window.scrollY || 0) * factor,
-        alpha: kind === 'bubble' ? random(.45, .75) : random(.55, 1),
-        rise: kind === 'bubble' ? random(16, 30) : random(3, 8),
+        alpha: random(.55, 1),
+        rise: random(3, 8),
         drift: random(3, 9),
         phase: random(0, Math.PI * 2),
         twinkle: random(.5, 1.3)
@@ -61,10 +59,8 @@
       canvas.style.height = `${height}px`;
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
       const targetDots = coarsePointer.matches ? 14 : 26;
-      const targetBubbles = coarsePointer.matches ? 2 : 4;
       floaters.length = 0;
-      for (let i = 0; i < targetDots; i++) floaters.push(makeFloater('plankton'));
-      for (let i = 0; i < targetBubbles; i++) floaters.push(makeFloater('bubble'));
+      for (let i = 0; i < targetDots; i++) floaters.push(makeFloater());
     }
 
     function addSpark(x, y, vx = random(-9, 9), vy = random(-28, -10)) {
@@ -105,22 +101,17 @@
         particle.y -= particle.rise * dt;
         particle.x += Math.sin(elapsed * particle.twinkle + particle.phase) * particle.drift * dt;
         const screenY = particle.y - scrollY * particle.factor;
-        // floated off the top (or scrolled far past): respawn below the fold, staggered
-        if (screenY < -24 || screenY > height * 1.6 + 80) { Object.assign(particle, makeFloater(particle.kind, true)); continue; }
+        // Floated off the top (or scrolled far past): respawn below the fold, staggered.
+        if (screenY < -24 || screenY > height * 1.6 + 80) { Object.assign(particle, makeFloater(true)); continue; }
         if (screenY > height + 20) continue;           // still waiting below the screen
         if (particle.x < -6) particle.x = width + 5;
         if (particle.x > width + 6) particle.x = -5;
         const shimmer = .78 + .22 * Math.sin(elapsed * particle.twinkle + particle.phase);
         context.globalAlpha = particle.alpha * shimmer;
         context.font = `600 ${particle.size.toFixed(1)}px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`;
-        if (particle.kind === 'bubble') {
-          context.shadowBlur = 0;
-          context.fillStyle = 'rgb(170,232,247)';
-        } else {
-          context.shadowColor = `hsla(${particle.hue}, 100%, 65%, .9)`;
-          context.shadowBlur = 6;
-          context.fillStyle = `hsl(${particle.hue} 100% 80%)`;
-        }
+        context.shadowColor = `hsla(${particle.hue}, 100%, 65%, .9)`;
+        context.shadowBlur = 6;
+        context.fillStyle = `hsl(${particle.hue} 100% 80%)`;
         context.fillText(particle.glyph, particle.x, screenY);
       }
       context.shadowBlur = 0;
