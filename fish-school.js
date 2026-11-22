@@ -45,16 +45,20 @@
   let nextSchoolAt = performance.now() + random(800, 1600);
   let lastScareAt = 0;
   let frameHandle = 0;
+  let canvasHasInk = false;
+  const frameInterval = 1000 / 30;
+  const jellyReactionRange = 170;
   let hueWalker = Math.random() * 360;   // golden-angle walk => neighbours never match
   let paper = document.body && document.body.dataset.theme === 'night' ? 0 : 1;   // 0 = night, 1 = paper (eased)
 
   function resize() {
     width = window.innerWidth;
     height = window.innerHeight;
-    dpr = Math.min(2, window.devicePixelRatio || 1);
+    dpr = Math.min(1.5, window.devicePixelRatio || 1);
     canvas.width = Math.round(width * dpr);
     canvas.height = Math.round(height * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    canvasHasInk = false;
   }
   window.addEventListener('resize', resize, { passive: true });
   resize();
@@ -211,7 +215,11 @@
   function animate(now) {
     frameHandle = 0;
     if (document.hidden) {
-      lastFrame = now;
+      lastFrame = 0;
+      frameHandle = requestAnimationFrame(animate);
+      return;
+    }
+    if (lastFrame && now - lastFrame < frameInterval) {
       frameHandle = requestAnimationFrame(animate);
       return;
     }
@@ -223,7 +231,8 @@
       spawnSchool(now);
     }
 
-    ctx.clearRect(0, 0, width, height);
+    if (schools.length || canvasHasInk) ctx.clearRect(0, 0, width, height);
+    let drewFish = false;
     const jelly = jellyCenter();
     for (let s = schools.length - 1; s >= 0; s--) {
       const school = schools[s];
@@ -235,7 +244,7 @@
         const centerY = fish.y + Math.sin((now - fish.bornAt) * 0.0088 + fish.phase) * 4.5;
 
         if (jelly && !school.startleSent && now - lastScareAt > 1250 &&
-            Math.hypot(jelly.x - centerX, jelly.y - centerY) < 290) {
+            Math.hypot(jelly.x - centerX, jelly.y - centerY) < jellyReactionRange) {
           school.startleSent = true;
           lastScareAt = now;
           window.dispatchEvent(new CustomEvent('ascii-fish-rush', {
@@ -244,12 +253,14 @@
         }
 
         drawFish(fish, now);
+        drewFish = true;
         const offscreen = fish.direction > 0 ? fish.x > width + fish.width + 90 : fish.x < -fish.width - 90;
         if (offscreen) school.fishes.splice(i, 1);
       }
       if (!school.fishes.length) schools.splice(s, 1);
     }
 
+    canvasHasInk = drewFish;
     if (!frameHandle) frameHandle = requestAnimationFrame(animate);
   }
 

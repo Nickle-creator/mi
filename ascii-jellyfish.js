@@ -29,7 +29,7 @@
   const lights = new Float32Array(SIZE);
   const glyphs = new Array(SIZE);
 
-  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const dpr = Math.min(1.5, window.devicePixelRatio || 1);
   canvas.width = W * dpr;
   canvas.height = H * dpr;
   canvas.style.width = W + 'px';
@@ -85,7 +85,7 @@
   let dragX = 0, dragY = 0;
   let dartVX = 0, dartVY = 0;
   let lastActive = performance.now();
-  let nextTrick = 5;
+  let nextTrick = 1.8;
   let zClock = 1;
   const ripples = [];
   const particles = [];
@@ -162,7 +162,7 @@
     bellR = R; bellH = Ht;
     const baseY = 0.15;
     const hoverGlow = hover * 0.14;
-    const rings = 30, around = 120;
+    const rings = 24, around = 96;
 
     for (let ri = 0; ri <= rings; ri++) {
       const theta = 0.03 + (1.6 - 0.03) * ri / rings;
@@ -192,12 +192,12 @@
     }
 
     // glowing radial canals with light pulses running down them
-    const canals = 16;
+    const canals = 12;
     for (let k = 0; k < canals; k++) {
       const phi = k / canals * Math.PI * 2;
       const front = fract(time * 0.33 + k * 0.137);
-      for (let s = 0; s <= 30; s++) {
-        const u = s / 30;
+      for (let s = 0; s <= 24; s++) {
+        const u = s / 24;
         const theta = 0.08 + u * 1.38;
         const st = Math.sin(theta), ct = Math.cos(theta);
         const rr = R * st * 1.005;
@@ -210,8 +210,8 @@
     }
 
     // scalloped bright rim
-    for (let ai = 0; ai <= 170; ai++) {
-      const phi = ai / 170 * Math.PI * 2;
+    for (let ai = 0; ai <= 136; ai++) {
+      const phi = ai / 136 * Math.PI * 2;
       const r = R * 1.1 * (1 - 0.0 * pulse) + 0.035 * Math.sin(phi * 14 + time * 1.8);
       const x = r * Math.cos(phi), z = r * Math.sin(phi);
       const y = baseY - 0.02 + 0.03 * Math.sin(phi * 6 + time * 1.2);
@@ -227,8 +227,8 @@
       const cyy = baseY + Ht * 0.6;
       const tx = -Math.sin(a), tz = Math.cos(a);
       for (const ring of [0.23, 0.185]) {
-        for (let j = 0; j <= 34; j++) {
-          const ang = 0.4 + j / 34 * Math.PI * 2 * 0.86;
+        for (let j = 0; j <= 28; j++) {
+          const ang = 0.4 + j / 28 * Math.PI * 2 * 0.86;
           const rx = ring * Math.cos(ang) * gScale, ry = ring * 0.72 * Math.sin(ang);
           const beat = 0.5 + 0.5 * Math.sin(time * 1.6 + k + j * 0.2);
           const intensity = 0.62 + 0.3 * beat + 0.1 * glow;
@@ -256,8 +256,8 @@
       const a = arm * Math.PI / 2 + 0.4;
       const len = 1.35 + 0.25 * Math.sin(arm * 2.2);
       const tx = -Math.sin(a), tz = Math.cos(a);
-      for (let s = 0; s <= 48; s++) {
-        const u = s / 48, lag = u * u;
+      for (let s = 0; s <= 40; s++) {
+        const u = s / 40, lag = u * u;
         const wave = time * 0.9 + a + u * 5.8;
         const flare = (0.04 + 0.22 * u) * amp0;
         const cx = 0.16 * Math.cos(a) + flare * Math.sin(wave) - lagXv * lag * 0.7;
@@ -463,7 +463,7 @@
     // random tricks while awake
     if (sleepy < 0.2) {
       nextTrick -= dt;
-      if (nextTrick <= 0) { randomTrick(); nextTrick = 5 + Math.random() * 5; }
+      if (nextTrick <= 0) { randomTrick(); nextTrick = 2.2 + Math.random() * 1.8; }
     }
 
     // look at the cursor
@@ -577,24 +577,30 @@
   window.addEventListener('keydown', wake, { passive: true });
   // Fish rush past -> the jellyfish flinches with a light ripple, then jets away from the school.
   let lastFlinch = 0;
+  const fishReactionRange = 170;
   window.addEventListener('ascii-fish-rush', (e) => {
     if (reducedMotion) return;
+    const fish = e.detail;
+    if (!fish || !Number.isFinite(fish.x) || !Number.isFinite(fish.y)) return;
+    const rect = root.getBoundingClientRect();
+    const cx = rect.left + rect.width * 0.5, cy = rect.top + rect.height * 0.31;
+    const fx = fish.x, fy = fish.y;
+    if (Math.hypot(cx - fx, cy - fy) > fishReactionRange) return;
     const now = performance.now();
     if (now - lastFlinch < 3200) return;          // don't get jittery
     lastFlinch = now;
-    const rect = root.getBoundingClientRect();
-    const cx = rect.left + rect.width * 0.5, cy = rect.top + rect.height * 0.31;
-    const fx = e.detail && Number.isFinite(e.detail.x) ? e.detail.x : cx - 1;
-    const fy = e.detail && Number.isFinite(e.detail.y) ? e.detail.y : cy;
     let dx = cx - fx, dy = cy - fy;
     const len = Math.hypot(dx, dy) || 1;
     dx /= len; dy /= len;
     excite = 1;
     glow = 1;
+    bellBloom = Math.max(bellBloom, 0.65);
+    ruffle = Math.max(ruffle, 0.8);
+    fan = Math.max(fan, 0.45);
     ripples.push({ age: 0 }, { age: -0.35 });
     dartVX = dx * 430;
     dartVY = dy * 430 - 70;                        // always a little upward, like a startled swim stroke
-    nextTrick = Math.max(nextTrick, 4);            // let the flinch play out before the next trick
+    nextTrick = Math.max(nextTrick, 2.6);          // let the flinch play out before the next trick
   });
 
   window.addEventListener('pointerdown', (e) => {

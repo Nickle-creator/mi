@@ -26,19 +26,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="image" href="starry-night-lite.webp" fetchpriority="high">
-<link rel="preload" as="image" href="water-lilies-lite.webp" fetchpriority="high">
-<link rel="preload" as="image" href="supper-at-emmaus-lite.webp" fetchpriority="high">
-<link rel="preload" as="image" href="wheat-field-lite.webp" fetchpriority="high">
-<link rel="preload" as="image" href="almond-blossom-lite.webp" fetchpriority="high">
-<link rel="preload" as="image" href="the-kiss-lite.webp" fetchpriority="high">
-<link rel="preload" as="image" href="irises-lite.webp" fetchpriority="high">
-<link rel="preload" as="image" href="japanese-footbridge-lite.webp" fetchpriority="high">
-<link rel="preload" as="image" href="two-sisters-lite.webp" fetchpriority="high">
 <link rel="preload" as="image" href="great-wave-lite.webp" fetchpriority="high">
-<link rel="preload" as="image" href="la-grande-jatte-lite.webp" fetchpriority="high">
-<link rel="preload" as="image" href="childs-bath-lite.webp" fetchpriority="high">
-<link rel="preload" as="image" href="cliff-walk-pourville-lite.webp" fetchpriority="high">
-<link rel="preload" as="image" href="landscape-ile-de-france-lite.webp" fetchpriority="high">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   /* =========================================================
@@ -811,9 +799,9 @@
   @media (max-width:700px){ body[data-theme="night"] .grain{opacity:.28} }
 </style>
 <link rel="stylesheet" href="ascii-jellyfish.css?v=ascii-corners-blue-10">
-<script src="ascii-jellyfish.js?v=ascii-corners-blue-10" defer></script>
-<script src="fish-school.js?v=colorful-2" defer></script>
-<link rel="stylesheet" href="site-polish.css?v=collage-vinyl-5">
+<script src="ascii-jellyfish.js?v=ascii-near-fish-11" defer></script>
+<script src="fish-school.js?v=nearby-schools-3" defer></script>
+<link rel="stylesheet" href="site-polish.css?v=glow-player-6">
 <script src="site-polish.js?v=collage-vinyl-5" defer></script>
 <style id="additional-collage-art">
   #story .art-inlay--supper{top:43%;left:-9vw;right:auto;width:min(31vw,28rem);aspect-ratio:1.41;transform:rotate(2deg);clip-path:polygon(4% 6%,18% 2%,33% 5%,48% 1%,65% 3%,80% 0,96% 5%,94% 21%,100% 37%,96% 53%,99% 71%,95% 94%,79% 92%,62% 100%,43% 96%,25% 99%,4% 93%,6% 76%,0 58%,4% 40%,1% 23%)}
@@ -916,6 +904,7 @@
       <span class="turntable" aria-hidden="true">
         <span class="vinyl-disc"><span class="vinyl-label"><span class="vinyl-spindle"></span></span></span>
         <span class="record-tonearm"></span>
+        <span class="vinyl-ascii-accent">~ . ~</span>
       </span>
       <span class="music-meta" aria-hidden="true">
         <strong>Dexys Midnight Runners</strong>
@@ -1112,10 +1101,23 @@
   TIMELINE.forEach((item, i) => {
     const art = document.createElement('article');
     art.className = `spread grid r${i} ${i % 2 ? 'flip' : ''}`;
+    const isWassupPhoto = item.image === 'three.jpeg';
     art.innerHTML = `
       ${item.cut ? `<figure class="cut px spread-cut" data-cut="${item.cut}" data-shape="${i % 2 ? 'b' : 'd'}" data-speed="${i % 2 ? '.1' : '-.1'}" aria-hidden="true"></figure>` : ''}
       <figure class="reveal">
-        <div class="print" style="--pr:${PR[i]}"><div class="frame"><img src="${item.image}" alt="${item.title}" loading="lazy"></div></div>
+        <div class="print" style="--pr:${PR[i]}"><div class="frame">
+          <img src="${item.image}" alt="${item.title}" loading="${isWassupPhoto ? 'eager' : 'lazy'}" decoding="async" fetchpriority="${isWassupPhoto ? 'low' : 'auto'}">
+          ${isWassupPhoto ? `<div class="record-fallback" aria-hidden="true"><pre>
+       .----------------.
+      /   .---------.    \\
+     |   /  .---.    \\    |
+     |  |  / .-. \\   |----|--
+     |  | | ( o ) |  |   /
+     |  |  \\ '-' /   |  /
+     |   \\ '---'    /  /
+      \\   '-------'  /
+       '-------------'</pre><span>PLATE 03 / STILL SPINNING</span></div>` : ''}
+        </div></div>
         <figcaption class="cap"><span class="label"><b>Fig. ${pad(i + 1)}</b></span><span class="credit">${item.date} — from the archive</span></figcaption>
       </figure>
       <div class="copy reveal">
