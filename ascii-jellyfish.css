@@ -32,18 +32,3 @@
     will-change: auto;
   }
 }
-
-/* soft backing pool so the jellyfish stays readable over busy paintings */
-.ascii-jellyfish::before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  left: 8%; top: 2%;
-  width: 84%; height: 66%;
-  border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(244, 235, 214, .66) 0%, rgba(244, 235, 214, .38) 55%, rgba(244, 235, 214, 0) 100%);
-  transition: background .6s ease;
-}
-body[data-theme="night"] .ascii-jellyfish::before {
-  background: radial-gradient(closest-side, rgba(4, 9, 22, .78) 0%, rgba(4, 9, 22, .5) 55%, rgba(4, 9, 22, 0) 100%);
-}

@@ -539,8 +539,8 @@
       const haloKey = h + ':' + Math.round(paletteMix * 8);
       if (haloKey !== lastHalo) {
         lastHalo = haloKey;
-        const a = 0.3 * (1 - paletteMix);   // softer, deeper glow at night; none on paper
-        canvas.style.filter = a < 0.03 ? 'none' : `drop-shadow(0 0 6px hsla(${h}, 100%, 46%, ${a.toFixed(2)}))`;
+        const a = 0.32;   // soft light glow, no dark halo
+        canvas.style.filter = a < 0.03 ? 'none' : `drop-shadow(0 0 6px hsla(${h}, 100%, 64%, ${a.toFixed(2)}))`;
       }
     }
   }
