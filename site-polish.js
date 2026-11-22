@@ -26,35 +26,30 @@
     const maxSparks = 42;
     let lastPointer = { x: -100, y: -100, at: 0 };
 
-    // pre-rendered soft glow dots (cheap to draw, clearly visible)
-    const glowSprites = {};
-    const glowSprite = (hue) => {
-      if (glowSprites[hue]) return glowSprites[hue];
-      const c = document.createElement('canvas');
-      c.width = c.height = 48;
-      const g = c.getContext('2d');
-      const grad = g.createRadialGradient(24, 24, 0, 24, 24, 24);
-      grad.addColorStop(0, `hsla(${hue},100%,90%,1)`);
-      grad.addColorStop(.22, `hsla(${hue},100%,72%,.62)`);
-      grad.addColorStop(1, `hsla(${hue},100%,60%,0)`);
-      g.fillStyle = grad;
-      g.fillRect(0, 0, 48, 48);
-      return (glowSprites[hue] = c);
-    };
+    const pick = (list) => list[Math.floor(Math.random() * list.length)];
     const planktonHues = [188, 188, 176, 200, 168, 292];
+    const BUBBLE_GLYPHS = ['o', 'o', 'O', '.'];
+    const PLANKTON_GLYPHS = ['.', '.', '*', '+', ':'];
 
-    const makeFloater = (kind, startAtBottom = false) => ({
-      kind,
-      hue: planktonHues[Math.floor(Math.random() * planktonHues.length)],
-      x: random(0, Math.max(1, width)),
-      y: startAtBottom ? height + random(8, 40) : random(0, Math.max(1, height)),
-      radius: kind === 'bubble' ? random(3, 9) : random(1.3, 2.9),
-      alpha: kind === 'bubble' ? random(.42, .78) : random(.5, 1),
-      rise: kind === 'bubble' ? random(16, 34) : random(4, 10),
-      drift: random(4, 12),
-      phase: random(0, Math.PI * 2),
-      twinkle: random(.5, 1.3)
-    });
+    // Particles live in the PAGE, not on the glass: bubbles drift up the page and scroll away with it
+    // (factor 1), plankton sit a little deeper and scroll more slowly (factor .45).
+    const makeFloater = (kind, startAtBottom = false) => {
+      const factor = kind === 'bubble' ? 1 : .45;
+      const screenY = startAtBottom ? height + random(10, height * .55) : random(0, height);
+      return {
+        kind, factor,
+        glyph: pick(kind === 'bubble' ? BUBBLE_GLYPHS : PLANKTON_GLYPHS),
+        hue: pick(planktonHues),
+        size: kind === 'bubble' ? random(10, 17) : random(8, 12),
+        x: random(0, Math.max(1, width)),
+        y: screenY + (window.scrollY || 0) * factor,
+        alpha: kind === 'bubble' ? random(.45, .75) : random(.55, 1),
+        rise: kind === 'bubble' ? random(16, 30) : random(3, 8),
+        drift: random(3, 9),
+        phase: random(0, Math.PI * 2),
+        twinkle: random(.5, 1.3)
+      };
+    };
 
     function resizeCanvas() {
       width = window.innerWidth;
@@ -65,8 +60,8 @@
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const targetDots = coarsePointer.matches ? 24 : 40;
-      const targetBubbles = coarsePointer.matches ? 7 : 13;
+      const targetDots = coarsePointer.matches ? 14 : 26;
+      const targetBubbles = coarsePointer.matches ? 2 : 4;
       floaters.length = 0;
       for (let i = 0; i < targetDots; i++) floaters.push(makeFloater('plankton'));
       for (let i = 0; i < targetBubbles; i++) floaters.push(makeFloater('bubble'));
@@ -103,33 +98,32 @@
       elapsed += dt;
       context.clearRect(0, 0, width, height);
 
+      const scrollY = window.scrollY || 0;
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
       for (const particle of floaters) {
         particle.y -= particle.rise * dt;
         particle.x += Math.sin(elapsed * particle.twinkle + particle.phase) * particle.drift * dt;
-        if (particle.y < -16) Object.assign(particle, makeFloater(particle.kind, true));
+        const screenY = particle.y - scrollY * particle.factor;
+        // floated off the top (or scrolled far past): respawn below the fold, staggered
+        if (screenY < -24 || screenY > height * 1.6 + 80) { Object.assign(particle, makeFloater(particle.kind, true)); continue; }
+        if (screenY > height + 20) continue;           // still waiting below the screen
         if (particle.x < -6) particle.x = width + 5;
         if (particle.x > width + 6) particle.x = -5;
         const shimmer = .78 + .22 * Math.sin(elapsed * particle.twinkle + particle.phase);
         context.globalAlpha = particle.alpha * shimmer;
+        context.font = `600 ${particle.size.toFixed(1)}px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`;
         if (particle.kind === 'bubble') {
-          const r = particle.radius;
-          context.fillStyle = 'rgba(120,205,232,.16)';
-          context.beginPath();
-          context.arc(particle.x, particle.y, r, 0, Math.PI * 2);
-          context.fill();
-          context.lineWidth = 1.2;
-          context.strokeStyle = 'rgba(160,230,246,.95)';
-          context.stroke();
-          context.lineWidth = 1.1;
-          context.strokeStyle = 'rgba(240,253,255,.95)';
-          context.beginPath();
-          context.arc(particle.x, particle.y, r * .66, Math.PI * 1.08, Math.PI * 1.46);
-          context.stroke();
+          context.shadowBlur = 0;
+          context.fillStyle = 'rgb(170,232,247)';
         } else {
-          const size = particle.radius * 8;
-          context.drawImage(glowSprite(particle.hue), particle.x - size / 2, particle.y - size / 2, size, size);
+          context.shadowColor = `hsla(${particle.hue}, 100%, 65%, .9)`;
+          context.shadowBlur = 6;
+          context.fillStyle = `hsl(${particle.hue} 100% 80%)`;
         }
+        context.fillText(particle.glyph, particle.x, screenY);
       }
+      context.shadowBlur = 0;
 
       for (let i = sparks.length - 1; i >= 0; i--) {
         const spark = sparks[i];
@@ -221,4 +215,62 @@
     document.addEventListener('visibilitychange', scheduleParallax);
     scheduleParallax();
   }
+})();
+
+
+/* ---------- ASCII record + level meter for the music button ---------- */
+(() => {
+  const button = document.getElementById('musicToggle');
+  const record = button && button.querySelector('.ascii-record');
+  const meter = button && button.querySelector('.ascii-meter');
+  if (!record) return;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const COLS = 9, ROWS = 5, CW = 5.1, CH = 8, RADIUS = 21;
+  const GROOVE = ' .,:;-=+*';
+  const RIM = [')', "'", '_', "'", '(', '.', '-', '.'];      // right, bottom-right, bottom, ... top-right
+  const cells = [];
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      const x = (c + .5) * CW - COLS * CW / 2, y = (r + .5) * CH - ROWS * CH / 2;
+      cells.push({ x, y, d: Math.hypot(x, y), theta: Math.atan2(y, x) });
+    }
+  }
+  const draw = (angle) => {
+    let out = '';
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        const cell = cells[r * COLS + c];
+        if (cell.d > RADIUS + 1) out += ' ';
+        else if (cell.d < 7.5) out += cell.x < -2 ? '<span class="label">(</span>' : cell.x > 2 ? '<span class="label">)</span>' : '<span class="label">o</span>';
+        else if (cell.d > RADIUS - 6) out += RIM[(Math.round(cell.theta / (Math.PI / 4)) + 8) % 8];
+        else {
+          const sheen = .5 + .5 * Math.cos(2 * (cell.theta - angle));       // two opposite light streaks, like real vinyl
+          out += GROOVE[Math.min(GROOVE.length - 1, Math.floor(sheen * GROOVE.length))];
+        }
+      }
+      out += r < ROWS - 1 ? '\n' : '';
+    }
+    record.innerHTML = out;
+  };
+  let angle = .6, level = 3, timer = 0;
+  const drawMeter = (on) => {
+    if (!meter) return;
+    const l = on ? level : 0;
+    meter.textContent = '[' + '#'.repeat(l) + '.'.repeat(6 - l) + ']';
+  };
+  const tick = () => {
+    angle += .5;
+    level = Math.max(1, Math.min(6, level + Math.floor(Math.random() * 3) - 1));
+    draw(angle);
+    drawMeter(true);
+  };
+  const sync = () => {
+    const playing = button.classList.contains('is-playing');
+    if (timer) { window.clearInterval(timer); timer = 0; }
+    if (playing && !reduced) timer = window.setInterval(tick, 95);
+    drawMeter(playing);
+    if (!playing || reduced) draw(angle);
+  };
+  new MutationObserver(sync).observe(button, { attributes: true, attributeFilter: ['class'] });
+  sync();
 })();
