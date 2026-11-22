@@ -12,7 +12,7 @@
 /* Parallax is driven only on desktop pointers; mobile scroll stays still and calm. */
 .cut[data-speed],.art-inlay,.painting-bleed{translate:0 var(--parallax-y,0px)}
 
-/* A compact, drawn turntable uses no icon font or pictographic characters. */
+/* A compact ASCII record uses text glyphs only, with a blue jellyfish-like glow. */
 .mast .controls .music-ctl{
   min-width:15.6rem;justify-content:flex-start;gap:.62rem;padding:.28rem .58rem;
   text-align:left;letter-spacing:normal;overflow:hidden;border-radius:999px;
@@ -28,47 +28,16 @@
 }
 
 .turntable{position:relative;display:block;flex:none;width:2.55rem;height:2.55rem;isolation:isolate}
-.turntable::before{
-  content:"";position:absolute;inset:1px;border-radius:50%;
-  background:radial-gradient(circle at 38% 32%,#333944 0,#1a1e25 68%,#101318 100%);
-  border:1px solid rgba(220,231,245,.2);box-shadow:0 2px 5px rgba(0,0,0,.6),inset 0 0 0 2px rgba(0,0,0,.22);
+.vinyl-ascii-disc{
+  position:absolute;inset:0;display:grid;place-items:center;margin:0;
+  color:#b8efff;font:700 5.4px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  letter-spacing:0;white-space:pre;text-align:center;
+  text-shadow:0 0 1px rgba(116,221,255,.95),0 0 5px rgba(69,189,255,.62);
+  animation:jellyfish-luminance 2.8s ease-in-out infinite;
 }
-.vinyl-disc{
-  position:absolute;inset:3px;border-radius:50%;overflow:hidden;
-  border:1px solid rgba(214,226,243,.18);
-  background:
-    radial-gradient(circle at center,rgba(8,10,13,.95) 0 1.5px,transparent 1.8px),
-    repeating-radial-gradient(circle at center,rgba(218,228,243,.14) 0 .7px,rgba(0,0,0,0) 1px 2.4px),
-    conic-gradient(from 20deg,#282d35,#101318 16%,#343a43 29%,#13161b 44%,#252a32 58%,#111419 76%,#303640 91%,#171a20);
-  box-shadow:inset 0 0 0 1px rgba(0,0,0,.75),0 1px 2px rgba(0,0,0,.45);
+.music-ctl.is-playing .vinyl-ascii-disc{
+  animation:vinyl-spin 2.8s linear infinite,jellyfish-luminance 1.45s ease-in-out infinite;
 }
-.vinyl-disc::after{
-  content:"";position:absolute;inset:2px;border-radius:50%;pointer-events:none;
-  background:linear-gradient(128deg,rgba(255,255,255,.18),transparent 25% 61%,rgba(255,255,255,.06) 68%,transparent 76%);
-  opacity:.72;
-}
-.vinyl-label{
-  position:absolute;z-index:1;left:50%;top:50%;width:12px;height:12px;
-  transform:translate(-50%,-50%);border-radius:50%;
-  border:1px solid rgba(255,233,217,.7);
-  background:radial-gradient(circle at 38% 32%,#dcaa91,#9d665e 72%,#754a4a);
-  box-shadow:0 0 5px rgba(217,157,134,.25);
-}
-.vinyl-spindle{
-  position:absolute;left:50%;top:50%;width:2px;height:2px;transform:translate(-50%,-50%);
-  border-radius:50%;background:#17171a;box-shadow:0 0 0 1px rgba(255,242,225,.55);
-}
-.record-tonearm{
-  position:absolute;z-index:2;right:3px;top:3px;width:9px;height:14px;
-  border-top:1.5px solid #d4d9df;border-right:1.5px solid #d4d9df;
-  border-radius:0 6px 0 0;transform:rotate(8deg);transform-origin:top right;
-  filter:drop-shadow(0 1px 1px rgba(0,0,0,.55));
-}
-.record-tonearm::after{
-  content:"";position:absolute;right:-2px;bottom:-1px;width:4px;height:3px;
-  border-radius:1px;background:#dca58c;transform:rotate(-12deg);
-}
-.music-ctl.is-playing .vinyl-disc{animation:vinyl-spin 2.8s linear infinite}
 
 .music-meta{display:grid;gap:.17rem;min-width:0;flex:1;line-height:1.05}
 .music-meta strong{
@@ -97,6 +66,7 @@
 @media(max-width:500px){
   .mast .controls .music-ctl{width:min(11.4rem,47vw);min-width:0;gap:.38rem;padding-inline:.36rem}
   .turntable{width:2.25rem;height:2.25rem}
+  .vinyl-ascii-disc{font-size:4.8px}
   .music-meta strong{font-size:.51rem;letter-spacing:.01em}
   .music-meta small{font-size:.36rem;letter-spacing:.07em}
   .music-status{gap:.24rem}
@@ -105,6 +75,7 @@
 @media(max-width:360px){
   .mast .controls .music-ctl{width:min(10rem,47vw);gap:.3rem;padding-inline:.3rem}
   .turntable{width:2.05rem;height:2.05rem}
+  .vinyl-ascii-disc{font-size:4.2px}
   .music-meta strong{font-size:.47rem}
   .music-meta small{font-size:.33rem;letter-spacing:.05em}
 }
@@ -113,7 +84,7 @@
 }
 @media(prefers-reduced-motion:reduce){
   .mast .progress span{will-change:auto}
-  .music-ctl.is-playing .vinyl-disc,.music-ctl.is-playing .music-eq i{animation:none}
+  .vinyl-ascii-disc,.music-ctl.is-playing .music-eq i{animation:none}
 }
 
 
@@ -125,15 +96,10 @@
   animation:jellyfish-luminance 2.8s ease-in-out infinite;
 }
 .music-ctl.is-playing .vinyl-ascii-accent{animation-duration:1.45s}
-.music-ctl.is-playing .turntable::before{animation:platter-luminance 2.4s ease-in-out infinite}
 
 @keyframes jellyfish-luminance{
-  0%,100%{opacity:.62;filter:drop-shadow(0 0 2px rgba(101,220,255,.48))}
-  50%{opacity:1;filter:drop-shadow(0 0 7px rgba(101,220,255,.9))}
-}
-@keyframes platter-luminance{
-  0%,100%{box-shadow:0 2px 5px rgba(0,0,0,.6),inset 0 0 0 2px rgba(0,0,0,.22),0 0 4px rgba(93,199,245,.16)}
-  50%{box-shadow:0 2px 5px rgba(0,0,0,.6),inset 0 0 0 2px rgba(0,0,0,.22),0 0 14px rgba(93,199,245,.45)}
+  0%,100%{opacity:.72;filter:drop-shadow(0 0 1px rgba(101,220,255,.48))}
+  50%{opacity:1;filter:drop-shadow(0 0 4px rgba(101,220,255,.82))}
 }
 
 /* If the archived photo ever fails, keep the scrapbook frame alive with ASCII art. */
@@ -159,5 +125,5 @@
   .record-fallback span{font-size:.4rem;letter-spacing:.1em}
 }
 @media(prefers-reduced-motion:reduce){
-  .vinyl-ascii-accent,.music-ctl.is-playing .turntable::before,.record-fallback pre{animation:none}
+  .vinyl-ascii-accent,.vinyl-ascii-disc,.record-fallback pre{animation:none}
 }
