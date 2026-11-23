@@ -305,7 +305,7 @@
   /* --- colophon --- */
   footer{
     --sheet-tint:var(--foot-tint);
-    position:relative; isolation:isolate; overflow:hidden; padding:clamp(6rem,13vw,10rem) 0 2.5rem;
+    position:relative; isolation:isolate; overflow:hidden; padding:clamp(6rem,13vw,10rem) 0 0;
     background:linear-gradient(var(--foot-tint),var(--foot-tint)), var(--tile) 0 0/512px 512px, var(--paper);
   }
   footer .big{ font:400 clamp(3.4rem,14vw,14rem)/.88 var(--serif); letter-spacing:-.045em; }
@@ -680,8 +680,10 @@
       <span class="label">Made only for you.</span>
       <a class="go" href="#top" id="backTop">Back to top</a>
     </div>
-    <p class="label colophon">Paintings: Vincent van Gogh, The Starry Night (1889), Wheat Field with Cypresses (1889), Almond Blossom (1890); Gustav Klimt, The Kiss (1907–08); Claude Monet, Water Lilies (1906), The Japanese Footbridge (1899), Cliff Walk at Pourville (1882); Caravaggio, The Supper at Emmaus (1601); Georges Seurat, A Sunday on La Grande Jatte (1884–86); Pierre-Auguste Renoir, Two Sisters (On the Terrace) (1881). Public-domain reproductions, cropped and torn by hand.</p>
   </div>
+  <figure class="art foot-band" aria-hidden="true">
+    <img src="art/footer-band.webp" width="1100" height="275" alt="" loading="lazy" decoding="async" data-drift="sec:.04">
+  </figure>
 </footer>
 
 <script>
