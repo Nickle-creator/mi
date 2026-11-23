@@ -39,7 +39,7 @@
     --tile:url(art/paper-day.webp);
     --mast:rgba(239,228,210,.97); --stamp:rgba(239,228,210,.82); --ctl:rgba(239,228,210,.3);
     --snap-tint:rgba(205,184,148,.32); --foot-tint:rgba(190,160,110,.26);
-    --grain-op:.34; --vig:rgba(89,61,29,.12);
+    --grain-op:.10; --vig:rgba(89,61,29,.12);
     --hero-mask:linear-gradient(90deg,transparent 0,rgba(0,0,0,.35) 30%,#000 62%);
   }
   :root[data-theme="night"]{
@@ -49,7 +49,7 @@
     --tile:url(art/paper-night.webp);
     --mast:rgba(24,30,38,.96); --stamp:rgba(24,30,38,.82); --ctl:rgba(242,235,222,.05);
     --snap-tint:rgba(56,76,96,.42); --foot-tint:rgba(30,58,76,.34);
-    --grain-op:.42; --vig:rgba(0,0,0,.34);
+    --grain-op:.12; --vig:rgba(0,0,0,.34);
     --hero-mask:none;
   }
 
@@ -78,11 +78,11 @@
      ========================================================= */
   .label{ font:500 .66rem/1.5 var(--sans); letter-spacing:.17em; text-transform:uppercase; color:var(--ink2); }
   .label b{ color:var(--burn); font-weight:500; }
-  .credit{ font:italic 400 .72rem/1.4 var(--sans); letter-spacing:.01em; color:var(--ink2); }
+  .credit{ font:normal 400 .72rem/1.4 var(--sans); letter-spacing:.01em; color:var(--ink2); }
   .credit b{ font-style:normal; font-weight:500; letter-spacing:.14em; text-transform:uppercase; font-size:.62rem; color:var(--burn); margin-right:.5rem; }
   h1,h2,h3{ font-family:var(--serif); font-weight:400; }
   h2{ font-size:clamp(2.5rem,6.6vw,6.4rem); line-height:.94; letter-spacing:-.032em; }
-  h2 em,h1 em{ font-style:italic; }
+  em{ font-style:normal; }
   .wavy{ text-decoration:underline wavy var(--burn); text-decoration-thickness:1px; text-underline-offset:.14em; text-decoration-skip-ink:none; }
 
   .wrap{ position:relative; z-index:2; max-width:96rem; margin:0 auto; padding:0 var(--gutter); }
@@ -271,7 +271,7 @@
   .row-btn[aria-expanded="true"] .pm{ transform:rotate(135deg); }
   .ans{ display:grid; grid-template-rows:0fr; transition:grid-template-rows .85s var(--ease); }
   .ans > div{ overflow:hidden; padding-left:3.5rem; }
-  .ans p{ font:italic 400 clamp(1.3rem,2vw,1.85rem)/1.2 var(--serif); color:var(--burn); padding-bottom:1.6rem; opacity:0; transform:translateY(8px); transition:opacity .6s var(--ease2), transform .9s var(--ease); }
+  .ans p{ font:normal 400 clamp(1.3rem,2vw,1.85rem)/1.2 var(--serif); color:var(--burn); padding-bottom:1.6rem; opacity:0; transform:translateY(8px); transition:opacity .6s var(--ease2), transform .9s var(--ease); }
   .row.open .ans{ grid-template-rows:1fr; }
   .row.open .ans p{ opacity:1; transform:none; transition-delay:.12s; }
 
@@ -293,7 +293,7 @@
   .side .meta{ display:flex; flex-direction:column; gap:1.25rem; position:relative; z-index:2; }
   .count{ font:400 clamp(3rem,6vw,5.6rem)/.85 var(--serif); letter-spacing:-.045em; color:var(--burn); }
   .count small{ font-size:.4em; color:var(--ink2); letter-spacing:0; }
-  .cap-big{ font:italic 400 clamp(1.5rem,2.4vw,2.2rem)/1.08 var(--serif); min-height:3.3em; padding-top:.9rem; border-top:1px solid var(--rule); transition:opacity .5s var(--ease2); }
+  .cap-big{ font:normal 400 clamp(1.5rem,2.4vw,2.2rem)/1.08 var(--serif); min-height:3.3em; padding-top:.9rem; border-top:1px solid var(--rule); transition:opacity .5s var(--ease2); }
   .cap-big.swap{ opacity:0; }
   .pager{ display:flex; gap:.5rem; }
   .segs{ grid-column:1 / span 9; grid-row:2; display:flex; gap:.5rem; margin-top:1.25rem; position:relative; z-index:2; }
@@ -305,7 +305,7 @@
   /* --- colophon --- */
   footer{
     --sheet-tint:var(--foot-tint);
-    position:relative; isolation:isolate; overflow:hidden; padding:clamp(6rem,13vw,10rem) 0 0;
+    position:relative; isolation:isolate; overflow:hidden; padding:clamp(6rem,13vw,10rem) 0 2.5rem;
     background:linear-gradient(var(--foot-tint),var(--foot-tint)), var(--tile) 0 0/512px 512px, var(--paper);
   }
   footer .big{ font:400 clamp(3.4rem,14vw,14rem)/.88 var(--serif); letter-spacing:-.045em; }
@@ -380,6 +380,23 @@
 <link rel="icon" type="image/svg+xml" href="favicon.svg?v=mimi-record-2" />
 <link rel="canonical" href="https://nickle-creator.github.io/mi/" />
 <meta property="og:image" content="og-preview.jpg" />
+<style id="vinyl-theme">
+  .mast .controls .music-ctl{ background:var(--ctl); border:1px solid var(--rule); border-radius:0; box-shadow:none; color:var(--ink); padding:.28rem .7rem .28rem .5rem; }
+  .mast .controls .music-ctl:hover,.mast .controls .music-ctl:focus-visible{ background:var(--ink); border-color:var(--ink); color:var(--paper); box-shadow:none; }
+  .music-ctl .vinyl-ascii-disc,.music-ctl .vinyl-ascii-accent{ color:var(--burn); text-shadow:none; animation:none; filter:none; }
+  .music-ctl:hover .vinyl-ascii-disc,.music-ctl:hover .vinyl-ascii-accent{ color:var(--burn); }
+  .music-ctl.is-playing .vinyl-ascii-disc{ animation:vinyl-spin 2.8s linear infinite; }
+  .music-meta strong{ color:inherit; font:500 .6rem/1.1 var(--sans); letter-spacing:.14em; text-transform:uppercase; }
+  .music-meta small{ color:var(--ink2); font:500 .5rem/1.1 var(--sans); letter-spacing:.14em; }
+  .music-ctl:hover .music-meta small{ color:inherit; }
+  .music-eq i{ background:var(--burn); }
+  .music-status{ color:inherit; }
+  .music-status__dot{ background:var(--ink2); box-shadow:none; }
+  .music-ctl.is-playing .music-status__dot{ background:var(--burn); box-shadow:none; }
+  .music-action{ font:500 .58rem/1 var(--sans); letter-spacing:.14em; }
+  .mast .progress,.mast .progress span{ height:1px; }
+  .mast .progress span{ background:var(--burn); box-shadow:none; }
+</style>
 </head>
 <body>
 
@@ -553,8 +570,8 @@
         </figure>
         <div class="copy">
           <figure class="art" style="--r:-1.2deg" aria-hidden="true">
-            <img src="art/spread-cypress.webp" width="564" height="768" alt="" loading="lazy" decoding="async" data-drift="sec:.05">
-            <figcaption class="credit"><b>Pl. 06</b>Detail from Vincent van Gogh, Wheat Field with Cypresses, 1889</figcaption>
+            <img src="art/spread-footbridge.webp" width="638" height="802" alt="" loading="lazy" decoding="async" data-drift="sec:.05">
+            <figcaption class="credit"><b>Pl. 06</b>Detail from Claude Monet, The Japanese Footbridge, 1899</figcaption>
           </figure>
           <div class="txt reveal">
             <div class="no">04</div>
@@ -577,8 +594,8 @@
         </figure>
         <div class="copy">
           <figure class="art" style="--r:1deg" aria-hidden="true">
-            <img src="art/spread-branch.webp" width="1170" height="690" alt="" loading="lazy" decoding="async" data-drift="sec:.05">
-            <figcaption class="credit"><b>Pl. 07</b>Detail from Vincent van Gogh, Almond Blossom, 1890</figcaption>
+            <img src="art/spread-cliff.webp" width="958" height="566" alt="" loading="lazy" decoding="async" data-drift="sec:.05">
+            <figcaption class="credit"><b>Pl. 07</b>Detail from Claude Monet, Cliff Walk at Pourville, 1882</figcaption>
           </figure>
           <div class="txt reveal">
             <div class="no">05</div>
@@ -605,8 +622,8 @@
             </div>
           </div>
           <figure class="art" aria-hidden="true">
-            <img src="art/reasons-meadow.webp" width="809" height="635" alt="" loading="lazy" decoding="async" data-drift="sec:.05">
-            <figcaption class="credit"><b>Pl. 08</b>Detail from Gustav Klimt, The Kiss, 1907–08</figcaption>
+            <img src="art/reasons-jatte.webp" width="897" height="673" alt="" loading="lazy" decoding="async" data-drift="sec:.05">
+            <figcaption class="credit"><b>Pl. 08</b>Detail from Georges Seurat, A Sunday on La Grande Jatte, 1884–86</figcaption>
           </figure>
         </aside>
         <div class="ledger" id="reasons-list">
@@ -640,8 +657,8 @@
         </div>
         <div class="side">
           <figure class="art" aria-hidden="true">
-            <img src="art/snaps-village.webp" width="596" height="783" alt="" loading="lazy" decoding="async" data-drift="sec:.05">
-            <figcaption class="credit"><b>Pl. 09</b>Detail from Vincent van Gogh, The Starry Night, 1889</figcaption>
+            <img src="art/snaps-sisters.webp" width="664" height="830" alt="" loading="lazy" decoding="async" data-drift="sec:.05">
+            <figcaption class="credit"><b>Pl. 09</b>Detail from Pierre-Auguste Renoir, Two Sisters (On the Terrace), 1881</figcaption>
           </figure>
           <div class="meta">
             <div class="count" id="count"></div>
@@ -663,11 +680,8 @@
       <span class="label">Made only for you.</span>
       <a class="go" href="#top" id="backTop">Back to top</a>
     </div>
-    <p class="label colophon">Paintings — Vincent van Gogh, The Starry Night (1889), Wheat Field with Cypresses (1889), Almond Blossom (1890) · Gustav Klimt, The Kiss (1907–08) · Claude Monet, Water Lilies (1906) · Caravaggio, The Supper at Emmaus (1601). Public-domain reproductions, details and torn edges by hand.</p>
+    <p class="label colophon">Paintings: Vincent van Gogh, The Starry Night (1889), Wheat Field with Cypresses (1889), Almond Blossom (1890); Gustav Klimt, The Kiss (1907–08); Claude Monet, Water Lilies (1906), The Japanese Footbridge (1899), Cliff Walk at Pourville (1882); Caravaggio, The Supper at Emmaus (1601); Georges Seurat, A Sunday on La Grande Jatte (1884–86); Pierre-Auguste Renoir, Two Sisters (On the Terrace) (1881). Public-domain reproductions, cropped and torn by hand.</p>
   </div>
-  <figure class="art foot-band" aria-hidden="true">
-    <img src="art/footer-band.webp" width="1100" height="275" alt="" loading="lazy" decoding="async" data-drift="sec:.04">
-  </figure>
 </footer>
 
 <script>
