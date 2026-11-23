@@ -27,6 +27,8 @@
   const intensities = new Float32Array(SIZE);
   const hues = new Float32Array(SIZE);
   const lights = new Float32Array(SIZE);
+  const coreCells = new Uint8Array(SIZE);
+  const textOverlapCells = new Uint8Array(SIZE);
   const glyphs = new Array(SIZE);
 
   const dpr = Math.min(1.5, window.devicePixelRatio || 1);
@@ -52,25 +54,21 @@
   const fract = (v) => v - Math.floor(v);
 
   let paletteMix = 0;
-  let targetPaletteMix = document.body?.dataset.theme === 'night' ? 0 : 1;
-  const blendHue = (a, b, amount) => {
-    const delta = ((b - a + 540) % 360) - 180;
-    return (a + delta * amount + 360) % 360;
+  let targetPaletteMix = document.documentElement.dataset.theme === 'night' ? 0 : 1;
+  const NIGHT_ACCENT = [217, 120, 138];
+  const NIGHT_CORE = [243, 236, 223];
+  const PAPER_MAROON = [122, 31, 46];
+  const themeRgb = (core = false) => {
+    const night = core ? NIGHT_CORE : NIGHT_ACCENT;
+    return night.map((value, i) => Math.round(value + (PAPER_MAROON[i] - value) * paletteMix));
   };
+  const themeColor = (core = false) => `rgb(${themeRgb(core).join(', ')})`;
+  const themeRgba = (core, alpha) => `rgba(${themeRgb(core).join(', ')}, ${alpha})`;
   const mixv = (night, paper) => night + (paper - night) * paletteMix;
-  function themedHue(value) {
-    const hue = ((value % 360) + 360) % 360;
-    let paperHue = hue;
-    if (hue >= 165 && hue < 270) paperHue = 164 + (hue - 165) * 0.4;
-    else if (hue >= 270) paperHue = 10 + (hue - 270) * 0.46;
-    else if (hue < 60) paperHue = 34 + hue * 0.28;
-    const themed = blendHue(hue, paperHue, paletteMix);
-    return blendHue(themed, 212, 0.65);
-  }
   const themeObserver = new MutationObserver(() => {
-    targetPaletteMix = document.body.dataset.theme === 'night' ? 0 : 1;
+    targetPaletteMix = document.documentElement.dataset.theme === 'night' ? 0 : 1;
   });
-  themeObserver.observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
+  themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
   /* ---------------- state ---------------- */
   let t = 0;
@@ -95,6 +93,7 @@
   function clearCells() {
     depths.fill(-1000);
     intensities.fill(-1);
+    coreCells.fill(0);
     glyphs.fill(' ');
   }
 
@@ -120,7 +119,7 @@
   }
 
   // glass = translucent shell: brighter cells behind may stay visible
-  function put(x, y, z, glyph, intensity, hue, light, depthBias = 0, glass = false) {
+  function put(x, y, z, glyph, intensity, hue, light, depthBias = 0, glass = false, core = false) {
     const p = project(x, y, z);
     if (!p || p.col < 0 || p.col >= COLS || p.row < 0 || p.row >= ROWS) return;
     const i = Math.round(p.row) * COLS + Math.round(p.col);
@@ -132,6 +131,7 @@
       intensities[i] = intensity;
       hues[i] = hue;
       lights[i] = light;
+      coreCells[i] = core ? 1 : 0;
       glyphs[i] = glyph;
     }
   }
@@ -239,7 +239,7 @@
     // glowing core
     for (let s = 0; s < 12; s++) {
       const a = s / 12 * Math.PI * 2;
-      put(0.07 * Math.cos(a), baseY + Ht * 0.42 + 0.05 * Math.sin(a * 2), 0.07 * Math.sin(a), '@%#'[s % 3], 0.85, 320, 72, 0.7);
+      put(0.07 * Math.cos(a), baseY + Ht * 0.42 + 0.05 * Math.sin(a * 2), 0.07 * Math.sin(a), '@%#'[s % 3], 0.85, 320, 72, 0.7, false, true);
     }
   }
 
@@ -356,16 +356,17 @@
       const f = p.age / p.life;
       const col = Math.round(p.col), row = Math.round(p.row);
       if (col < 0 || col >= COLS - 1 || row < 0 || row >= ROWS) continue;
-      ctx.globalAlpha = clamp(1 - f * f, 0, 1) * (1 - 0.35 * sleepy);
+      const overText = textOverlapCells[row * COLS + col] || textOverlapCells[row * COLS + col + 1];
+      ctx.globalAlpha = clamp(1 - f * f, 0, 1) * (1 - 0.35 * sleepy) * (overText ? 0.35 : 1);
       if (p.kind === 'heart') {
-        ctx.fillStyle = `hsl(${themedHue(335)} 90% ${mixv(62, 42).toFixed(0)}%)`;
+        ctx.fillStyle = themeColor();
         ctx.fillText('<', (col + 0.5) * CELL_W, (row + 0.5) * CELL_H);
         ctx.fillText('3', (col + 1.5) * CELL_W, (row + 0.5) * CELL_H);
       } else if (p.kind === 'zzz') {
-        ctx.fillStyle = `hsl(${themedHue(215)} 75% ${mixv(68, 38).toFixed(0)}%)`;
+        ctx.fillStyle = themeColor();
         ctx.fillText(f > 0.5 ? 'Z' : 'z', (col + 0.5) * CELL_W, (row + 0.5) * CELL_H);
       } else {
-        ctx.fillStyle = `hsl(${themedHue(180 + p.seed * 140)} 95% ${mixv(68, 40).toFixed(0)}%)`;
+        ctx.fillStyle = themeColor();
         ctx.fillText('.+*+.'[Math.min(4, Math.floor(f * 5))], (col + 0.5) * CELL_W, (row + 0.5) * CELL_H);
       }
     }
@@ -438,6 +439,7 @@
     corkscrew *= Math.exp(-dt * 1.25);
     fan = Math.max(0, fan - dt * 0.42);
     paletteMix += (targetPaletteMix - paletteMix) * (1 - Math.exp(-dt * 2.2));
+    if (Math.abs(targetPaletteMix - paletteMix) < 0.005) paletteMix = targetPaletteMix;
     if (rainbowT > 0) { rainbowT -= dt; rainbow = Math.min(1, rainbow + dt * 2); }
     else rainbow = Math.max(0, rainbow - dt * 1.2);
 
@@ -496,21 +498,14 @@
     paintTrailing(t);
 
     ctx.clearRect(0, 0, W, H);
-    let hueSum = 0, n = 0;
-    const hueBoost = hover * 22;
+    markTextCells();
     for (let row = 0; row < ROWS; row++) {
       for (let col = 0; col < COLS; col++) {
         const i = row * COLS + col;
         const glyph = glyphs[i];
         if (!glyph || glyph === ' ') continue;
-        let hue = hues[i] + hueBoost;
-        if (rainbow > 0) hue = hue * (1 - rainbow) + ((col * 5 + row * 6 + t * 100) % 360) * rainbow;
-        hue = themedHue(hue);
-        hueSum += hue; n++;
-        // darker palette: deep sea-glass on night, ink-on-paper on the paper theme
-        const light = clamp(mixv(lights[i] + 16, lights[i] * 0.5 - 4), mixv(50, 14), mixv(96, 44)) * (1 - 0.12 * sleepy);
-        ctx.fillStyle = `hsl(${hue.toFixed(0)} ${mixv(100, 72).toFixed(0)}% ${light.toFixed(0)}%)`;
-        ctx.globalAlpha = clamp(mixv(0.74 + intensities[i] * 0.26, 0.68 + intensities[i] * 0.32), 0.5, 1) * (1 - 0.35 * sleepy);
+        ctx.fillStyle = themeColor(coreCells[i] === 1);
+        ctx.globalAlpha = clamp(mixv(0.74 + intensities[i] * 0.26, 0.68 + intensities[i] * 0.32), 0.5, 1) * (1 - 0.35 * sleepy) * (textOverlapCells[i] ? 0.35 : 1);
         ctx.fillText(glyph, (col + 0.5) * CELL_W, (row + 0.5) * CELL_H);
       }
     }
@@ -519,16 +514,16 @@
 
     // cheap soft halo (CSS filter instead of per-glyph shadowBlur)
     if (++frameCount % 6 === 0) {
-      const h = Math.round((n ? hueSum / n : 195) / 10) * 10;
-      const haloKey = h + ':' + Math.round(pulse * 6);
+      const haloKey = Math.round(paletteMix * 10) + ':' + Math.round(pulse * 6);
       if (haloKey !== lastHalo) {
         lastHalo = haloKey;
-        // bioluminescent glow: tight bright core + wide coloured bloom, swelling with each swim stroke
+        // Keep the original glow radii and pulse; paper mode uses a softer tinted maroon halo.
         const k = 0.72 + 0.28 * pulse;
+        const haloScale = 1 - 0.72 * paletteMix;
         canvas.style.filter =
-          `drop-shadow(0 0 2px hsla(${h}, 100%, 82%, ${(0.95 * k).toFixed(2)})) ` +
-          `drop-shadow(0 0 9px hsla(${h}, 100%, 66%, ${(0.8 * k).toFixed(2)})) ` +
-          `drop-shadow(0 0 22px hsla(${h}, 100%, 58%, ${(0.6 * k).toFixed(2)}))`;
+          `drop-shadow(0 0 2px ${themeRgba(false, (0.95 * k * haloScale).toFixed(2))}) ` +
+          `drop-shadow(0 0 9px ${themeRgba(false, (0.8 * k * haloScale).toFixed(2))}) ` +
+          `drop-shadow(0 0 22px ${themeRgba(false, (0.6 * k * haloScale).toFixed(2))})`;
       }
     }
   }
@@ -540,6 +535,39 @@
   let idleAnchorX = 0, idleXPhase = 0, idleYPhase = -Math.PI / 2, idleDrift = 0;
   let cornerClock = 0;
   let scrollDepth = 0, lastDraw = 0, lastTime = 0;
+  let textRects = [], lastTextScan = -Infinity;
+  function refreshTextRects(now) {
+    if (now - lastTextScan < 240) return;
+    lastTextScan = now;
+    const next = [];
+    const range = document.createRange();
+    document.querySelectorAll('h1,h2,h3,h4,p,li,a,figcaption,blockquote,dt,dd,label,small,caption,td,th,span,strong,em').forEach((el) => {
+      if (el.closest('.mast') || !el.textContent.trim() || el.closest('.js .reveal:not(.in)')) return;
+      const style = getComputedStyle(el);
+      if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity) < 0.1) return;
+      range.selectNodeContents(el);
+      for (const rect of range.getClientRects()) {
+        if (rect.width > 0 && rect.height > 0) next.push({ left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom });
+      }
+    });
+    textRects = next;
+  }
+  function markTextCells() {
+    textOverlapCells.fill(0);
+    const bounds = canvas.getBoundingClientRect();
+    const cellWidth = bounds.width / COLS, cellHeight = bounds.height / ROWS;
+    if (!(cellWidth > 0 && cellHeight > 0)) return;
+    for (const rect of textRects) {
+      if (rect.left >= bounds.right || rect.right <= bounds.left || rect.top >= bounds.bottom || rect.bottom <= bounds.top) continue;
+      const firstCol = clamp(Math.floor((Math.max(rect.left, bounds.left) - bounds.left) / cellWidth), 0, COLS - 1);
+      const lastCol = clamp(Math.ceil((Math.min(rect.right, bounds.right) - bounds.left) / cellWidth) - 1, 0, COLS - 1);
+      const firstRow = clamp(Math.floor((Math.max(rect.top, bounds.top) - bounds.top) / cellHeight), 0, ROWS - 1);
+      const lastRow = clamp(Math.ceil((Math.min(rect.bottom, bounds.bottom) - bounds.top) / cellHeight) - 1, 0, ROWS - 1);
+      for (let row = firstRow; row <= lastRow; row++) {
+        textOverlapCells.fill(1, row * COLS + firstCol, row * COLS + lastCol + 1);
+      }
+    }
+  }
 
   const maxX = () => Math.max(8, window.innerWidth - W * SCALE - 8);
   const maxY = () => Math.max(58, window.innerHeight - H * SCALE - 12);
@@ -673,6 +701,7 @@
     currentX = clamp(currentX, 8, maxX());
     currentY = clamp(currentY, 8, maxY());
     setPosition(currentX, currentY, targetScale);
+    refreshTextRects(now);
 
     // velocity (px/s) drives tentacle drag + body lean
     const vk = 1 - Math.exp(-dt * 5);
@@ -687,6 +716,7 @@
   if (reducedMotion) {
     pulse = 0.3;
     setPosition(currentX, currentY, 1);
+    refreshTextRects(performance.now());
     draw();
   } else {
     window.requestAnimationFrame(animate);

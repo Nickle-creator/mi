@@ -48,8 +48,39 @@
   let canvasHasInk = false;
   const frameInterval = 1000 / 30;
   const jellyReactionRange = 170;
-  let hueWalker = Math.random() * 360;   // golden-angle walk => neighbours never match
-  let paper = document.body && document.body.dataset.theme === 'night' ? 0 : 1;   // 0 = night, 1 = paper (eased)
+  const NIGHT_COLORS = [[232, 199, 102], [145, 202, 209]];
+  const PAPER_COLORS = [[41, 32, 27], [44, 74, 134]];
+  let paper = document.documentElement.dataset.theme === 'night' ? 0 : 1;   // 0 = night, 1 = paper (eased)
+  let textRects = [], lastTextScan = -Infinity;
+
+  function colorForFish(fish) {
+    const paletteIndex = fish.look.paletteIndex;
+    const night = NIGHT_COLORS[paletteIndex], paperColor = PAPER_COLORS[paletteIndex];
+    const rgb = night.map((value, i) => Math.round(value + (paperColor[i] - value) * paper));
+    return { rgb, css: `rgb(${rgb.join(', ')})` };
+  }
+
+  function refreshTextRects(now) {
+    if (now - lastTextScan < 240) return;
+    lastTextScan = now;
+    const next = [];
+    const range = document.createRange();
+    document.querySelectorAll('h1,h2,h3,h4,p,li,a,figcaption,blockquote,dt,dd,label,small,caption,td,th').forEach((el) => {
+      if (el.closest('.mast') || !el.textContent.trim()) return;
+      if (el.closest('.js .reveal:not(.in)')) return;
+      const style = getComputedStyle(el);
+      if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity) < 0.1) return;
+      range.selectNodeContents(el);
+      for (const rect of range.getClientRects()) {
+        if (rect.width > 0 && rect.height > 0) next.push({ left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom });
+      }
+    });
+    textRects = next;
+  }
+
+  function overlapsText(left, top, right, bottom) {
+    return textRects.some((rect) => left < rect.right && right > rect.left && top < rect.bottom && bottom > rect.top);
+  }
 
   function resize() {
     width = window.innerWidth;
@@ -72,12 +103,10 @@
     return Math.exp(random(Math.log(0.5), Math.log(2.0)));
   }
 
-  function rollLook(size) {
-    hueWalker = (hueWalker + 137.5 + random(-25, 25)) % 360;
+  function rollLook(size, paletteIndex = 0) {
     const mode = pick(GLOW_MODES);
     return {
-      hue: hueWalker,
-      hueSpan: random(-7, 7) * (Math.random() < 0.25 ? 0 : 1),   // per-letter colour drift
+      paletteIndex,
       sat: random(72, 100),
       baseL: mode === 'neon' ? random(70, 82) : random(56, 74),
       glowMode: mode,
@@ -85,15 +114,14 @@
       glowAlpha: random(0.55, 1),
       glowSpeed: random(1.6, 5.5),
       glowDepth: random(0.35, 1),
-      bodyAlpha: random(0.62, 1) * (size > 1.5 ? 0.88 : 1),
-      // a few fish get a complementary-colour glow instead of matching their body
-      glowHueOffset: Math.random() < 0.3 ? random(60, 180) : 0
+      bodyAlpha: random(0.62, 1) * (size > 1.5 ? 0.88 : 1)
     };
   }
 
   function spawnSchool(now) {
     const direction = Math.random() < 0.5 ? 1 : -1;
     const count = 3 + Math.floor(Math.random() * 4);
+    const accentFish = Math.floor(Math.random() * count);
     const speciesOrder = shuffledSpecies();
     const lane = random(Math.max(110, height * 0.14), Math.max(160, height * 0.86));
     const spread = random(19, 34);
@@ -111,7 +139,7 @@
       const speed = baseSpeed * random(0.87, 1.16) * (1.12 - 0.22 * clamp((size - 0.5) / 1.5, 0, 1));
       school.fishes.push({
         type, direction, size, speed,
-        look: rollLook(size),
+        look: rollLook(size, i === accentFish ? 1 : 0),
         x, y: lane + (i - (count - 1) / 2) * spread + random(-9, 9),
         phase: random(0, Math.PI * 2),
         seed: random(0, 100),
@@ -183,7 +211,10 @@
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
     const top = -((rows.length - 1) * lineHeight) / 2;
-    const glowHue = (look.hue + look.glowHueOffset) % 360;
+    const color = colorForFish(fish);
+    const boxTop = swimY + top - lineHeight / 2 - 7;
+    const boxBottom = swimY + top + (rows.length - 1) * lineHeight + lineHeight / 2 + 7;
+    const overText = overlapsText(fish.x - 7, boxTop, fish.x + fish.width + 7, boxBottom);
 
     rows.forEach((row, rowIndex) => {
       const y = top + rowIndex * lineHeight;
@@ -193,13 +224,12 @@
         const g = glowAt(look, age, col, cols, EYES.includes(glyph));
         const shimmer = 5 * Math.sin(age * 4 + col * 0.7 + rowIndex);
         const nightL = clamp(look.baseL + shimmer + g.lift * 45, 40, 94) * 0.86;
-        const paperL = clamp(nightL * 0.52, 20, 44);          // ink-dark on cream paper
-        const light = nightL + (paperL - nightL) * paper;
-        const hue = (look.hue + col * look.hueSpan + 360) % 360;
-        ctx.fillStyle = `hsl(${hue.toFixed(0)} ${(look.sat * (1 - 0.22 * paper)).toFixed(0)}% ${light.toFixed(0)}%)`;
-        ctx.globalAlpha = clamp(look.bodyAlpha * g.alpha + 0.2 * paper, 0.25, 1);
+        const paperL = clamp(nightL * 0.52, 20, 44);
+        const brightness = (nightL / 60) + (paperL / 30 - nightL / 60) * paper;
+        ctx.fillStyle = color.css;
+        ctx.globalAlpha = clamp((look.bodyAlpha * g.alpha + 0.2 * paper) * brightness, 0.25, 1) * (overText ? 0.35 : 1);
         if (g.blur > 0.05 && paper < 0.6) {
-          ctx.shadowColor = `hsla(${glowHue.toFixed(0)}, 100%, 55%, ${(look.glowAlpha * g.alpha * (1 - paper)).toFixed(2)})`;
+          ctx.shadowColor = `rgba(${color.rgb.join(', ')}, ${(look.glowAlpha * g.alpha * (1 - paper)).toFixed(2)})`;
           ctx.shadowBlur = look.glowBlur * g.blur * (1 - paper);
         } else {
           ctx.shadowBlur = 0;
@@ -225,14 +255,16 @@
     }
     const dt = lastFrame ? Math.min(0.05, (now - lastFrame) * 0.001) : 0.016;
     lastFrame = now;
-    const paperTarget = document.body.dataset.theme === 'night' ? 0 : 1;
+    const paperTarget = document.documentElement.dataset.theme === 'night' ? 0 : 1;
     paper += (paperTarget - paper) * Math.min(1, dt * 4);
+    if (Math.abs(paperTarget - paper) < 0.005) paper = paperTarget;
     if (now >= nextSchoolAt && schools.reduce((n, school) => n + school.fishes.length, 0) < 24) {
       spawnSchool(now);
     }
 
     if (schools.length || canvasHasInk) ctx.clearRect(0, 0, width, height);
     let drewFish = false;
+    if (schools.length) refreshTextRects(now);
     const jelly = jellyCenter();
     for (let s = schools.length - 1; s >= 0; s--) {
       const school = schools[s];
