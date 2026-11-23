@@ -372,9 +372,20 @@
     .js .hero-top,.js .hero-foot{ opacity:1; }
   }
 </style>
+<link rel="stylesheet" href="ascii-jellyfish.css?v=ascii-corners-blue-10">
+<link rel="stylesheet" href="site-polish.css?v=ascii-vinyl-7">
+<script src="ascii-jellyfish.js?v=ascii-near-fish-11" defer></script>
+<script src="fish-school.js?v=nearby-schools-3" defer></script>
+<script src="site-polish.js?v=collage-vinyl-5" defer></script>
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=mimi-record-2" />
+<link rel="canonical" href="https://nickle-creator.github.io/mi/" />
+<meta property="og:image" content="og-preview.jpg" />
 </head>
 <body>
 
+<div id="asciiJellyfish" class="ascii-jellyfish" aria-hidden="true">
+  <canvas class="ascii-jellyfish__canvas" width="648" height="616">A 3D ASCII jellyfish.</canvas>
+</div>
 <header class="mast">
   <div class="brand">For You <i>Mimi</i></div>
   <div class="sec-now" aria-live="off">
@@ -382,7 +393,21 @@
     <span class="label" id="secName">Opening</span>
   </div>
   <div class="controls" aria-label="Page controls">
-    <button id="musicToggle" class="ctl" type="button" aria-pressed="false" title="Play the original music"><span>Play Music</span></button>
+        <button id="musicToggle" class="ctl music-ctl" type="button" aria-pressed="false" aria-label="Play Dexys Midnight Runners" title="Play Dexys Midnight Runners">
+      <span class="turntable" aria-hidden="true">
+        <pre class="vinyl-ascii-disc">    .----.
+  .' .--. `.
+ /  /==\  \
+|  |==o=|  |
+ \  \==/  /
+  `. '--' .'
+    `----'</pre>
+        <span class="vinyl-ascii-accent">~ . ~</span>
+      </span>
+      <span class="music-meta" aria-hidden="true">
+        <strong>Dexys Midnight Runners</strong>
+        <small><span class="music-eq"><i></i><i></i><i></i><i></i></span> Mixtape · Side A</small>
+      </span>
     <button id="themeToggle" class="ctl" type="button" aria-label="Switch to paper theme" aria-pressed="true"><span>Paper theme</span></button>
   </div>
   <div class="progress" aria-hidden="true"><span id="readingProgress"></span></div>
@@ -655,19 +680,21 @@
 
   /* ---------- audio + theme ---------- */
   var bgMusic = $('#bgMusic'), musicToggle = $('#musicToggle'), themeToggle = $('#themeToggle');
-  function setAudioButton(btn, playing, label){
+  function setAudioButton(btn, playing){
+    btn.classList.toggle('is-playing', playing);
     btn.setAttribute('aria-pressed', String(playing));
-    btn.querySelector('span').textContent = playing ? 'Pause ' + label : label;
+    var t = (playing ? 'Pause' : 'Play') + ' Dexys Midnight Runners';
+    btn.setAttribute('aria-label', t); btn.title = t;
+    btn.querySelector('.music-action').textContent = playing ? 'Pause' : 'Play';
   }
   musicToggle.addEventListener('click', function(){
-    if(!bgMusic.paused){ bgMusic.pause(); setAudioButton(musicToggle,false,'Play Music'); return; }
-    bgMusic.play().then(function(){ setAudioButton(musicToggle,true,'Play Music'); }).catch(function(){
-      musicToggle.querySelector('span').textContent = 'Audio unavailable';
-      musicToggle.setAttribute('aria-pressed','false');
-      setTimeout(function(){ setAudioButton(musicToggle,false,'Play Music'); }, 2200);
+    if(!bgMusic.paused){ bgMusic.pause(); setAudioButton(musicToggle,false); return; }
+    bgMusic.play().then(function(){ setAudioButton(musicToggle,true); }).catch(function(){
+      musicToggle.querySelector('.music-action').textContent = 'Unavailable';
+      setTimeout(function(){ setAudioButton(musicToggle,false); }, 2200);
     });
   });
-  bgMusic.addEventListener('pause', function(){ setAudioButton(musicToggle,false,'Play Music'); });
+  bgMusic.addEventListener('pause', function(){ setAudioButton(musicToggle,false); });
 
   function applyTheme(theme){
     var night = theme === 'night';
