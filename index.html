@@ -48,7 +48,7 @@
     --accent:#91cad1; --burn:#d9788a; --rim:#d9cfb8;
     --tile:url(art/paper-night.webp);
     --mast:rgba(0,0,0,.94); --stamp:rgba(0,0,0,.82); --ctl:transparent;
-    --snap-tint:rgba(255,255,255,.035); --foot-tint:rgba(255,255,255,.03);
+    --snap-tint:rgba(0,0,0,0); --foot-tint:rgba(0,0,0,0);
     --grain-op:.12; --vig:rgba(0,0,0,.34);
     --hero-mask:none;
   }
@@ -201,13 +201,13 @@
   section{ position:relative; isolation:isolate; overflow-x:clip; padding:clamp(5rem,12vw,10rem) 0; }
 
   /* the next sheet of paper, pasted over the last one */
-  .tear{ position:absolute; left:0; right:0; top:-27px; height:56px; pointer-events:none; z-index:1; }
+  .tear{ position:absolute; left:0; right:0; top:-150px; height:200px; pointer-events:none; z-index:1; }
   .tear::before,.tear::after{
     content:''; position:absolute; inset:0;
-    -webkit-mask:url(art/tear.webp) 0 0/1600px 56px repeat-x; mask:url(art/tear.webp) 0 0/1600px 56px repeat-x;
+    -webkit-mask:url(art/tear.webp) 0 0/2400px 200px repeat-x; mask:url(art/tear.webp) 0 0/2400px 200px repeat-x;
   }
   .tear::before{ background:var(--rim); -webkit-mask-image:url(art/tear-rim.webp); mask-image:url(art/tear-rim.webp); }
-  .tear::after{ background:linear-gradient(var(--sheet-tint),var(--sheet-tint)), var(--tile) 0 27px/512px 512px, var(--paper); }
+  .tear::after{ background:linear-gradient(var(--sheet-tint),var(--sheet-tint)), var(--tile) 0 150px/512px 512px, var(--paper); }
 
   /* --- story --- */
   .story-head{ align-items:center; margin:clamp(2rem,5vw,4rem) 0 clamp(3.5rem,8vw,7rem); }
@@ -311,7 +311,7 @@
   /* --- colophon --- */
   footer{
     --sheet-tint:var(--foot-tint);
-    position:relative; isolation:isolate; overflow:hidden; padding:clamp(6rem,13vw,10rem) 0 0;
+    position:relative; isolation:isolate; overflow-x:clip; overflow-y:visible; padding:clamp(6rem,13vw,10rem) 0 0;
     background:linear-gradient(var(--foot-tint),var(--foot-tint)), var(--tile) 0 0/512px 512px, var(--paper);
   }
   footer .big{ font:400 clamp(3.4rem,14vw,14rem)/.88 var(--serif); letter-spacing:-.045em; }
@@ -452,6 +452,7 @@
   .pq{ padding:clamp(4.5rem,11vw,9rem) 0; text-align:center; }
   .pq-t{ font:400 clamp(1.9rem,5.2vw,4.6rem)/1.12 var(--serif); letter-spacing:-.025em; color:var(--ink); }
   .pq-t span{ display:block; } .pq-t,.pq-t span{ font-style:normal; }
+  main > .pq:last-child{ padding-bottom:clamp(9rem,17vw,13rem); }
   .pq-c{ margin-top:1.6rem; font:500 .62rem/1 var(--sans); letter-spacing:.2em; text-transform:uppercase; color:var(--ink2); }
   .pq-c::before,.pq-c::after{ content:""; display:inline-block; width:2rem; height:1px; background:var(--rule); vertical-align:middle; margin:0 .9rem; }
   @media (max-width:430px){ .pq-c::before,.pq-c::after{ width:.8rem; margin:0 .5rem; } }
