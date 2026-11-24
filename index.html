@@ -449,12 +449,32 @@
   @media (max-width:360px){ .brand{ display:none; } }
   @media (max-width:430px){ .mast .controls{ gap:.8rem; } .brand{ font-size:1.1rem; } .music-meta strong{ font-size:.5rem; letter-spacing:.1em; } .mast .controls > .ctl:not(.music-ctl){ font-size:.5rem; letter-spacing:.1em; padding:.3rem 0; } }
   /* ---- poem layer ---- */
-  .poem{ position:fixed; z-index:-1; left:var(--gutter); top:50%; transform:translateY(-50%); width:min(24rem,38vw); pointer-events:none;
-    font:400 clamp(.95rem,1.15vw,1.12rem)/1.85 var(--serif); color:var(--ink); opacity:0; transition:opacity 2s var(--ease2); }
-  .poem.on{ opacity:.14; }
-  .poem h2{ font:500 .58rem/1 var(--sans); letter-spacing:.2em; text-transform:uppercase; margin-bottom:1.6rem; }
-  .poem p{ margin-bottom:1.4rem; } .poem span{ display:block; }
-  @media (max-width:900px){ .poem{ width:calc(100vw - 2*var(--gutter)); } .poem.on{ opacity:.09; } }
+  .poem{ position:fixed; z-index:-1; right:var(--gutter); bottom:2.6rem; width:min(21rem,30vw); pointer-events:none;
+    font:400 clamp(.95rem,1.1vw,1.1rem)/1.8 var(--serif); color:var(--ink); opacity:0; transition:opacity 2s var(--ease2); }
+  .poem.on{ opacity:.2; }
+  .poem h2{ font:500 .56rem/1 var(--sans); letter-spacing:.2em; text-transform:uppercase; margin-bottom:1.1rem; }
+  .poem .st{ position:absolute; left:0; right:0; bottom:0; opacity:0; transform:translateY(8px); transition:opacity 1.1s var(--ease2), transform 1.4s var(--ease); }
+  .poem .st.cur{ opacity:1; transform:none; position:relative; }
+  .poem span{ display:block; } .poem .st span:nth-child(5){ padding-left:1.4rem; }
+  @media (max-width:900px){ .poem{ width:calc(100vw - 2*var(--gutter)); bottom:1.4rem; } .poem.on{ opacity:.1; } }
+  /* ---- turntable figure ---- */
+  .mast .controls .music-ctl .turntable{ width:3.7rem; height:2.34rem; flex:none; }
+  .turntable svg{ width:100%; height:100%; display:block; overflow:visible; fill:none; stroke:currentColor; stroke-width:1.5; }
+  .turntable .groove{ opacity:.35; stroke-width:.8; }
+  .turntable .lab{ fill:var(--burn); stroke:none; }
+  .turntable .tick{ stroke:var(--paper); stroke-width:1.4; }
+  .turntable .spin,.turntable .pivot{ fill:var(--paper); }
+  .turntable .knob{ opacity:.6; }
+  .turntable .head{ fill:currentColor; stroke:none; }
+  .turntable .platter{ transform-box:view-box; transform-origin:44px 38px; animation:rec-spin 2.6s linear infinite; animation-play-state:paused; }
+  .music-ctl.is-playing .turntable .platter{ animation-play-state:running; }
+  .turntable .tonearm{ transform-box:view-box; transform-origin:104px 14px; transform:rotate(-30deg); transition:transform 1.2s var(--ease); }
+  .music-ctl.is-playing .turntable .tonearm{ transform:rotate(0deg); }
+  .music-meta{ display:grid; gap:.3rem; }
+  .music-meta .music-action{ font:500 .5rem/1 var(--sans); letter-spacing:.2em; text-transform:uppercase; color:var(--burn); }
+  @keyframes rec-spin{ to{ transform:rotate(360deg); } }
+  @media (prefers-reduced-motion:reduce){ .turntable .platter{ animation:none; } }
+  @media (max-width:430px){ .mast .controls .music-ctl .turntable{ width:3rem; height:1.9rem; } }
 </style>
 </head>
 <body>
@@ -472,18 +492,23 @@
   <div class="controls" aria-label="Page controls">
         <button id="musicToggle" class="ctl music-ctl" type="button" aria-pressed="false" aria-label="Play Dexys Midnight Runners" title="Play Dexys Midnight Runners">
       <span class="turntable" aria-hidden="true">
-        <pre class="vinyl-ascii-disc">    .----.
-  .' .--. `.
- /  /==\  \
-|  |==o=|  |
- \  \==/  /
-  `. '--' .'
-    `----'</pre>
-        <span class="vinyl-ascii-accent">~ . ~</span>
+        <svg viewBox="0 0 120 76" focusable="false">
+          <rect class="plinth" x="1" y="1" width="118" height="74" rx="3"/>
+          <g class="platter">
+            <circle class="rec" cx="44" cy="38" r="31"/>
+            <circle class="groove" cx="44" cy="38" r="26"/><circle class="groove" cx="44" cy="38" r="22"/><circle class="groove" cx="44" cy="38" r="18"/>
+            <circle class="lab" cx="44" cy="38" r="10"/>
+            <line class="tick" x1="44" y1="28" x2="44" y2="33"/>
+          </g>
+          <circle class="spin" cx="44" cy="38" r="1.8"/>
+          <circle class="pivot" cx="104" cy="14" r="5"/>
+          <g class="tonearm"><line x1="104" y1="14" x2="62" y2="50"/><rect class="head" x="56" y="46" width="9" height="6" rx="1" transform="rotate(40 60 49)"/></g>
+          <circle class="knob" cx="104" cy="62" r="3.5"/>
+        </svg>
       </span>
       <span class="music-meta" aria-hidden="true">
         <strong>Dexys Midnight Runners</strong>
-        <small><span class="music-eq"><i></i><i></i><i></i><i></i></span> Mixtape · Side A</small>
+        <span class="music-action">Play</span>
       </span>
     </button>
     <button id="themeToggle" class="ctl" type="button" aria-label="Switch to paper theme" aria-pressed="true"><span>Paper theme</span></button>
@@ -924,7 +949,10 @@
     var st=t.split(/\n\s*\n/).map(function(b){ return b.split('\n').filter(function(l){ return l.trim() && l[0]!=='#'; }); }).filter(function(b){ return b.length; });
     if(!st.length) return;
     var h=document.createElement('h2'); h.textContent='Her Voice \u2014 Oscar Wilde, 1881'; el.appendChild(h);
-    st.forEach(function(b){ var p=document.createElement('p'); b.forEach(function(l){ var s=document.createElement('span'); s.textContent=l; p.appendChild(s); }); el.appendChild(p); });
+    var box=document.createElement('div'); el.appendChild(box); var ps=[];
+    st.forEach(function(b){ var p=document.createElement('p'); p.className='st'; b.forEach(function(l){ var s=document.createElement('span'); s.textContent=l; p.appendChild(s); }); box.appendChild(p); ps.push(p); });
+    var cur=-1; function upd(){ var m=document.documentElement.scrollHeight-innerHeight, i=Math.min(ps.length-1,Math.floor((m>0?scrollY/m:0)*ps.length)); if(i!==cur){ if(cur>=0) ps[cur].classList.remove('cur'); ps[i].classList.add('cur'); cur=i; } }
+    var tk=false; addEventListener('scroll',function(){ if(!tk){ tk=true; requestAnimationFrame(function(){ tk=false; upd(); }); } },{passive:true}); upd();
     requestAnimationFrame(function(){ el.classList.add('on'); });
   }).catch(function(){});
 })();
