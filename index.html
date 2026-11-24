@@ -43,12 +43,12 @@
     --hero-mask:linear-gradient(90deg,transparent 0,rgba(0,0,0,.35) 30%,#000 62%);
   }
   :root[data-theme="night"]{
-    --paper:#181e26; --paper2:#1f2a36; --print:#222b33;
+    --paper:#000; --paper2:#0c0c0c; --print:#131313;
     --ink:#f3ecdf; --ink2:#b9b5ab; --rule:rgba(243,236,223,.22);
     --accent:#91cad1; --burn:#d9788a; --rim:#d9cfb8;
     --tile:url(art/paper-night.webp);
-    --mast:rgba(24,30,38,.96); --stamp:rgba(24,30,38,.82); --ctl:rgba(242,235,222,.05);
-    --snap-tint:rgba(56,76,96,.42); --foot-tint:rgba(30,58,76,.34);
+    --mast:rgba(0,0,0,.94); --stamp:rgba(0,0,0,.82); --ctl:transparent;
+    --snap-tint:rgba(255,255,255,.035); --foot-tint:rgba(255,255,255,.03);
     --grain-op:.12; --vig:rgba(0,0,0,.34);
     --hero-mask:none;
   }
@@ -167,7 +167,7 @@
     font-size:clamp(2.8rem,11.2vw,12.2rem); line-height:.88; letter-spacing:-.04em; max-width:13ch;
     margin:clamp(2rem,7vh,5rem) 0; position:relative; z-index:2;
   }
-  :root[data-theme="night"] .hero h1{ text-shadow:0 1px 0 rgba(0,0,0,.25), 0 0 28px rgba(9,13,19,.35); }
+  :root[data-theme="night"] .hero h1{ text-shadow:0 1px 0 rgba(0,0,0,.25), 0 0 28px rgba(0,0,0,.35); }
   .hero h1 .ln{ display:block; overflow:hidden; padding-bottom:.1em; margin-bottom:-.1em; }
   .hero h1 .ln > span{ display:block; }
   .js .hero h1 .ln > span{ transform:translateY(108%); transition:transform 1.4s var(--ease); }
@@ -427,10 +427,39 @@
     .music-meta strong{ font-size:.42rem; letter-spacing:0; line-height:1.1; white-space:normal; overflow:visible; text-overflow:clip; }
     .music-meta small{ display:none; }
   }
+
+  /* ---- quieter masthead: no pills, no boxes, just type ---- */
+  .mast{ border-bottom:1px solid var(--rule); }
+  .brand{ font-size:1.3rem; letter-spacing:-.02em; } .brand i{ font-style:normal; }
+  .sec-now{ gap:.7rem; color:var(--ink2); font:500 .62rem/1 var(--sans); letter-spacing:.16em; text-transform:uppercase; }
+  .sec-now .n{ font:400 .62rem/1 var(--sans); letter-spacing:.16em; min-width:0; text-align:left; color:var(--burn); }
+  .controls{ gap:1.7rem; align-items:center; }
+  .mast .controls .ctl{ border:0; background:none; min-height:0; padding:.3rem 0; border-radius:0; box-shadow:none; min-width:0;
+    font:500 .62rem/1 var(--sans); letter-spacing:.16em; position:relative; }
+  .mast .controls .ctl::after{ content:""; position:absolute; left:0; right:0; bottom:0; height:1px; background:currentColor; transform:scaleX(0); transform-origin:left; transition:transform .5s var(--ease); }
+  .mast .controls .ctl:hover,.mast .controls .ctl:focus-visible{ background:none; color:var(--burn); border:0; }
+  .mast .controls .ctl:hover::after{ transform:scaleX(1); }
+  .mast .controls .ctl[aria-pressed="true"]{ color:inherit; }
+  .mast .controls .music-ctl{ padding:0; gap:.55rem; }
+  .mast .controls .music-ctl .turntable{ width:1.7rem; height:1.7rem; }
+  .music-meta small,.music-eq{ display:none; }
+  .music-meta strong{ font-size:.62rem; letter-spacing:.16em; }
+  @media (max-width:900px){ .sec-now{ display:none; } .mast{ grid-template-columns:1fr auto; } }
+  @media (max-width:900px){ .mast{ grid-template-columns:auto 1fr !important; } .brand{ display:block; white-space:nowrap; } .controls{ justify-content:flex-end; } }
+  @media (max-width:360px){ .brand{ display:none; } }
+  @media (max-width:430px){ .mast .controls{ gap:.8rem; } .brand{ font-size:1.1rem; } .music-meta strong{ font-size:.5rem; letter-spacing:.1em; } .mast .controls > .ctl:not(.music-ctl){ font-size:.5rem; letter-spacing:.1em; padding:.3rem 0; } }
+  /* ---- poem layer ---- */
+  .poem{ position:fixed; z-index:-1; left:var(--gutter); top:50%; transform:translateY(-50%); width:min(24rem,38vw); pointer-events:none;
+    font:400 clamp(.95rem,1.15vw,1.12rem)/1.85 var(--serif); color:var(--ink); opacity:0; transition:opacity 2s var(--ease2); }
+  .poem.on{ opacity:.14; }
+  .poem h2{ font:500 .58rem/1 var(--sans); letter-spacing:.2em; text-transform:uppercase; margin-bottom:1.6rem; }
+  .poem p{ margin-bottom:1.4rem; } .poem span{ display:block; }
+  @media (max-width:900px){ .poem{ width:calc(100vw - 2*var(--gutter)); } .poem.on{ opacity:.09; } }
 </style>
 </head>
 <body>
 
+<div class="poem" id="poem" aria-hidden="true"></div>
 <div id="asciiJellyfish" class="ascii-jellyfish" aria-hidden="true">
   <canvas class="ascii-jellyfish__canvas" width="648" height="616">A 3D ASCII jellyfish.</canvas>
 </div>
@@ -887,6 +916,17 @@
   $('#backTop').addEventListener('click', function(e){ e.preventDefault(); scrollTo({ top:0, behavior: reduce.matches ? 'auto' : 'smooth' }); });
 
   requestAnimationFrame(function(){ requestAnimationFrame(function(){ document.body.classList.add('ready'); }); });
+})();
+</script>
+<script>
+(function(){ var el=document.getElementById('poem'); if(!el||!window.fetch) return;
+  fetch('poem.txt').then(function(r){ return r.ok ? r.text() : ''; }).then(function(t){
+    var st=t.split(/\n\s*\n/).map(function(b){ return b.split('\n').filter(function(l){ return l.trim() && l[0]!=='#'; }); }).filter(function(b){ return b.length; });
+    if(!st.length) return;
+    var h=document.createElement('h2'); h.textContent='Her Voice \u2014 Oscar Wilde, 1881'; el.appendChild(h);
+    st.forEach(function(b){ var p=document.createElement('p'); b.forEach(function(l){ var s=document.createElement('span'); s.textContent=l; p.appendChild(s); }); el.appendChild(p); });
+    requestAnimationFrame(function(){ el.classList.add('on'); });
+  }).catch(function(){});
 })();
 </script>
 </body>

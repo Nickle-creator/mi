@@ -1,0 +1,2 @@
+# Paste "Her Voice" by Oscar Wilde here, one line per line, blank line between stanzas.
+# Lines starting with # are ignored. The poem appears faintly behind the page once this file has text.
