@@ -451,7 +451,7 @@
   /* ---- pull quotes ---- */
   .pq{ padding:clamp(4.5rem,11vw,9rem) 0; text-align:center; }
   .pq-t{ font:400 clamp(1.9rem,5.2vw,4.6rem)/1.12 var(--serif); letter-spacing:-.025em; color:var(--ink); }
-  .pq-t span{ display:block; } .pq-t .b{ color:var(--burn); }
+  .pq-t span{ display:block; } .pq-t,.pq-t span{ font-style:normal; }
   .pq-c{ margin-top:1.6rem; font:500 .62rem/1 var(--sans); letter-spacing:.2em; text-transform:uppercase; color:var(--ink2); }
   .pq-c::before,.pq-c::after{ content:""; display:inline-block; width:2rem; height:1px; background:var(--rule); vertical-align:middle; margin:0 .9rem; }
   @media (max-width:430px){ .pq-c::before,.pq-c::after{ width:.8rem; margin:0 .5rem; } }
@@ -549,10 +549,7 @@
   </section>
 
   <!-- ===================== 02 / STORY ===================== -->
-  <aside class="pq" aria-label="Robert Burns, A Red, Red Rose">
-    <div class="wrap"><p class="pq-t reveal"><span>O my Luve is like a red, red rose</span><span class="b">That’s newly sprung in June;</span></p>
-    <p class="pq-c reveal">Robert Burns &mdash; A Red, Red Rose</p></div>
-  </aside>
+  <aside class="pq" data-quote="0"></aside>
 
   <section id="story" data-sec="02" data-name="mwah.">
     <div class="wrap">
@@ -689,10 +686,7 @@
   </section>
 
   <!-- ===================== 03 / REASONS ===================== -->
-  <aside class="pq" aria-label="Robert Burns, A Red, Red Rose">
-    <div class="wrap"><p class="pq-t reveal"><span>So fair art thou, my bonnie lass,</span><span class="b">So deep in luve am I;</span></p>
-    <p class="pq-c reveal">Robert Burns &mdash; A Red, Red Rose</p></div>
-  </aside>
+  <aside class="pq" data-quote="1"></aside>
 
   <section id="reasons" data-sec="03" data-name="And I love you">
     <div class="wrap">
@@ -726,10 +720,7 @@
   </section>
 
   <!-- ===================== 04 / SNAPSHOTS ===================== -->
-  <aside class="pq" aria-label="Robert Burns, A Red, Red Rose">
-    <div class="wrap"><p class="pq-t reveal"><span>Till a’ the seas gang dry, my dear,</span><span class="b">And the rocks melt wi’ the sun;</span></p>
-    <p class="pq-c reveal">Robert Burns &mdash; A Red, Red Rose</p></div>
-  </aside>
+  <aside class="pq" data-quote="2"></aside>
 
   <section id="snaps" data-sec="04" data-name="Snapshots">
     <div class="tear" aria-hidden="true"></div>
@@ -760,10 +751,7 @@
       </div>
     </div>
   </section>
-  <aside class="pq" aria-label="Robert Burns, A Red, Red Rose">
-    <div class="wrap"><p class="pq-t reveal"><span>And I will come again, my luve,</span><span class="b">Though it were ten thousand mile.</span></p>
-    <p class="pq-c reveal">Robert Burns &mdash; A Red, Red Rose</p></div>
-  </aside>
+  <aside class="pq" data-quote="3"></aside>
 
 </main>
 
@@ -781,6 +769,7 @@
   </figure>
 </footer>
 
+<script src="quotes/quotes.js"></script>
 <script>
 (function(){
   'use strict';
