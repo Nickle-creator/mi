@@ -11,6 +11,10 @@
   (function(){
     var d=document.documentElement; d.classList.add('js');
     try{ if(localStorage.getItem('mimi-reading-theme-v2')==='twilight') d.dataset.theme='twilight'; }catch(e){}
+    var arrival=false;
+    try{ arrival=sessionStorage.getItem('mimi-jellyfish-arrival')==='1'; if(arrival) sessionStorage.removeItem('mimi-jellyfish-arrival'); }catch(e){}
+    if(location.search.indexOf('meet-jellyfish=1')!==-1){ arrival=true; try{ history.replaceState(null,'',location.pathname+location.hash); }catch(e){} }
+    if(arrival) d.classList.add('jellyfish-arrival');
   })();
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -475,12 +479,30 @@
   @media (prefers-reduced-motion:reduce){ .turntable .platter{ animation:none; } }
   @media (max-width:430px){ .mast .controls .music-ctl .turntable{ width:3rem; height:1.9rem; } }
 </style>
+<style id="jellyfish-arrival-style">
+  .jellyfish-intro[hidden]{ display:none !important; }
+  .jellyfish-intro{ position:fixed; z-index:55; top:calc(var(--bar) + 1rem); left:12px; width:min(16rem,calc(100vw - 24px)); padding:.95rem 1rem .8rem; color:var(--ink); background:var(--print); border:1px solid var(--burn); box-shadow:7px 7px 0 var(--rule); opacity:0; transform:translate3d(0,10px,0) rotate(-.8deg); transition:opacity .45s var(--ease2),transform .65s var(--ease); pointer-events:none; }
+  .jellyfish-intro::before{ content:''; position:absolute; top:-.38rem; left:1rem; width:2.6rem; height:.68rem; background:var(--burn); opacity:.7; transform:rotate(-4deg); }
+  .jellyfish-intro::after{ content:''; position:absolute; top:50%; right:-9px; width:9px; height:1px; background:var(--burn); }
+  .jellyfish-intro.is-visible{ opacity:1; transform:none; pointer-events:auto; }
+  .jellyfish-intro__label{ color:var(--burn); font:500 .56rem/1.2 var(--sans); letter-spacing:.16em; text-transform:uppercase; }
+  .jellyfish-intro__copy{ margin-top:.45rem; font:400 1.22rem/1.12 var(--serif); }
+  .jellyfish-intro__dismiss{ margin-top:.7rem; padding:.35rem 0 0; border-top:1px solid var(--rule); color:var(--ink2); font:500 .52rem/1.2 var(--sans); letter-spacing:.14em; text-transform:uppercase; }
+  .jellyfish-intro__dismiss:hover{ color:var(--burn); }
+  @media (max-width:600px){ .jellyfish-intro{ width:min(12rem,calc(100vw - 24px)); padding:.8rem .85rem .7rem; } .jellyfish-intro__copy{ font-size:1.05rem; } }
+  @media (prefers-reduced-motion:reduce){ .jellyfish-intro{ transition:none !important; } }
+</style>
 </head>
 <body>
 
 <div id="asciiJellyfish" class="ascii-jellyfish" aria-hidden="true">
   <canvas class="ascii-jellyfish__canvas" width="648" height="616">A 3D ASCII jellyfish.</canvas>
 </div>
+<aside id="jellyfishIntro" class="jellyfish-intro" role="status" aria-live="polite" hidden>
+  <p class="jellyfish-intro__label">Witness · Aquatic</p>
+  <p class="jellyfish-intro__copy">Meet the jellyfish. It saw everything. It remembers nothing. Its lawyer is a bubble.</p>
+  <button class="jellyfish-intro__dismiss" type="button">Dismiss witness</button>
+</aside>
 <header class="mast">
   <div class="brand">For You <i>Mimi</i></div>
   <div class="sec-now" aria-live="off">

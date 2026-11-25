@@ -3,6 +3,8 @@
   const canvas = root?.querySelector('canvas');
   const ctx = canvas?.getContext('2d', { alpha: true });
   if (!root || !canvas || !ctx) return;
+  const introNote = document.getElementById('jellyfishIntro');
+  const arrivalIntro = !!introNote && document.documentElement.classList.contains('jellyfish-arrival');
 
   /* ------------------------------------------------------------------
      ASCII moon-jelly companion
@@ -72,6 +74,8 @@
 
   /* ---------------- state ---------------- */
   let t = 0;
+  const introStartedAt = performance.now();
+  const introDuration = 2500;
   let yaw = 0, pitch = 0, roll = 0, lift = 0;
   let swimPhase = 0, pulse = 0;
   let excite = 0, glow = 0, rainbow = 0, rainbowT = 0, ruffle = 0;
@@ -580,6 +584,39 @@
     root.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) scale(${(SCALE * scale).toFixed(3)})`;
   }
 
+  function introProgress(now) {
+    if (!arrivalIntro || reducedMotion) return 1;
+    return smooth(0, 1, clamp((now - introStartedAt) / introDuration, 0, 1));
+  }
+  function positionIntroNote() {
+    if (!arrivalIntro || introNote.hidden) return;
+    const r = root.getBoundingClientRect();
+    const noteWidth = introNote.offsetWidth || 190, noteHeight = introNote.offsetHeight || 120;
+    const safeTop = (document.querySelector('.mast')?.getBoundingClientRect().bottom || 0) + 10;
+    const maxLeft = Math.max(12, window.innerWidth - noteWidth - 12);
+    const maxTop = Math.max(safeTop, window.innerHeight - noteHeight - 12);
+    introNote.style.left = `${Math.round(clamp(r.left - noteWidth - 12, 12, maxLeft))}px`;
+    introNote.style.top = `${Math.round(clamp(r.top + 46, safeTop, maxTop))}px`;
+  }
+  let introDismissTimer = 0;
+  function hideIntroNote() {
+    if (!arrivalIntro || introNote.hidden) return;
+    window.clearTimeout(introDismissTimer);
+    introNote.classList.remove('is-visible');
+    window.setTimeout(() => {
+      introNote.hidden = true;
+      document.documentElement.classList.remove('jellyfish-arrival');
+    }, reducedMotion ? 30 : 500);
+  }
+  function showIntroNote() {
+    if (!arrivalIntro) return;
+    introNote.hidden = false;
+    positionIntroNote();
+    requestAnimationFrame(() => introNote.classList.add('is-visible'));
+    introNote.querySelector('.jellyfish-intro__dismiss')?.addEventListener('click', hideIntroNote, { once: true });
+    introDismissTimer = window.setTimeout(hideIntroNote, 7500);
+  }
+
   function readjustIdleAnchor() {
     const limit = maxX();
     idleAnchorX = clamp(currentX, 8, limit);
@@ -659,7 +696,10 @@
   currentY = diving ? 48 + initialDepth * (maxY() - 48) : Math.max(26, window.innerHeight * 0.035);
   prevX = currentX; prevY = currentY;
   readjustIdleAnchor();
-  setPosition(currentX, currentY, 1);
+  const firstIntroProgress = introProgress(performance.now());
+  const firstIntroOffset = arrivalIntro && !reducedMotion ? (1 - firstIntroProgress) * (window.innerWidth + W * SCALE) : 0;
+  setPosition(currentX + firstIntroOffset, currentY, arrivalIntro && !reducedMotion ? 0.76 + 0.24 * firstIntroProgress : 1);
+  if (arrivalIntro) showIntroNote();
 
   function animate(now) {
     const dt = lastTime ? Math.min(0.05, (now - lastTime) * 0.001) : 0.016;
@@ -700,7 +740,11 @@
     dartVX *= decay; dartVY *= decay;
     currentX = clamp(currentX, 8, maxX());
     currentY = clamp(currentY, 8, maxY());
-    setPosition(currentX, currentY, targetScale);
+    const intro = introProgress(now);
+    const introOffset = arrivalIntro && !reducedMotion ? (1 - intro) * (window.innerWidth + W * SCALE) : 0;
+    const introScale = arrivalIntro && !reducedMotion ? 0.76 + 0.24 * intro : targetScale;
+    setPosition(currentX + introOffset, currentY, introScale);
+    if (arrivalIntro && !introNote.hidden) positionIntroNote();
     refreshTextRects(now);
 
     // velocity (px/s) drives tentacle drag + body lean
@@ -716,6 +760,7 @@
   if (reducedMotion) {
     pulse = 0.3;
     setPosition(currentX, currentY, 1);
+    if (arrivalIntro) positionIntroNote();
     refreshTextRects(performance.now());
     draw();
   } else {
