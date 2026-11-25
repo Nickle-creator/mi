@@ -17,11 +17,17 @@
   *{ box-sizing:border-box; margin:0; padding:0; }
   html,body{ height:100%; }
   body{ background:#000; color:var(--ink); font-family:var(--sans); overflow:hidden; -webkit-font-smoothing:antialiased; touch-action:manipulation; }
-  #bg{ position:fixed; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; opacity:1; transform:scale(1); filter:saturate(.92) contrast(1.04); transition:opacity 1.55s var(--ease),transform 2.2s var(--ease),filter 1.55s var(--ease); }
-  html.js.prelude #bg{ opacity:.18; transform:scale(1.045); filter:saturate(.42) contrast(1.04) brightness(.58); }
-  html.js.revealed #bg{ opacity:1; transform:scale(1); filter:saturate(.92) contrast(1.04); }
-  /* the painting is lit by wherever you point: a lantern that follows the cursor */
-  .lamp{ position:fixed; inset:0; pointer-events:none; background:radial-gradient(circle min(46vw,420px) at var(--mx) var(--my), rgba(0,0,0,0) 0, rgba(0,0,0,.62) 100%); transition:background .2s; }
+  #bg{ position:fixed; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; transform:scale(1.035); transition:transform 6s cubic-bezier(.2,.6,.2,1); will-change:transform; }
+  html.open #bg{ transform:scale(1); }
+  body.leaving #bg{ transform:scale(1.09); transition-duration:2.2s; }
+  /* static dimming + a small warm lantern that follows the cursor (cheap: one small layer moved with transform) */
+  .dim{ position:fixed; inset:0; pointer-events:none; background:radial-gradient(ellipse 85% 85% at 50% 52%, rgba(0,0,0,.18), rgba(0,0,0,.66)); }
+  .lamp{ position:fixed; left:0; top:0; width:760px; height:760px; margin:-380px 0 0 -380px; pointer-events:none; opacity:0; transition:opacity 1.2s var(--ease); will-change:transform;
+    background:radial-gradient(circle, rgba(255,214,160,.17) 0, rgba(255,214,160,.07) 38%, rgba(255,214,160,0) 68%); }
+  html.revealed .lamp{ opacity:1; }
+  .curtain{ position:fixed; inset:0; z-index:200; background:#000; pointer-events:none; opacity:1; transition:opacity 1.3s var(--ease); }
+  html.open .curtain{ opacity:0; }
+  body.leaving .curtain{ opacity:1; transition:opacity .8s var(--ease) .9s; }
   .top{ position:fixed; left:0; right:0; top:0; height:46svh; pointer-events:none; background:linear-gradient(rgba(0,0,0,.88),rgba(0,0,0,.55) 55%,transparent); }
   body::after{ content:''; position:fixed; inset:0; z-index:100; pointer-events:none; opacity:.1; background:url(art/grain.webp) 0 0/170px 170px; }
   main{ position:relative; z-index:5; text-align:center; padding:clamp(2.2rem,7svh,4rem) 1.2rem 0; }
@@ -43,15 +49,6 @@
   html.js.prelude #yes,html.js.prelude #no{ opacity:0; pointer-events:none; }
   html.js.revealed #yes,html.js.revealed #no{ opacity:1; pointer-events:auto; transition-delay:.18s; }
   #slot{ position:fixed; left:50%; bottom:7svh; width:9.5rem; height:3.6rem; translate:-50% 0; }
-  .handoff{ position:fixed; inset:0; z-index:90; display:flex; align-items:flex-end; justify-content:flex-start; padding:clamp(1rem,6vw,5rem); background:radial-gradient(circle at 8% 92%,rgba(217,120,138,.2),rgba(0,0,0,.86) 48%); backdrop-filter:blur(3px); opacity:0; visibility:hidden; pointer-events:none; transition:opacity .45s var(--ease),visibility .45s; }
-  body.handoff .handoff{ opacity:1; visibility:visible; pointer-events:auto; }
-  .handoff-card{ width:min(39rem,100%); display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:1.25rem; padding:1.25rem clamp(1rem,3vw,2rem); background:rgba(8,8,8,.94); border:1px solid var(--rule); border-left:3px solid var(--burn); box-shadow:9px 9px 0 rgba(217,120,138,.2); opacity:0; transform:translate3d(-22px,14px,0) rotate(-.8deg); transition:opacity .55s var(--ease),transform .7s var(--ease); }
-  body.handoff .handoff-card{ opacity:1; transform:none; transition-delay:.08s; }
-  .handoff-label{ color:var(--burn); font:500 .58rem/1.2 var(--sans); letter-spacing:.18em; text-transform:uppercase; }
-  .handoff h2{ margin:.55rem 0; font:400 clamp(1.9rem,5vw,3.3rem)/.94 var(--serif); letter-spacing:-.035em; }
-  .handoff-copy p:last-child{ max-width:35ch; color:var(--ink2); font:400 1.05rem/1.35 var(--serif); }
-  .handoff-ascii{ color:var(--burn); font:400 clamp(.48rem,1vw,.72rem)/.92 ui-monospace,monospace; text-shadow:0 0 12px rgba(217,120,138,.48); animation:witness-drift 1.8s ease-in-out infinite; }
-  @keyframes witness-drift{ 50%{ transform:translate3d(0,-8px,0) rotate(2deg); } }
   /* the figures speak */
   .say{ position:fixed; z-index:18; top:0; width:max-content; max-width:min(15rem,calc(100vw - 2rem)); padding:.7rem .95rem; background:rgba(0,0,0,.86); border:1px solid var(--rule); font:400 1.15rem/1.25 var(--serif); color:var(--ink); opacity:0; pointer-events:none; transition:opacity .45s var(--ease),transform .55s var(--ease); }
   .say.from-left{ left:max(1rem,env(safe-area-inset-left)); border-left:2px solid var(--burn); transform:translate(-22px,-50%); }
@@ -73,13 +70,13 @@
   .done .done-note{ max-width:34ch; font:400 clamp(.95rem,1.35vw,1.15rem)/1.45 var(--serif); }
   .done a{ margin-top:1rem; font:500 .66rem/1 var(--sans); letter-spacing:.2em; text-transform:uppercase; color:var(--ink); text-decoration:none; border-bottom:1px solid var(--burn); padding-bottom:.4rem; }
   @keyframes in{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:none; } }
-  @media (prefers-reduced-motion:reduce){ #yes,#no,.say,#bg,.ask>*,.plate,.handoff,.handoff-card{ transition:none !important; } #q.typing::after,.handoff-ascii{ animation:none; } .done{ animation:none !important; } }
-  @media (max-width:520px){ button{ min-width:5.6rem; padding:.9rem 1.3rem; } #slot{ width:7.4rem; } .say{ font-size:1rem; max-width:11rem; } .handoff{ padding:1rem; } .handoff-card{ gap:.35rem; padding:1rem; } .handoff h2{ font-size:clamp(1.65rem,7vw,2.25rem); } .handoff-ascii{ font-size:.45rem; } }
+  @media (prefers-reduced-motion:reduce){ #yes,#no,.say,#bg,.ask>*,.plate,#bg,.lamp,.curtain{ transition:none !important; } #q.typing::after{ animation:none; } .done{ animation:none !important; } }
+  @media (max-width:520px){ button{ min-width:5.6rem; padding:.9rem 1.3rem; } #slot{ width:7.4rem; } .say{ font-size:1rem; max-width:11rem; } }
 </style>
 </head>
 <body>
 <img id="bg" src="supper-at-emmaus.webp" alt="" aria-hidden="true">
-<div class="lamp" aria-hidden="true"></div><div class="top" aria-hidden="true"></div>
+<div class="dim" aria-hidden="true"></div><div class="lamp" id="lamp" aria-hidden="true"></div><div class="top" aria-hidden="true"></div>
 <main>
   <section class="ask">
     <p class="label">Gotham City · Confidential</p>
@@ -99,23 +96,7 @@
 <span id="slot"></span>
 <button id="no" type="button">No</button>
 <button id="yes" type="button">Yes</button>
-<div id="handoff" class="handoff" role="status" aria-live="polite">
-  <div class="handoff-card">
-    <div class="handoff-copy">
-      <p class="handoff-label">Gotham case transfer · Witness 01</p>
-      <h2>Next witness: the jellyfish.</h2>
-      <p>It saw everything. It remembers nothing. Still, it has excellent tentacle alibis.</p>
-    </div>
-    <pre class="handoff-ascii" aria-hidden="true">      .-.
-    .-(   )-.
-   /  .:::.  \\
-  |  (o) (o)  |
-   \\  '---'  /
-    '._/|\\_.'
-       / \\
-      ~   ~</pre>
-  </div>
-</div>
+<div class="curtain" aria-hidden="true"></div>
 <script>
 /* Edit the wording here. Painting coordinates are in the 1100 x 782 image. */
 var CFG = {
@@ -130,7 +111,7 @@ var CFG = {
 var IW=1100, IH=782;
 var ANCHOR={ christ:[430,285], beard:[1085,420], green:[330,340], no:[925,655] };
 var yes=document.getElementById('yes'), no=document.getElementById('no'), slot=document.getElementById('slot');
-var dodges=0, caught=false, said=0, timers={}, introDone=false, handoffStarted=false;
+var dodges=0, caught=false, said=0, timers={}, introDone=false, leaving=false, tick=0, lx=0, ly=0;
 function map(p){ var vw=innerWidth,vh=innerHeight,s=Math.max(vw/IW,vh/IH); return [(vw-IW*s)/2+p[0]*s,(vh-IH*s)/2+p[1]*s]; }
 function layout(){
   var n=map(ANCHOR.no), nw=no.offsetWidth||130, nh=no.offsetHeight||56; n[0]=Math.min(Math.max(n[0],nw/2+14),innerWidth-nw/2-14); n[1]=Math.min(Math.max(n[1],innerHeight*.5),innerHeight-nh-innerHeight*.2); no.style.left=n[0]+'px'; no.style.top=n[1]+'px';
@@ -155,40 +136,47 @@ function dodge(px,py){
   if(!introDone||caught) return;
   dodges++;
   if(dodges>=CFG.attemptsToGiveUp){ caught=true; yes.style.transition='transform 1.2s cubic-bezier(.22,.8,.2,1)'; home(); ui(); speak('christ',CFG.giveUp,4000); return; }
-  away(px,py); ui(); if(dodges%2===1) chatter();
+  away(px,py); ui();
 }
-function near(e){ if(!introDone||caught) return; var b=yes.getBoundingClientRect(), pad=Math.max(46,70-dodges*.3);
+function near(e){ if(!introDone||caught) return; var b=yes.getBoundingClientRect(), pad=14;
   if(e.clientX>b.left-pad&&e.clientX<b.right+pad&&e.clientY>b.top-pad&&e.clientY<b.bottom+pad) dodge(e.clientX,e.clientY); }
-addEventListener('pointermove',function(e){ document.documentElement.style.setProperty('--mx',e.clientX+'px'); document.documentElement.style.setProperty('--my',e.clientY+'px'); if(e.pointerType!=='touch') near(e); });
-yes.addEventListener('pointerdown',function(e){ if(!caught){ e.preventDefault(); dodge(e.clientX,e.clientY); } });
-yes.addEventListener('click',function(e){ if(!introDone){ e.preventDefault(); return; } if(!caught && e.detail>0){ e.preventDefault(); return; } document.body.classList.add('won'); });
-no.addEventListener('mouseenter',function(){ speak('beard','Yes, that one!',2200); });
+var lamp=document.getElementById('lamp');
+function moveLamp(){ tick=0; lamp.style.transform='translate3d('+lx+'px,'+ly+'px,0)'; }
+addEventListener('pointermove',function(e){ lx=e.clientX; ly=e.clientY; if(!tick) tick=requestAnimationFrame(moveLamp); if(e.pointerType!=='touch') near(e); },{passive:true});
+/* the figures only speak when you actually try the Yes box */
+addEventListener('pointerdown',function(e){
+  if(!introDone||caught||leaving) return;
+  var b=yes.getBoundingClientRect(), pad=48;
+  if(e.clientX>b.left-pad&&e.clientX<b.right+pad&&e.clientY>b.top-pad&&e.clientY<b.bottom+pad){ e.preventDefault(); chatter(); if(!yes.dataset.hit) dodge(e.clientX,e.clientY); }
+  yes.dataset.hit='';
+});
+yes.addEventListener('click',function(e){ if(!introDone||leaving){ e.preventDefault(); return; } if(!caught&&e.detail>0){ e.preventDefault(); return; } document.body.classList.add('won'); });
 function goHome(e){
   if(e) e.preventDefault();
-  if(!introDone||handoffStarted) return;
-  handoffStarted=true; yes.disabled=true; no.disabled=true;
-  var target='home.html';
-  try{ sessionStorage.setItem('mimi-jellyfish-arrival','1'); }catch(err){ target='home.html?meet-jellyfish=1'; }
-  document.body.classList.add('handoff');
-  var wait=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches?450:1750;
-  window.setTimeout(function(){ location.href=target; },wait);
+  if(!introDone||leaving) return;
+  leaving=true; yes.disabled=true; no.disabled=true;
+  try{ sessionStorage.setItem('mimi-jellyfish-arrival','1'); }catch(err){ }
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  speak('christ','Finally. Mind the jellyfish.',2200);
+  document.body.classList.add('leaving');
+  setTimeout(function(){ location.href='home.html'; },reduce?500:2000);
 }
 no.addEventListener('click',goHome);
 document.querySelector('.done a').addEventListener('click',goHome);
 function boot(){ introDone=false; yes.disabled=true; no.disabled=true; layout(); yes.style.transition='none'; home(); requestAnimationFrame(function(){ yes.style.transition=''; }); ui(); }
 function startIntro(onReveal){
   var root=document.documentElement,q=document.getElementById('q'),full='Are you Batman?';
-  q.setAttribute('aria-label',full);
+  q.setAttribute('aria-label',full); root.classList.add('open');
   function reveal(){ q.classList.remove('typing'); root.classList.remove('prelude','typing'); root.classList.add('revealed'); introDone=true; yes.disabled=false; no.disabled=false; if(onReveal) onReveal(); }
   if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){ q.textContent=full; reveal(); return; }
   q.textContent=''; q.classList.add('typing'); root.classList.add('typing');
   var i=0;
-  function typeNext(){ q.textContent=full.slice(0,++i); if(i<full.length) window.setTimeout(typeNext,56); else window.setTimeout(reveal,420); }
-  window.setTimeout(typeNext,220);
+  function typeNext(){ q.textContent=full.slice(0,++i); if(i<full.length) window.setTimeout(typeNext,46); else window.setTimeout(reveal,420); }
+  window.setTimeout(typeNext,700);
 }
 addEventListener('resize',function(){ layout(); if(caught||dodges===0) home(); });
 boot();
-startIntro(function(){ setTimeout(function(){ speak('christ','Press No.',3000); },950); setInterval(function(){ if(!caught&&!document.querySelector('.say.on')) chatter(); },4300); });
+startIntro();
 if(document.fonts&&document.fonts.ready) document.fonts.ready.then(function(){ layout(); if(dodges===0) home(); });
 </script>
 </body>
