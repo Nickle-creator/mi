@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>One question, Mimi</title>
+<meta name="robots" content="noindex">
+<script>try{var t=localStorage.getItem('mimi-reading-theme-v2');document.documentElement.setAttribute('data-theme',t==='twilight'?'twilight':'night');}catch(e){document.documentElement.setAttribute('data-theme','night');}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#efe4d2; --ink:#29201b; --ink2:#67574b; --rule:rgba(41,32,27,.24); --burn:#7a1f2e; --onburn:#f4ecda;
+    --tile:url(art/paper-day.webp); --grain-op:.10; --ease:cubic-bezier(.22,.8,.2,1);
+    --serif:'Instrument Serif',Georgia,serif; --sans:'Inter',system-ui,sans-serif;
+  }
+  :root[data-theme="night"]{ --paper:#000; --ink:#f3ecdf; --ink2:#b9b5ab; --rule:rgba(243,236,223,.22); --burn:#d9788a; --onburn:#000; --tile:url(art/paper-night.webp); --grain-op:.12; }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ height:100%; }
+  body{ background:var(--tile) 0 0/512px 512px, var(--paper); color:var(--ink); font-family:var(--sans); overflow:hidden; -webkit-font-smoothing:antialiased; touch-action:manipulation; }
+  body::after{ content:''; position:fixed; inset:0; z-index:100; pointer-events:none; opacity:var(--grain-op); background:url(art/grain.webp) 0 0/170px 170px; }
+  .band{ position:fixed; left:0; right:0; bottom:0; height:min(30vw,22svh); background:url(art/hero-band.webp) center bottom/cover no-repeat; pointer-events:none; }
+  main{ position:relative; min-height:100svh; display:grid; place-content:center; text-align:center; padding:2rem 1.2rem 18svh; gap:2.6rem; }
+  .label{ font:500 .64rem/1 var(--sans); letter-spacing:.2em; text-transform:uppercase; color:var(--burn); }
+  h1{ font:400 clamp(3rem,10vw,8.5rem)/.92 var(--serif); letter-spacing:-.04em; }
+  .hint{ min-height:1.2em; font:500 .66rem/1 var(--sans); letter-spacing:.2em; text-transform:uppercase; color:var(--ink2); transition:opacity .4s; }
+  .row{ display:flex; justify-content:center; align-items:center; gap:2.4rem; min-height:3.4rem; }
+  button{ font:500 .72rem/1 var(--sans); letter-spacing:.2em; text-transform:uppercase; cursor:pointer; color:inherit; }
+  #yes{ position:fixed; z-index:20; left:0; top:0; padding:1.15rem 2.2rem; background:var(--burn); color:var(--onburn); border:1px solid var(--burn);
+    transition:transform .38s var(--ease); will-change:transform; }
+  #yes:focus-visible,#no:focus-visible{ outline:1px solid var(--ink); outline-offset:5px; }
+  #slot{ display:inline-block; width:9.5rem; height:3.4rem; }
+  #no{ background:none; border:0; padding:.6rem 0; border-bottom:1px solid var(--rule); color:var(--ink2); transition:color .3s,border-color .3s; }
+  #no:hover{ color:var(--ink); border-color:var(--ink); }
+  .done{ display:none; }
+  body.won .ask{ display:none; } body.won .done{ display:grid; gap:1.6rem; animation:in 1.4s var(--ease) both; }
+  body.won #yes{ display:none; }
+  .done h2{ font:400 clamp(3.4rem,11vw,9.5rem)/.9 var(--serif); letter-spacing:-.045em; }
+  .done p:not(.label){ font:400 clamp(1.1rem,2vw,1.5rem)/1.5 var(--serif); color:var(--ink2); }
+  .done a{ justify-self:center; margin-top:1rem; font:500 .66rem/1 var(--sans); letter-spacing:.2em; text-transform:uppercase; color:var(--ink); text-decoration:none; border-bottom:1px solid var(--burn); padding-bottom:.4rem; }
+  .ask{ display:grid; gap:2.6rem; }
+  @keyframes in{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:none; } }
+  @media (prefers-reduced-motion:reduce){ #yes{ transition:none; } .done{ animation:none !important; } }
+  @media (max-width:520px){ .row{ gap:1.4rem; } #yes{ padding:1.05rem 1.6rem; } #slot{ width:7.4rem; } }
+</style>
+</head>
+<body>
+<div class="band" aria-hidden="true"></div>
+<main>
+  <section class="ask">
+    <p class="label">One question</p>
+    <h1 id="q">Do you love me?</h1>
+    <p class="hint" id="hint" aria-live="polite">&nbsp;</p>
+    <div class="row"><span id="slot"></span><button id="no" type="button">No</button></div>
+  </section>
+  <section class="done" aria-live="polite">
+    <p class="label">Thought so</p>
+    <h2>I knew it.</h2>
+    <p>Yours, always.</p>
+    <a href="index.html">Back to our story</a>
+  </section>
+</main>
+<button id="yes" type="button">Yes</button>
+<script>
+/* Edit the wording here. */
+var CFG = {
+  dodgesBeforeCatch: 14,
+  hints: ["Too slow.","Nice try.","Over here.","It is shy.","Closer.","Faster, Mimi.","Almost had it.","Really?","Keep going.","Not that one."],
+  noHints: ["That is not the button.","Try the other one.","Wrong answer.","Be honest.","Try again."]
+};
+var yes=document.getElementById('yes'), no=document.getElementById('no'), slot=document.getElementById('slot'), hint=document.getElementById('hint');
+var dodges=0, caught=false, lastX=0, lastY=0, noCount=0;
+function say(t){ hint.textContent=t; }
+function place(x,y){ lastX=x; lastY=y; yes.style.transform='translate('+Math.round(x)+'px,'+Math.round(y)+'px)'; }
+function home(){ var r=slot.getBoundingClientRect(), b=yes.getBoundingClientRect(); place(r.left+(r.width-b.width)/2, r.top+(r.height-b.height)/2); }
+function away(px,py){
+  var w=innerWidth,h=innerHeight,b=yes.getBoundingClientRect(),m=14,tries=0,x,y,nb=no.getBoundingClientRect();
+  do{ x=m+Math.random()*(w-b.width-2*m); y=m+Math.random()*(h-b.height-2*m); tries++;
+      var cx=x+b.width/2, cy=y+b.height/2, far=Math.hypot(cx-px,cy-py)>Math.max(180,Math.min(w,h)*.38);
+      var hitNo=!(x>nb.right+10||x+b.width<nb.left-10||y>nb.bottom+10||y+b.height<nb.top-10);
+  }while((!far||hitNo)&&tries<40);
+  place(x,y);
+}
+function dodge(px,py){
+  if(caught) return;
+  dodges++;
+  if(dodges>=CFG.dodgesBeforeCatch){ caught=true; yes.style.transition='transform 1.2s cubic-bezier(.22,.8,.2,1)'; home(); say('Okay. You earned it.'); return; }
+  away(px,py); say(CFG.hints[(dodges-1)%CFG.hints.length]);
+}
+function near(e){ if(caught) return; var b=yes.getBoundingClientRect(), pad=Math.max(46,70-dodges*2);
+  if(e.clientX>b.left-pad&&e.clientX<b.right+pad&&e.clientY>b.top-pad&&e.clientY<b.bottom+pad) dodge(e.clientX,e.clientY); }
+addEventListener('pointermove',function(e){ if(e.pointerType!=='touch') near(e); });
+yes.addEventListener('pointerdown',function(e){ if(!caught){ e.preventDefault(); dodge(e.clientX,e.clientY); } });
+yes.addEventListener('click',function(e){
+  if(!caught && e.detail>0){ e.preventDefault(); return; }   /* mouse/touch clicks dodge; keyboard (detail 0) always works */
+  win();
+});
+function win(){ document.body.classList.add('won'); document.getElementById('q').textContent='Do you love me?'; }
+no.addEventListener('click',function(){ say(CFG.noHints[noCount%CFG.noHints.length]); noCount++; });
+addEventListener('resize',function(){ if(!caught) { if(dodges===0) home(); } else home(); });
+addEventListener('load',function(){ yes.style.transition='none'; home(); requestAnimationFrame(function(){ yes.style.transition=''; }); });
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(function(){ if(dodges===0){ yes.style.transition='none'; home(); requestAnimationFrame(function(){ yes.style.transition=''; }); } });
+</script>
+</body>
+</html>
