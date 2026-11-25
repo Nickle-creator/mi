@@ -5,16 +5,21 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>One question</title>
 <meta name="robots" content="noindex">
+<meta name="theme-color" content="#000000">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preload" as="image" href="supper-at-emmaus.webp">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js','prelude');</script>
 <style>
   :root{ --paper:#000; --ink:#f3ecdf; --ink2:#b9b5ab; --rule:rgba(243,236,223,.3); --burn:#d9788a; --onburn:#000; --ease:cubic-bezier(.22,.8,.2,1);
     --serif:'Instrument Serif',Georgia,serif; --sans:'Inter',system-ui,sans-serif; --mx:50vw; --my:45vh; }
   *{ box-sizing:border-box; margin:0; padding:0; }
   html,body{ height:100%; }
   body{ background:#000; color:var(--ink); font-family:var(--sans); overflow:hidden; -webkit-font-smoothing:antialiased; touch-action:manipulation; }
-  #bg{ position:fixed; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; filter:saturate(.92) contrast(1.04); }
+  #bg{ position:fixed; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; opacity:1; transform:scale(1); filter:saturate(.92) contrast(1.04); transition:opacity 1.55s var(--ease),transform 2.2s var(--ease),filter 1.55s var(--ease); }
+  html.js.prelude #bg{ opacity:.18; transform:scale(1.045); filter:saturate(.42) contrast(1.04) brightness(.58); }
+  html.js.revealed #bg{ opacity:1; transform:scale(1); filter:saturate(.92) contrast(1.04); }
   /* the painting is lit by wherever you point: a lantern that follows the cursor */
   .lamp{ position:fixed; inset:0; pointer-events:none; background:radial-gradient(circle min(46vw,420px) at var(--mx) var(--my), rgba(0,0,0,0) 0, rgba(0,0,0,.62) 100%); transition:background .2s; }
   .top{ position:fixed; left:0; right:0; top:0; height:46svh; pointer-events:none; background:linear-gradient(rgba(0,0,0,.88),rgba(0,0,0,.55) 55%,transparent); }
@@ -25,27 +30,41 @@
   h1{ font:400 clamp(2.8rem,8vw,6.8rem)/.92 var(--serif); letter-spacing:-.04em; }
   .hint{ min-height:1.2em; font:500 .66rem/1 var(--sans); letter-spacing:.2em; text-transform:uppercase; }
   .count{ font:500 .58rem/1 var(--sans); letter-spacing:.2em; text-transform:uppercase; color:var(--ink2); }
-  button{ font:400 clamp(1.25rem,1.8vw,1.55rem)/1 var(--serif); cursor:pointer; color:inherit; min-width:8.5rem; padding:1rem 2.4rem; transition:transform .3s var(--ease), background .3s, color .3s, box-shadow .3s; }
-  #yes{ position:fixed; z-index:20; left:0; top:0; background:var(--burn); color:var(--onburn); border:1px solid var(--burn); box-shadow:5px 5px 0 var(--ink); will-change:transform; transition:transform .38s var(--ease); }
+  .quip{ max-width:28ch; color:var(--ink2); font:400 clamp(1.05rem,1.45vw,1.3rem)/1.3 var(--serif); letter-spacing:.01em; }
+  .ask>.label,.ask>h1,.ask>.quip,.ask>.hint,.ask>.count{ opacity:1; transform:none; transition:opacity .75s var(--ease),transform .75s var(--ease); }
+  html.js.prelude .ask>.label,html.js.prelude .ask>h1,html.js.prelude .ask>.quip,html.js.prelude .ask>.hint,html.js.prelude .ask>.count{ opacity:0; transform:translateY(10px); }
+  html.js.typing .ask>.label,html.js.typing .ask>h1,html.js.revealed .ask>.label,html.js.revealed .ask>h1,html.js.revealed .ask>.quip,html.js.revealed .ask>.hint,html.js.revealed .ask>.count{ opacity:1; transform:none; }
+  html.js.revealed .ask>.quip{ transition-delay:.12s; }
+  html.js.revealed .ask>.hint{ transition-delay:.22s; }
+  html.js.revealed .ask>.count{ transition-delay:.32s; }
+  #q.typing::after{ content:''; display:inline-block; width:1px; height:.78em; margin-left:.08em; background:var(--burn); vertical-align:-.08em; animation:caret .8s steps(1,end) infinite; }
+  @keyframes caret{ 50%{ opacity:0; } }
+  button{ font:400 clamp(1.25rem,1.8vw,1.55rem)/1 var(--serif); cursor:pointer; color:inherit; min-width:8.5rem; padding:1rem 2.4rem; transition:transform .3s var(--ease), background .3s, color .3s, box-shadow .3s, opacity .75s var(--ease); }
+  #yes{ position:fixed; z-index:20; left:0; top:0; background:var(--burn); color:var(--onburn); border:1px solid var(--burn); box-shadow:5px 5px 0 var(--ink); will-change:transform; transition:transform .38s var(--ease),opacity .75s var(--ease); }
   #no{ position:fixed; z-index:15; left:0; top:0; translate:-50% -50%; background:rgba(0,0,0,.55); color:var(--ink); border:1px solid var(--ink); box-shadow:5px 5px 0 var(--burn); }
   #no:hover{ background:var(--ink); color:#000; } #no:active{ box-shadow:1px 1px 0 var(--burn); }
   #yes:focus-visible,#no:focus-visible{ outline:1px solid var(--ink); outline-offset:6px; }
+  html.js.prelude #yes,html.js.prelude #no{ opacity:0; pointer-events:none; }
+  html.js.revealed #yes,html.js.revealed #no{ opacity:1; pointer-events:auto; transition-delay:.18s; }
   #slot{ position:fixed; left:50%; bottom:7svh; width:9.5rem; height:3.6rem; translate:-50% 0; }
   /* the figures speak */
   .say{ position:fixed; z-index:12; left:0; top:0; max-width:15rem; padding:.7rem .95rem; background:rgba(0,0,0,.78); border:1px solid var(--rule); font:400 1.15rem/1.25 var(--serif); color:var(--ink); opacity:0; pointer-events:none; transform:translate(-50%,calc(-100% - 6px)); transition:opacity .5s var(--ease); }
   .say.on{ opacity:1; }
   .say::after{ content:''; position:absolute; left:50%; bottom:-6px; width:1px; height:6px; background:var(--ink2); }
-  .plate{ position:fixed; z-index:6; left:1.2rem; bottom:1rem; font:500 .56rem/1.5 var(--sans); letter-spacing:.18em; text-transform:uppercase; color:var(--ink2); }
+  .plate{ position:fixed; z-index:6; left:1.2rem; bottom:1rem; font:500 .56rem/1.5 var(--sans); letter-spacing:.18em; text-transform:uppercase; color:var(--ink2); transition:opacity .8s var(--ease); }
+  html.js.prelude .plate{ opacity:0; }
+  html.js.revealed .plate{ opacity:1; transition-delay:.08s; }
   .done{ display:none; position:relative; z-index:6; }
   body.won .ask,body.won #yes,body.won #no,body.won .say,body.won .lamp{ display:none; }
   body.won .done{ display:grid; gap:1.4rem; justify-items:center; padding-top:18svh; animation:in 1.4s var(--ease) both; }
   body.won .top{ height:100%; background:rgba(0,0,0,.78); }
   .done h2{ font:400 clamp(3.4rem,11vw,9.5rem)/.9 var(--serif); letter-spacing:-.045em; }
   .done p:not(.label){ font:400 clamp(1.1rem,2vw,1.5rem)/1.5 var(--serif); color:var(--ink2); }
+  .done .done-note{ max-width:34ch; font:400 clamp(.95rem,1.35vw,1.15rem)/1.45 var(--serif); }
   .done a{ margin-top:1rem; font:500 .66rem/1 var(--sans); letter-spacing:.2em; text-transform:uppercase; color:var(--ink); text-decoration:none; border-bottom:1px solid var(--burn); padding-bottom:.4rem; }
   @keyframes in{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:none; } }
-  @media (prefers-reduced-motion:reduce){ #yes,.say{ transition:none; } .done{ animation:none !important; } }
-  @media (max-width:520px){ button{ min-width:5.6rem; padding:.9rem 1.3rem; } #slot{ width:7.4rem; } .say{ font-size:1rem; max-width:11rem; } }
+  @media (prefers-reduced-motion:reduce){ #yes,#no,.say,#bg,.ask>*,.plate{ transition:none !important; } #q.typing::after{ animation:none; } .done{ animation:none !important; } }
+  @media (max-width:520px){ button{ min-width:5.6rem; padding:.9rem 1.3rem; } #slot{ width:7.4rem; } .say{ font-size:1rem; max-width:11rem; } .quip{ max-width:25ch; } }
 </style>
 </head>
 <body>
@@ -53,8 +72,9 @@
 <div class="lamp" aria-hidden="true"></div><div class="top" aria-hidden="true"></div>
 <main>
   <section class="ask">
-    <p class="label">One question</p>
-    <h1 id="q">Are you Batman?</h1>
+    <p class="label">Gotham City · Confidential</p>
+    <h1 id="q" aria-label="Are you Batman?">Are you Batman?</h1>
+    <p class="quip">No cape required. Alibis optional.</p>
     <p class="hint" id="hint" aria-live="polite">&nbsp;</p>
     <p class="count" id="count">&nbsp;</p>
   </section>
@@ -62,6 +82,7 @@
     <p class="label">Thought so</p>
     <h2>I knew it.</h2>
     <p>Yours, always.</p>
+    <p class="done-note">Your secret is safe with me. The portrait has already told three people.</p>
     <a href="home.html">Come in</a>
   </section>
 </main>
@@ -85,7 +106,7 @@ var CFG = {
 var IW=1100, IH=782;
 var ANCHOR={ christ:[430,285], beard:[1085,420], green:[330,340], no:[925,655] };
 var yes=document.getElementById('yes'), no=document.getElementById('no'), slot=document.getElementById('slot'), hint=document.getElementById('hint');
-var dodges=0, caught=false, said=0, timers={};
+var dodges=0, caught=false, said=0, timers={}, introDone=false;
 function map(p){ var vw=innerWidth,vh=innerHeight,s=Math.max(vw/IW,vh/IH); return [(vw-IW*s)/2+p[0]*s,(vh-IH*s)/2+p[1]*s]; }
 function layout(){
   var n=map(ANCHOR.no), nw=no.offsetWidth||130, nh=no.offsetHeight||56; n[0]=Math.min(Math.max(n[0],nw/2+14),innerWidth-nw/2-14); n[1]=Math.min(Math.max(n[1],innerHeight*.5),innerHeight-nh-innerHeight*.2); no.style.left=n[0]+'px'; no.style.top=n[1]+'px';
@@ -106,21 +127,32 @@ function away(px,py){
   place(x,y);
 }
 function dodge(px,py){
-  if(caught) return;
+  if(!introDone||caught) return;
   dodges++;
   if(dodges>=CFG.attemptsToGiveUp){ caught=true; yes.style.transition='transform 1.2s cubic-bezier(.22,.8,.2,1)'; home(); ui('Okay. You earned it.'); speak('christ',CFG.giveUp,4000); return; }
   away(px,py); ui(CFG.hints[(dodges-1)%CFG.hints.length]); if(dodges%2===1) chatter();
 }
-function near(e){ if(caught) return; var b=yes.getBoundingClientRect(), pad=Math.max(46,70-dodges*.3);
+function near(e){ if(!introDone||caught) return; var b=yes.getBoundingClientRect(), pad=Math.max(46,70-dodges*.3);
   if(e.clientX>b.left-pad&&e.clientX<b.right+pad&&e.clientY>b.top-pad&&e.clientY<b.bottom+pad) dodge(e.clientX,e.clientY); }
 addEventListener('pointermove',function(e){ document.documentElement.style.setProperty('--mx',e.clientX+'px'); document.documentElement.style.setProperty('--my',e.clientY+'px'); if(e.pointerType!=='touch') near(e); });
 yes.addEventListener('pointerdown',function(e){ if(!caught){ e.preventDefault(); dodge(e.clientX,e.clientY); } });
-yes.addEventListener('click',function(e){ if(!caught && e.detail>0){ e.preventDefault(); return; } document.body.classList.add('won'); });
+yes.addEventListener('click',function(e){ if(!introDone){ e.preventDefault(); return; } if(!caught && e.detail>0){ e.preventDefault(); return; } document.body.classList.add('won'); });
 no.addEventListener('mouseenter',function(){ speak('beard','Yes, that one!',2200); });
-no.addEventListener('click',function(){ location.href='home.html'; });
-function boot(){ layout(); yes.style.transition='none'; home(); requestAnimationFrame(function(){ yes.style.transition=''; }); ui(' '); document.getElementById('count').textContent='Attempts 0 / '+CFG.attemptsToGiveUp; }
+no.addEventListener('click',function(){ if(introDone) location.href='home.html'; });
+function boot(){ introDone=false; yes.disabled=true; no.disabled=true; layout(); yes.style.transition='none'; home(); requestAnimationFrame(function(){ yes.style.transition=''; }); ui(' '); document.getElementById('count').textContent='Attempts 0 / '+CFG.attemptsToGiveUp; }
+function startIntro(onReveal){
+  var root=document.documentElement,q=document.getElementById('q'),full='Are you Batman?';
+  q.setAttribute('aria-label',full);
+  function reveal(){ q.classList.remove('typing'); root.classList.remove('prelude','typing'); root.classList.add('revealed'); introDone=true; yes.disabled=false; no.disabled=false; if(onReveal) onReveal(); }
+  if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){ q.textContent=full; reveal(); return; }
+  q.textContent=''; q.classList.add('typing'); root.classList.add('typing');
+  var i=0;
+  function typeNext(){ q.textContent=full.slice(0,++i); if(i<full.length) window.setTimeout(typeNext,56); else window.setTimeout(reveal,420); }
+  window.setTimeout(typeNext,220);
+}
 addEventListener('resize',function(){ layout(); if(caught||dodges===0) home(); });
-addEventListener('load',function(){ boot(); setTimeout(function(){ speak('christ','Press No.',3000); },1400); setInterval(function(){ if(!caught&&!document.querySelector('.say.on')) chatter(); },5200); });
+boot();
+startIntro(function(){ setTimeout(function(){ speak('christ','Press No.',3000); },950); setInterval(function(){ if(!caught&&!document.querySelector('.say.on')) chatter(); },5200); });
 if(document.fonts&&document.fonts.ready) document.fonts.ready.then(function(){ layout(); if(dodges===0) home(); });
 </script>
 </body>
