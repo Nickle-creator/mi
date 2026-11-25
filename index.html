@@ -17,41 +17,46 @@
   :root[data-theme="night"]{ --paper:#000; --ink:#f3ecdf; --ink2:#b9b5ab; --rule:rgba(243,236,223,.22); --burn:#d9788a; --onburn:#000; --tile:url(art/paper-night.webp); --grain-op:.12; }
   *{ box-sizing:border-box; margin:0; padding:0; }
   html,body{ height:100%; }
-  body{ background:var(--tile) 0 0/512px 512px, var(--paper); color:var(--ink); font-family:var(--sans); overflow:hidden; -webkit-font-smoothing:antialiased; touch-action:manipulation; }
+  body{ background:var(--paper) var(--bgimg) center/cover no-repeat; color:var(--ink); font-family:var(--sans); overflow:hidden; -webkit-font-smoothing:antialiased; touch-action:manipulation; }
+  :root{ --bgimg:url(art/ask-bg-day.webp); --arm:url(art/ask-arm-day.webp); --shade:rgba(239,228,210,.5); }
+  :root[data-theme="night"]{ --bgimg:url(art/ask-bg-night.webp); --arm:url(art/ask-arm-night.webp); --shade:rgba(0,0,0,.55); }
+  body::before{ content:''; position:fixed; inset:0; background:radial-gradient(ellipse 70% 38% at 50% 24%, var(--shade), transparent 75%), radial-gradient(ellipse 120% 90% at 50% 50%, transparent 55%, var(--shade)); pointer-events:none; }
   body::after{ content:''; position:fixed; inset:0; z-index:100; pointer-events:none; opacity:var(--grain-op); background:url(art/grain.webp) 0 0/170px 170px; }
-  .band{ position:fixed; left:0; right:0; bottom:0; height:min(30vw,22svh); background:url(art/hero-band.webp) center bottom/cover no-repeat; pointer-events:none; }
-  main{ position:relative; min-height:100svh; display:grid; place-content:center; text-align:center; padding:2rem 1.2rem 18svh; gap:2.6rem; }
+  .arm{ position:fixed; top:56%; width:clamp(160px,41vw,760px); aspect-ratio:1400/500; background:var(--arm) center/contain no-repeat; pointer-events:none; transform:translateY(-50%); }
+  .arm.l{ left:-1vw; } .arm.r{ right:-1vw; transform:translateY(-50%) scaleX(-1); }
+  main{ position:relative; min-height:100svh; display:grid; place-content:start center; text-align:center; padding:clamp(3rem,13svh,7rem) 1.2rem 2rem; }
+  .ask{ display:grid; gap:1.6rem; justify-items:center; }
   .label{ font:500 .64rem/1 var(--sans); letter-spacing:.2em; text-transform:uppercase; color:var(--burn); }
   h1{ font:400 clamp(3rem,10vw,8.5rem)/.92 var(--serif); letter-spacing:-.04em; }
-  .hint{ min-height:1.2em; font:500 .66rem/1 var(--sans); letter-spacing:.2em; text-transform:uppercase; color:var(--ink2); transition:opacity .4s; }
-  .row{ display:flex; justify-content:center; align-items:center; gap:2.4rem; min-height:3.4rem; }
-  button{ font:500 .72rem/1 var(--sans); letter-spacing:.2em; text-transform:uppercase; cursor:pointer; color:inherit; }
-  #yes{ position:fixed; z-index:20; left:0; top:0; padding:1.15rem 2.2rem; background:var(--burn); color:var(--onburn); border:1px solid var(--burn);
-    transition:transform .38s var(--ease); will-change:transform; }
-  #yes:focus-visible,#no:focus-visible{ outline:1px solid var(--ink); outline-offset:5px; }
-  #slot{ display:inline-block; width:9.5rem; height:3.4rem; }
-  #no{ background:none; border:0; padding:.6rem 0; border-bottom:1px solid var(--rule); color:var(--ink2); transition:color .3s,border-color .3s; }
-  #no:hover{ color:var(--ink); border-color:var(--ink); }
+  .hint{ min-height:1.2em; font:500 .66rem/1 var(--sans); letter-spacing:.2em; text-transform:uppercase; color:var(--ink); opacity:.8; transition:opacity .4s; }
+  .count{ font:500 .58rem/1 var(--sans); letter-spacing:.2em; text-transform:uppercase; color:var(--ink2); }
+  button{ font:400 clamp(1.25rem,1.8vw,1.55rem)/1 var(--serif); letter-spacing:.01em; cursor:pointer; color:inherit; min-width:8.5rem; padding:1rem 2.4rem; transition:transform .3s var(--ease), background .3s, color .3s, box-shadow .3s; }
+  #yes{ position:fixed; z-index:20; left:0; top:0; background:var(--burn); color:var(--onburn); border:1px solid var(--burn); box-shadow:5px 5px 0 var(--ink); will-change:transform;
+    transition:transform .38s var(--ease); }
+  #no{ position:fixed; z-index:15; left:50%; top:56%; translate:-50% -50%; background:transparent; color:var(--ink); border:1px solid var(--ink); box-shadow:5px 5px 0 var(--burn); }
+  #no:hover{ background:var(--ink); color:var(--paper); }
+  #no:active{ box-shadow:1px 1px 0 var(--burn); }
+  #yes:focus-visible,#no:focus-visible{ outline:1px solid var(--ink); outline-offset:6px; }
+  #slot{ position:fixed; left:50%; top:84%; width:9.5rem; height:3.6rem; translate:-50% -50%; }
   .done{ display:none; }
   body.won .ask{ display:none; } body.won .done{ display:grid; gap:1.6rem; animation:in 1.4s var(--ease) both; }
-  body.won #yes{ display:none; }
+  body.won #yes,body.won #no,body.won .arm{ display:none; }
   .done h2{ font:400 clamp(3.4rem,11vw,9.5rem)/.9 var(--serif); letter-spacing:-.045em; }
   .done p:not(.label){ font:400 clamp(1.1rem,2vw,1.5rem)/1.5 var(--serif); color:var(--ink2); }
   .done a{ justify-self:center; margin-top:1rem; font:500 .66rem/1 var(--sans); letter-spacing:.2em; text-transform:uppercase; color:var(--ink); text-decoration:none; border-bottom:1px solid var(--burn); padding-bottom:.4rem; }
-  .ask{ display:grid; gap:2.6rem; }
-  @keyframes in{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:none; } }
+    @keyframes in{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:none; } }
   @media (prefers-reduced-motion:reduce){ #yes{ transition:none; } .done{ animation:none !important; } }
-  @media (max-width:520px){ .row{ gap:1.4rem; } #yes{ padding:1.05rem 1.6rem; } #slot{ width:7.4rem; } }
+  @media (max-width:520px){ .arm{ width:46vw; } button{ min-width:5.4rem; padding:.9rem 1.3rem; } #slot{ width:7.4rem; } }
 </style>
 </head>
 <body>
-<div class="band" aria-hidden="true"></div>
+<div class="arm l" aria-hidden="true"></div><div class="arm r" aria-hidden="true"></div>
 <main>
   <section class="ask">
     <p class="label">One question</p>
     <h1 id="q">Are you Batman?</h1>
     <p class="hint" id="hint" aria-live="polite">&nbsp;</p>
-    <div class="row"><span id="slot"></span><button id="no" type="button">No</button></div>
+    <p class="count" id="count">&nbsp;</p>
   </section>
   <section class="done" aria-live="polite">
     <p class="label">Thought so</p>
@@ -60,17 +65,19 @@
     <a href="home.html">Come in</a>
   </section>
 </main>
+<span id="slot"></span>
+<button id="no" type="button">No</button>
 <button id="yes" type="button">Yes</button>
 <script>
 /* Edit the wording here. */
 var CFG = {
-  dodgesBeforeCatch: 14,
+  attemptsToGiveUp: 100,
   hints: ["Too slow.","Nice try.","Over here.","It is shy.","Closer.","Faster, Mimi.","Almost had it.","Really?","Keep going.","Not that one."],
   noHints: ["That is not the button.","Try the other one.","Wrong answer.","Be honest.","Try again."]
 };
 var yes=document.getElementById('yes'), no=document.getElementById('no'), slot=document.getElementById('slot'), hint=document.getElementById('hint');
 var dodges=0, caught=false, lastX=0, lastY=0, noCount=0;
-function say(t){ hint.textContent=t; }
+function say(t){ hint.textContent=t; document.getElementById('count').textContent=caught?'':'Attempts '+dodges+' / '+CFG.attemptsToGiveUp; }
 function place(x,y){ lastX=x; lastY=y; yes.style.transform='translate('+Math.round(x)+'px,'+Math.round(y)+'px)'; }
 function home(){ var r=slot.getBoundingClientRect(), b=yes.getBoundingClientRect(); place(r.left+(r.width-b.width)/2, r.top+(r.height-b.height)/2); }
 function away(px,py){
@@ -84,7 +91,7 @@ function away(px,py){
 function dodge(px,py){
   if(caught) return;
   dodges++;
-  if(dodges>=CFG.dodgesBeforeCatch){ caught=true; yes.style.transition='transform 1.2s cubic-bezier(.22,.8,.2,1)'; home(); say('Okay. You earned it.'); return; }
+  if(dodges>=CFG.attemptsToGiveUp){ caught=true; yes.style.transition='transform 1.2s cubic-bezier(.22,.8,.2,1)'; home(); say('Okay. You earned it.'); return; }
   away(px,py); say(CFG.hints[(dodges-1)%CFG.hints.length]);
 }
 function near(e){ if(caught) return; var b=yes.getBoundingClientRect(), pad=Math.max(46,70-dodges*2);
