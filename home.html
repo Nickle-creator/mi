@@ -71,10 +71,16 @@
   :focus-visible{ outline:1px solid var(--burn); outline-offset:4px; }
   ul{ list-style:none; }
 
-  /* one fixed layer: archival grain (pre-rendered tile, plain alpha — no blend modes, no filters) + soft vignette */
+  /* archival grain: pinned to the PAGE (scrolls with the content, so it never feels like a screen overlay following you)
+     pre-rendered tile, plain alpha — no blend modes, no filters. The soft vignette stays fixed to the screen. */
+  body{ position:relative; }
   body::after{
-    content:''; position:fixed; inset:0; z-index:100; pointer-events:none; opacity:var(--grain-op);
-    background:url(art/grain.webp) 0 0/170px 170px, radial-gradient(ellipse at 50% 40%,transparent 52%,var(--vig) 100%);
+    content:''; position:absolute; inset:0; z-index:100; pointer-events:none; opacity:var(--grain-op);
+    background:url(art/grain.webp) 0 0/170px 170px;
+  }
+  html::after{
+    content:''; position:fixed; inset:0; z-index:101; pointer-events:none; opacity:var(--grain-op);
+    background:radial-gradient(ellipse at 50% 40%,transparent 52%,var(--vig) 100%);
   }
 
   /* =========================================================
