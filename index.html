@@ -69,7 +69,17 @@
   .done .done-note{ max-width:34ch; font:400 clamp(.95rem,1.35vw,1.15rem)/1.45 var(--serif); }
   .done a{ margin-top:1rem; font:500 .66rem/1 var(--sans); letter-spacing:.2em; text-transform:uppercase; color:var(--ink); text-decoration:none; border-bottom:1px solid var(--burn); padding-bottom:.4rem; }
   @keyframes in{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:none; } }
-  @media (prefers-reduced-motion:reduce){ #yes,#no,.say,#bg,.ask>*,.plate,#bg,.lamp,.curtain{ transition:none !important; } #q.typing::after{ animation:none; } .done{ animation:none !important; } }
+  @media (prefers-reduced-motion:reduce){ #yes,#no,.say,#bg,.ask>*,.plate,#bg,.lamp,.curtain,.dim{ transition:none !important; } #q.typing::after{ animation:none; } .done{ animation:none !important; } }
+  /* touch devices (no cursor to light the scene): once the question has typed out, ease the painting back and brighten it */
+  .dim{ transition:opacity 3.6s var(--ease) .2s; }
+  @media (hover:none) and (pointer:coarse){
+    #bg{ transform:scale(1.14); }
+    html.open #bg{ transform:scale(1.14); }
+    html.revealed #bg{ transform:scale(1); transition:transform 4.2s cubic-bezier(.2,.6,.2,1); }
+    body.leaving #bg{ transform:scale(1.09); transition-duration:2.2s; }
+    html.revealed .dim{ opacity:.5; }
+    .lamp{ display:none; }
+  }
   @media (max-width:520px){ button{ min-width:5.6rem; padding:.9rem 1.3rem; } #slot{ width:7.4rem; } .say{ font-size:1rem; max-width:11rem; } }
 </style>
 </head>
