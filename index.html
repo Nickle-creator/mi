@@ -33,7 +33,12 @@
   .ask{ display:grid; gap:1.1rem; justify-items:center; }
   .label{ font:500 .64rem/1 var(--sans); letter-spacing:.2em; text-transform:uppercase; color:var(--burn); }
   h1{ font:400 clamp(2.8rem,8vw,6.8rem)/.92 var(--serif); letter-spacing:-.04em; }
-  .count{ font:500 .58rem/1 var(--sans); letter-spacing:.2em; text-transform:uppercase; color:var(--ink2); }
+  .count{ font:500 .58rem/1 var(--sans); letter-spacing:.2em; text-transform:uppercase; color:var(--ink2); display:grid; gap:.55rem; justify-items:center; }
+  .meter{ width:calc(var(--mw,100) * 1.2px); height:2px; background:rgba(243,236,223,.2); transition:width 1.1s var(--ease); }
+  .meter i{ display:block; height:100%; width:0; background:var(--burn); transition:width .35s var(--ease); }
+  .count.oops{ color:var(--burn); animation:oopsShake .6s ease 1; }
+  .count.oops .meter i{ background:var(--ink); }
+  @keyframes oopsShake{ 0%,100%{ transform:none; } 20%{ transform:translateX(-7px) rotate(-1deg); } 40%{ transform:translateX(7px) rotate(1deg); } 60%{ transform:translateX(-4px); } 80%{ transform:translateX(4px); } }
   .ask>.label,.ask>h1,.ask>.count{ opacity:1; transform:none; transition:opacity .75s var(--ease),transform .75s var(--ease); }
   html.js.prelude .ask>.label,html.js.prelude .ask>h1,html.js.prelude .ask>.count{ opacity:0; transform:translateY(10px); }
   html.js.typing .ask>.label,html.js.typing .ask>h1,html.js.revealed .ask>.label,html.js.revealed .ask>h1,html.js.revealed .ask>.count{ opacity:1; transform:none; }
@@ -49,14 +54,14 @@
   html.js.revealed #yes,html.js.revealed #no{ opacity:1; pointer-events:auto; transition-delay:.18s; }
   #slot{ position:fixed; left:50%; bottom:7svh; width:9.5rem; height:3.6rem; translate:-50% 0; }
   /* the figures speak */
-  .say{ position:fixed; z-index:18; top:0; width:max-content; max-width:min(15rem,calc(100vw - 2rem)); padding:.7rem .95rem; background:rgba(0,0,0,.86); border:1px solid var(--rule); font:400 1.15rem/1.25 var(--serif); color:var(--ink); opacity:0; pointer-events:none; transition:opacity .45s var(--ease),transform .55s var(--ease); }
-  .say.from-left{ left:max(1rem,env(safe-area-inset-left)); border-left:2px solid var(--burn); transform:translate(-22px,-50%); }
-  .say.from-right{ right:max(1rem,env(safe-area-inset-right)); border-right:2px solid var(--burn); text-align:right; transform:translate(22px,-50%); }
-  .say.on{ opacity:1; }
-  .say.from-left.on,.say.from-right.on{ transform:translate(0,-50%); }
-  .say::after{ content:''; position:absolute; top:50%; width:9px; height:1px; background:var(--ink2); }
-  .say.from-left::after{ right:-9px; }
-  .say.from-right::after{ left:-9px; }
+  .say{ position:fixed; z-index:18; left:0; top:0; width:max-content; max-width:min(15rem,calc(100vw - 2rem)); padding:.7rem .95rem; background:rgba(0,0,0,.88); border:1px solid rgba(243,236,223,.28); border-radius:6px; font:400 1.15rem/1.25 var(--serif); color:var(--ink); opacity:0; pointer-events:none; transform:scale(.72); transform-origin:var(--ox,50%) var(--oy,50%); transition:opacity .35s var(--ease),transform .5s cubic-bezier(.3,1.5,.5,1); }
+  .say.on{ opacity:1; transform:scale(1); }
+  /* the pointer grows out of the speaker's head: JS sets its side, position and length */
+  .say::after{ content:''; position:absolute; background:rgba(0,0,0,.88); }
+  .say[data-side=left]::after{ right:100%; top:var(--ty,50%); width:var(--tl,40px); height:20px; margin-top:-10px; clip-path:polygon(100% 0,0 50%,100% 100%); }
+  .say[data-side=right]::after{ left:100%; top:var(--ty,50%); width:var(--tl,40px); height:20px; margin-top:-10px; clip-path:polygon(0 0,100% 50%,0 100%); }
+  .say[data-side=top]::after{ bottom:100%; left:var(--tx,50%); height:var(--tl,40px); width:20px; margin-left:-10px; clip-path:polygon(0 100%,50% 0,100% 100%); }
+  .say[data-side=bottom]::after{ top:100%; left:var(--tx,50%); height:var(--tl,40px); width:20px; margin-left:-10px; clip-path:polygon(0 0,50% 100%,100% 0); }
   .plate{ position:fixed; z-index:6; left:1.2rem; bottom:1rem; font:500 .56rem/1.5 var(--sans); letter-spacing:.18em; text-transform:uppercase; color:var(--ink2); transition:opacity .8s var(--ease); }
   html.js.prelude .plate{ opacity:0; }
   html.js.revealed .plate{ opacity:1; transition-delay:.08s; }
@@ -69,7 +74,7 @@
   .done .done-note{ max-width:34ch; font:400 clamp(.95rem,1.35vw,1.15rem)/1.45 var(--serif); }
   .done a{ margin-top:1rem; font:500 .66rem/1 var(--sans); letter-spacing:.2em; text-transform:uppercase; color:var(--ink); text-decoration:none; border-bottom:1px solid var(--burn); padding-bottom:.4rem; }
   @keyframes in{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:none; } }
-  @media (prefers-reduced-motion:reduce){ #yes,#no,.say,#bg,.ask>*,.plate,#bg,.lamp,.curtain,.dim{ transition:none !important; } #q.typing::after{ animation:none; } .done{ animation:none !important; } }
+  @media (prefers-reduced-motion:reduce){ #yes,#no,.say,#bg,.ask>*,.plate,#bg,.lamp,.curtain,.dim{ transition:none !important; } #q.typing::after{ animation:none; } .count.oops{ animation:none; } .meter,.meter i{ transition:none !important; } .done{ animation:none !important; } }
   /* touch devices (no cursor to light the scene): once the question has typed out, ease the painting back and brighten it */
   .dim{ transition:opacity 3.6s var(--ease) .2s; }
   @media (hover:none) and (pointer:coarse){
@@ -90,7 +95,7 @@
   <section class="ask">
     <p class="label">Gotham City · Confidential</p>
     <h1 id="q" aria-label="Are you Batman?">Are you Batman?</h1>
-    <p class="count" id="count">&nbsp;</p>
+    <p class="count" id="count"><span id="cnt">&nbsp;</span><span class="meter" id="meter"><i id="fill"></i></span></p>
   </section>
   <section class="done" aria-live="polite">
     <p class="label">Thought so</p>
@@ -115,22 +120,60 @@ var CFG = {
     beard:  ["Not that one!","Yes? Never!","The other button!","Stop chasing it!","That is one suspicious cape.","I have seen subtler detectives.","The table is not part of the case.","Careful with the tablecloth.","We were promised a quiet supper.","I would testify, but I have no idea."],
     green:  ["Do not chase it.","It only runs.","Just press No.","Be sensible.","The bread had nothing to do with it.","Even the painting knows.","The grapes are not taking questions.","Could we finish dinner first?","This is not what the candles are for.","A tap will do. No interrogation needed."]
   },
-  giveUp: "Fine. Go on, then."
+  giveUp: "Fine. Go on, then.",
+  finalAttempts: 150,
+  oops: "Oops. I meant 150.",
+  oopsReply: "He moved the goalposts."
 };
 var IW=1100, IH=782;
 var ANCHOR={ christ:[430,285], beard:[1085,420], green:[330,340], no:[925,655] };
 var yes=document.getElementById('yes'), no=document.getElementById('no'), slot=document.getElementById('slot');
 var dodges=0, caught=false, said=0, timers={}, introDone=false, leaving=false, tick=0, lx=0, ly=0;
 function map(p){ var vw=innerWidth,vh=innerHeight,s=Math.max(vw/IW,vh/IH); return [(vw-IW*s)/2+p[0]*s,(vh-IH*s)/2+p[1]*s]; }
+/* where each speaker's head sits in the 1100 x 782 painting, and which way their bubble leans */
+var HEAD={ christ:{p:[619,254],side:'right',gap:78}, beard:{p:[835,323],side:'left',gap:64}, green:{p:[335,345],side:'left',gap:70} };
+function bubble(k){
+  var e=document.getElementById('s-'+k), c=HEAD[k], vw=innerWidth, vh=innerHeight, m=12;
+  var P=map(c.p); P[0]=Math.min(Math.max(P[0],26),vw-26); P[1]=Math.min(Math.max(P[1],26),vh-26);
+  var w=e.offsetWidth||200, h=e.offsetHeight||56, side=c.side, left, top, tl=c.gap;
+  if(side==='right'){ left=P[0]+c.gap; } else { left=P[0]-c.gap-w; }
+  top=P[1]-h*.72;
+  if(left<m||left+w>vw-m){ /* no room beside the head (phones): sit above or below it instead */
+    side=(P[1]>vh*.38)?'bottom':'top';
+    left=Math.min(Math.max(P[0]-w/2,m),vw-w-m);
+    top=side==='bottom'?P[1]-c.gap-h:P[1]+c.gap; tl=c.gap-4;
+  }
+  top=Math.min(Math.max(top,m),vh-h-m);
+  if(side==='right') side='L'; else if(side==='left') side='R'; /* bubble sits right of the head -> pointer on its left edge, and vice versa */
+  side={L:'left',R:'right'}[side]||side;
+  e.dataset.side=side; e.style.left=Math.round(left)+'px'; e.style.top=Math.round(top)+'px';
+  var ty=Math.min(Math.max(P[1]-top,16),h-16), tx=Math.min(Math.max(P[0]-left,16),w-16);
+  if(side==='left'||side==='right'){ tl=Math.max(18,side==='left'?left-P[0]+2:P[0]-(left+w)+2); tl=Math.min(tl,c.gap+6); e.style.setProperty('--ty',ty+'px'); e.style.setProperty('--ox',(side==='left'?0:w)+'px'); e.style.setProperty('--oy',ty+'px'); }
+  else{ e.style.setProperty('--tx',tx+'px'); e.style.setProperty('--ox',tx+'px'); e.style.setProperty('--oy',(side==='top'?0:h)+'px'); }
+  e.style.setProperty('--tl',tl+'px');
+}
 function layout(){
   var n=map(ANCHOR.no), nw=no.offsetWidth||130, nh=no.offsetHeight||56; n[0]=Math.min(Math.max(n[0],nw/2+14),innerWidth-nw/2-14); n[1]=Math.min(Math.max(n[1],innerHeight*.5),innerHeight-nh-innerHeight*.2); no.style.left=n[0]+'px'; no.style.top=n[1]+'px';
-  var dialogueY={christ:.34,beard:.51,green:.67};
-  ['christ','beard','green'].forEach(function(k){ var e=document.getElementById('s-'+k),half=(e.offsetHeight||56)/2,center=innerHeight*dialogueY[k];
-    e.style.top=Math.min(Math.max(center,half+16),innerHeight-half-16)+'px'; });
+  ['christ','beard','green'].forEach(bubble);
 }
 function speak(k,t,ms){ var e=document.getElementById('s-'+k); document.querySelectorAll('.say.on').forEach(function(open){ if(open!==e) open.classList.remove('on'); }); e.textContent=t; layout(); e.classList.add('on'); clearTimeout(timers[k]); timers[k]=setTimeout(function(){ e.classList.remove('on'); },ms||3000); }
 function chatter(){ var ks=['christ','beard','green'],k=ks[said%3],a=CFG.lines[k]; speak(k,a[Math.floor(said/3)%a.length]); said++; }
-function ui(){ document.getElementById('count').textContent=caught?'':'Attempts '+dodges+' / '+CFG.attemptsToGiveUp; }
+var shownLimit=CFG.attemptsToGiveUp, extended=false, countEl=document.getElementById('count'), cntEl=document.getElementById('cnt'), meterEl=document.getElementById('meter'), fillEl=document.getElementById('fill');
+function ui(){
+  cntEl.textContent=caught?'':'Attempts '+dodges+' / '+Math.round(shownLimit);
+  meterEl.style.visibility=caught?'hidden':'visible';
+  fillEl.style.width=Math.min(100,dodges/shownLimit*100)+'%';
+}
+/* at 100 attempts the limit quietly grows to 150 (with an apology of sorts) */
+function growLimit(){
+  var from=shownLimit, to=CFG.finalAttempts, t0=performance.now(), dur=1300;
+  meterEl.style.setProperty('--mw',to);
+  countEl.classList.remove('oops'); void countEl.offsetWidth; countEl.classList.add('oops');
+  setTimeout(function(){ countEl.classList.remove('oops'); },2600);
+  (function step(now){ var k=Math.min(1,(now-t0)/dur); shownLimit=from+(to-from)*(1-Math.pow(1-k,3)); ui(); if(k<1) requestAnimationFrame(step); else shownLimit=to; })(t0);
+  speak('christ',CFG.oops,3200);
+  setTimeout(function(){ if(!caught) speak('beard',CFG.oopsReply,3000); },3400);
+}
 function place(x,y){ yes.style.transform='translate('+Math.round(x)+'px,'+Math.round(y)+'px)'; }
 function home(){ var r=slot.getBoundingClientRect(), b=yes.getBoundingClientRect(); place(r.left+(r.width-b.width)/2, r.top+(r.height-b.height)/2); }
 function away(px,py){
@@ -144,8 +187,11 @@ function away(px,py){
 /* count=true only for a real press; merely hovering makes Yes slip away but is never counted as an attempt */
 function dodge(px,py,count){
   if(!introDone||caught) return;
-  if(count) dodges++;
-  if(count&&dodges>=CFG.attemptsToGiveUp){ caught=true; yes.style.transition='transform 1.2s cubic-bezier(.22,.8,.2,1)'; home(); ui(); speak('christ',CFG.giveUp,4000); return; }
+  if(count){
+    dodges++;
+    if(!extended&&dodges>=CFG.attemptsToGiveUp){ extended=true; growLimit(); }
+    else if(extended&&dodges>=CFG.finalAttempts){ caught=true; yes.style.transition='transform 1.2s cubic-bezier(.22,.8,.2,1)'; home(); ui(); speak('christ',CFG.giveUp,4000); return; }
+  }
   away(px,py); ui();
 }
 function near(e){ if(!introDone||caught) return; var b=yes.getBoundingClientRect(), pad=14;
