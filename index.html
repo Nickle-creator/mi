@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#000000">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="preload" as="image" href="supper-at-emmaus.webp">
+<link rel="preload" as="image" href="supper-at-emmaus-hd.webp">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <script>document.documentElement.classList.add('js','prelude');</script>
@@ -21,7 +21,7 @@
   html.open #bg{ transform:scale(1); }
   body.leaving #bg{ transform:scale(1.09); transition-duration:2.2s; }
   /* static dimming + a small warm lantern that follows the cursor (cheap: one small layer moved with transform) */
-  .dim{ position:fixed; inset:0; pointer-events:none; background:radial-gradient(ellipse 85% 85% at 50% 52%, rgba(0,0,0,.18), rgba(0,0,0,.66)); }
+  .dim{ position:fixed; inset:0; pointer-events:none; background:radial-gradient(ellipse 85% 85% at 50% 52%, rgba(0,0,0,.34), rgba(0,0,0,.84)); }
   .lamp{ position:fixed; left:0; top:0; width:760px; height:760px; margin:-380px 0 0 -380px; pointer-events:none; opacity:0; transition:opacity 1.2s var(--ease); will-change:transform;
     background:radial-gradient(circle, rgba(255,214,160,.17) 0, rgba(255,214,160,.07) 38%, rgba(255,214,160,0) 68%); }
   html.revealed .lamp{ opacity:1; }
@@ -75,7 +75,7 @@
 </style>
 </head>
 <body>
-<img id="bg" src="supper-at-emmaus.webp" alt="" aria-hidden="true">
+<img id="bg" src="supper-at-emmaus-hd.webp" alt="" aria-hidden="true">
 <div class="dim" aria-hidden="true"></div><div class="lamp" id="lamp" aria-hidden="true"></div><div class="top" aria-hidden="true"></div>
 <main>
   <section class="ask">
@@ -132,14 +132,15 @@ function away(px,py){
   }while((!far||hitNo)&&tries<40);
   place(x,y);
 }
-function dodge(px,py){
+/* count=true only for a real press; merely hovering makes Yes slip away but is never counted as an attempt */
+function dodge(px,py,count){
   if(!introDone||caught) return;
-  dodges++;
-  if(dodges>=CFG.attemptsToGiveUp){ caught=true; yes.style.transition='transform 1.2s cubic-bezier(.22,.8,.2,1)'; home(); ui(); speak('christ',CFG.giveUp,4000); return; }
+  if(count) dodges++;
+  if(count&&dodges>=CFG.attemptsToGiveUp){ caught=true; yes.style.transition='transform 1.2s cubic-bezier(.22,.8,.2,1)'; home(); ui(); speak('christ',CFG.giveUp,4000); return; }
   away(px,py); ui();
 }
 function near(e){ if(!introDone||caught) return; var b=yes.getBoundingClientRect(), pad=14;
-  if(e.clientX>b.left-pad&&e.clientX<b.right+pad&&e.clientY>b.top-pad&&e.clientY<b.bottom+pad) dodge(e.clientX,e.clientY); }
+  if(e.clientX>b.left-pad&&e.clientX<b.right+pad&&e.clientY>b.top-pad&&e.clientY<b.bottom+pad) dodge(e.clientX,e.clientY,false); }
 var lamp=document.getElementById('lamp');
 function moveLamp(){ tick=0; lamp.style.transform='translate3d('+lx+'px,'+ly+'px,0)'; }
 addEventListener('pointermove',function(e){ lx=e.clientX; ly=e.clientY; if(!tick) tick=requestAnimationFrame(moveLamp); if(e.pointerType!=='touch') near(e); },{passive:true});
@@ -147,7 +148,7 @@ addEventListener('pointermove',function(e){ lx=e.clientX; ly=e.clientY; if(!tick
 addEventListener('pointerdown',function(e){
   if(!introDone||caught||leaving) return;
   var b=yes.getBoundingClientRect(), pad=48;
-  if(e.clientX>b.left-pad&&e.clientX<b.right+pad&&e.clientY>b.top-pad&&e.clientY<b.bottom+pad){ e.preventDefault(); chatter(); if(!yes.dataset.hit) dodge(e.clientX,e.clientY); }
+  if(e.clientX>b.left-pad&&e.clientX<b.right+pad&&e.clientY>b.top-pad&&e.clientY<b.bottom+pad){ e.preventDefault(); chatter(); if(!yes.dataset.hit) dodge(e.clientX,e.clientY,true); }
   yes.dataset.hit='';
 });
 yes.addEventListener('click',function(e){ if(!introDone||leaving){ e.preventDefault(); return; } if(!caught&&e.detail>0){ e.preventDefault(); return; } document.body.classList.add('won'); });
