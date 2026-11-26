@@ -12,7 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <script>document.documentElement.classList.add('js','prelude');</script>
 <style>
-  :root{ --paper:#000; --ink:#f3ecdf; --ink2:#b9b5ab; --rule:rgba(243,236,223,.3); --burn:#d9788a; --onburn:#000; --ease:cubic-bezier(.22,.8,.2,1);
+  :root{ --paper:#000; --ink:#f3ecdf; --ink2:#b9b5ab; --rule:rgba(243,236,223,.3); --burn:#d29a52; --onburn:#000; --ease:cubic-bezier(.22,.8,.2,1);
     --serif:'Instrument Serif',Georgia,serif; --sans:'Inter',system-ui,sans-serif; --mx:50vw; --my:45vh; }
   *{ box-sizing:border-box; margin:0; padding:0; }
   html,body{ height:100%; }
@@ -134,23 +134,28 @@ function map(p){ var vw=innerWidth,vh=innerHeight,s=Math.max(vw/IW,vh/IH); retur
 var HEAD={ christ:{p:[619,254],side:'right',gap:78}, beard:{p:[835,323],side:'left',gap:64}, green:{p:[335,345],side:'left',gap:70} };
 function bubble(k){
   var e=document.getElementById('s-'+k), c=HEAD[k], vw=innerWidth, vh=innerHeight, m=12;
+  var sc=Math.max(vw/IW,vh/IH), r=Math.max(46,58*sc); /* r ~ radius of a painted face, so the box sits clear of it */
   var P=map(c.p); P[0]=Math.min(Math.max(P[0],26),vw-26); P[1]=Math.min(Math.max(P[1],26),vh-26);
-  var w=e.offsetWidth||200, h=e.offsetHeight||56, side=c.side, left, top, tl=c.gap;
-  if(side==='right'){ left=P[0]+c.gap; } else { left=P[0]-c.gap-w; }
+  var w=e.offsetWidth||200, h=e.offsetHeight||56, placed=c.side, left, top, tl;
+  if(placed==='right') left=P[0]+r+24; else left=P[0]-r-24-w;
   top=P[1]-h*.72;
-  if(left<m||left+w>vw-m){ /* no room beside the head (phones): sit above or below it instead */
-    side=(P[1]>vh*.38)?'bottom':'top';
+  if(left<m||left+w>vw-m){ /* no room beside the head (phones): sit well below it (or above it if the head is low) */
+    placed=(P[1]>vh*.5)?'above':'below';
     left=Math.min(Math.max(P[0]-w/2,m),vw-w-m);
-    top=side==='bottom'?P[1]-c.gap-h:P[1]+c.gap; tl=c.gap-4;
+    top=placed==='above'?P[1]-r-30-h:P[1]+r+30;
   }
   top=Math.min(Math.max(top,m),vh-h-m);
-  if(side==='right') side='L'; else if(side==='left') side='R'; /* bubble sits right of the head -> pointer on its left edge, and vice versa */
-  side={L:'left',R:'right'}[side]||side;
+  var side=({right:'left',left:'right',above:'bottom',below:'top'})[placed]; /* the pointer sits on the edge facing the head */
   e.dataset.side=side; e.style.left=Math.round(left)+'px'; e.style.top=Math.round(top)+'px';
   var ty=Math.min(Math.max(P[1]-top,16),h-16), tx=Math.min(Math.max(P[0]-left,16),w-16);
-  if(side==='left'||side==='right'){ tl=Math.max(18,side==='left'?left-P[0]+2:P[0]-(left+w)+2); tl=Math.min(tl,c.gap+6); e.style.setProperty('--ty',ty+'px'); e.style.setProperty('--ox',(side==='left'?0:w)+'px'); e.style.setProperty('--oy',ty+'px'); }
-  else{ e.style.setProperty('--tx',tx+'px'); e.style.setProperty('--ox',tx+'px'); e.style.setProperty('--oy',(side==='top'?0:h)+'px'); }
-  e.style.setProperty('--tl',tl+'px');
+  if(side==='left'||side==='right'){
+    tl=side==='left'?left-(P[0]+r*.55):(P[0]-r*.55)-(left+w);
+    e.style.setProperty('--ty',ty+'px'); e.style.setProperty('--ox',(side==='left'?0:w)+'px'); e.style.setProperty('--oy',ty+'px');
+  } else {
+    tl=side==='top'?top-(P[1]+r*.6):(P[1]-r*.6)-(top+h);
+    e.style.setProperty('--tx',tx+'px'); e.style.setProperty('--ox',tx+'px'); e.style.setProperty('--oy',(side==='top'?0:h)+'px');
+  }
+  e.style.setProperty('--tl',Math.max(16,tl)+'px');
 }
 function layout(){
   var n=map(ANCHOR.no), nw=no.offsetWidth||130, nh=no.offsetHeight||56; n[0]=Math.min(Math.max(n[0],nw/2+14),innerWidth-nw/2-14); n[1]=Math.min(Math.max(n[1],innerHeight*.5),innerHeight-nh-innerHeight*.2); no.style.left=n[0]+'px'; no.style.top=n[1]+'px';
