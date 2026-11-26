@@ -43,7 +43,7 @@
     --tile:url(art/paper-day.webp);
     --mast:rgba(239,228,210,.97); --stamp:rgba(239,228,210,.82); --ctl:rgba(239,228,210,.3);
     --snap-tint:rgba(205,184,148,.32); --foot-tint:rgba(190,160,110,.26);
-    --grain-op:.14; --vig:rgba(89,61,29,.12);
+    --grain-op:.09; --vig-op:.14; --vig:rgba(89,61,29,.12);
     --hero-mask:linear-gradient(90deg,transparent 0,rgba(0,0,0,.35) 30%,#000 62%);
   }
   :root[data-theme="night"]{
@@ -53,7 +53,7 @@
     --tile:url(art/paper-night.webp);
     --mast:rgba(0,0,0,.94); --stamp:rgba(0,0,0,.82); --ctl:transparent;
     --snap-tint:rgba(0,0,0,0); --foot-tint:rgba(0,0,0,0);
-    --grain-op:.17; --vig:rgba(0,0,0,.34);
+    --grain-op:.11; --vig-op:.17; --vig:rgba(0,0,0,.34);
     --hero-mask:none;
   }
 
@@ -79,7 +79,7 @@
     background:url(art/grain.webp) 0 0/170px 170px;
   }
   html::after{
-    content:''; position:fixed; inset:0; z-index:101; pointer-events:none; opacity:var(--grain-op);
+    content:''; position:fixed; inset:0; z-index:101; pointer-events:none; opacity:var(--vig-op);
     background:radial-gradient(ellipse at 50% 40%,transparent 52%,var(--vig) 100%);
   }
 
