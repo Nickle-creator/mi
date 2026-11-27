@@ -436,11 +436,11 @@
      trigger a trick or expression until the reader pauses. */
   const moodProfiles = {
     idle: { face: '', color: false },
-    bright: { face: '*_*', color: true, trick: 'sparkle' },
-    curious: { face: 'o_o', color: false, trick: 'pulseWave' },
-    sunglasses: { face: '[■_■]', color: true, trick: 'spin' },
-    wave: { face: 'o/', color: false, trick: 'ruffle' },
-    dreamy: { face: '♡_♡', color: true, trick: 'hearts' }
+    bright: { face: '*  *', color: true, trick: 'sparkle', follow: 'flash' },
+    curious: { face: 'o  o', color: false, trick: 'pulseCascade', follow: 'ruffle' },
+    sunglasses: { face: '', color: true, trick: 'corkscrew', follow: 'flash' },
+    wave: { face: 'o/', color: false, trick: 'ruffle', follow: 'pulseWave' },
+    dreamy: { face: '♡  ♡', color: true, trick: 'hearts', follow: 'bellBloom' }
   };
   let mood = 'idle', targetMood = 'idle', moodMix = 0;
   let fastScrolling = false, scrollSettleTimer = 0, moodSettleTimer = 0;
@@ -454,6 +454,9 @@
     targetMood = nextMood;
     root.dataset.mood = nextMood;
     if (profile.trick && tricks[profile.trick]) tricks[profile.trick]();
+    if (profile.follow && tricks[profile.follow]) window.setTimeout(() => {
+      if (!fastScrolling && targetMood === nextMood) tricks[profile.follow]();
+    }, 420);
     excite = Math.max(excite, nextMood === 'sunglasses' ? 0.9 : 0.45);
     glow = Math.max(glow, profile.color ? 0.8 : 0.35);
   }
@@ -478,16 +481,33 @@
 
   function drawExpression(time) {
     const profile = moodProfiles[targetMood];
-    if (!profile.face || moodMix < 0.05) return;
+    if (moodMix < 0.05) return;
     const face = project(0, 0.76, 0.92);
     if (!face) return;
+    const x = face.col * CELL_W, y = face.row * CELL_H;
     ctx.save();
-    ctx.globalAlpha = moodMix * (0.82 + 0.12 * Math.sin(time * 2.2));
-    ctx.fillStyle = profile.color ? themeColor() : themeColor(true);
-    ctx.font = '700 9px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(profile.face, face.col * CELL_W, face.row * CELL_H);
+    ctx.globalAlpha = Math.min(1, moodMix * 1.25);
+    if (targetMood === 'sunglasses') {
+      /* A deliberately oversized, solid-black pair: it should read even
+         when Jerry is over a bright painting or a busy photo. */
+      const lensW = 22, lensH = 13, gap = 5;
+      ctx.fillStyle = '#050505';
+      ctx.strokeStyle = themeColor();
+      ctx.lineWidth = 1.5;
+      ctx.fillRect(x - gap / 2 - lensW, y - lensH / 2, lensW, lensH);
+      ctx.fillRect(x + gap / 2, y - lensH / 2, lensW, lensH);
+      ctx.strokeRect(x - gap / 2 - lensW, y - lensH / 2, lensW, lensH);
+      ctx.strokeRect(x + gap / 2, y - lensH / 2, lensW, lensH);
+      ctx.fillRect(x - gap / 2, y - 1, gap, 2);
+      ctx.fillRect(x - lensW - 6, y - lensH / 2 + 2, 6, 2);
+      ctx.fillRect(x + lensW + gap / 2, y - lensH / 2 + 2, 6, 2);
+    } else if (profile.face) {
+      ctx.fillStyle = profile.color ? themeColor() : themeColor(true);
+      ctx.font = '700 13px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(profile.face, x, y + Math.sin(time * 2.2) * 1.5);
+    }
     ctx.restore();
   }
 
