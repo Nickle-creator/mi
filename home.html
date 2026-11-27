@@ -10,7 +10,8 @@
   /* set theme + js flag before first paint: no flash, no layout jump */
   (function(){
     var d=document.documentElement; d.classList.add('js');
-    try{ if(localStorage.getItem('mimi-reading-theme-v2')==='twilight') d.dataset.theme='twilight'; }catch(e){}
+    /* always open in the dark theme; paper is something the reader switches to, for this visit only */
+    try{ localStorage.removeItem('mimi-reading-theme-v2'); }catch(e){}
     var arrival=false;
     try{ arrival=sessionStorage.getItem('mimi-jellyfish-arrival')==='1'; if(arrival) sessionStorage.removeItem('mimi-jellyfish-arrival'); }catch(e){}
     if(location.search.indexOf('meet-jellyfish=1')!==-1){ arrival=true; try{ history.replaceState(null,'',location.pathname+location.hash); }catch(e){} }
@@ -840,7 +841,6 @@
     themeToggle.setAttribute('aria-label', night ? 'Switch to paper theme' : 'Switch to night theme');
     themeToggle.querySelector('span').textContent = night ? 'Paper theme' : 'Night theme';
     var m = $('meta[name="theme-color"]'); if(m) m.setAttribute('content', night ? '#181e26' : '#efe4d2');
-    try{ localStorage.setItem('mimi-reading-theme-v2', night ? 'night' : 'twilight'); }catch(e){}
   }
   applyTheme(root.dataset.theme === 'twilight' ? 'twilight' : 'night');
   themeToggle.addEventListener('click', function(){ applyTheme(root.dataset.theme === 'night' ? 'twilight' : 'night'); });

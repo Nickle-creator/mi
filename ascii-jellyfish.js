@@ -59,10 +59,11 @@
   let targetPaletteMix = document.documentElement.dataset.theme === 'night' ? 0 : 1;
   const NIGHT_ACCENT = [217, 120, 138];
   const NIGHT_CORE = [243, 236, 223];
-  const PAPER_MAROON = [122, 31, 46];
+  const PAPER_ACCENT = [198, 28, 82];  /* vivid raspberry: lit-from-within on cream paper */
+  const PAPER_CORE = [236, 62, 110];   /* hot rose highlights */
   const themeRgb = (core = false) => {
-    const night = core ? NIGHT_CORE : NIGHT_ACCENT;
-    return night.map((value, i) => Math.round(value + (PAPER_MAROON[i] - value) * paletteMix));
+    const night = core ? NIGHT_CORE : NIGHT_ACCENT, paper = core ? PAPER_CORE : PAPER_ACCENT;
+    return night.map((value, i) => Math.round(value + (paper[i] - value) * paletteMix));
   };
   const themeColor = (core = false) => `rgb(${themeRgb(core).join(', ')})`;
   const themeRgba = (core, alpha) => `rgba(${themeRgb(core).join(', ')}, ${alpha})`;
@@ -479,55 +480,6 @@
   }, { threshold: [0.34, 0.55, 0.78], rootMargin: '-12% 0px -18% 0px' });
   document.querySelectorAll('[data-jerry]').forEach((spread) => spreadMoodObserver.observe(spread));
 
-  function drawExpression(time) {
-    const profile = moodProfiles[targetMood];
-    if (moodMix < 0.05) return;
-    const face = project(0, 0.76, 0.92);
-    if (!face) return;
-    const x = face.col * CELL_W, y = face.row * CELL_H;
-    ctx.save();
-    ctx.globalAlpha = Math.min(1, moodMix * 1.25);
-    if (targetMood === 'sunglasses') {
-      /* A deliberately oversized, solid-black pair: it should read even
-         when Jerry is over a bright painting or a busy photo. */
-      const lensW = 30, lensH = 19, gap = 7;
-      ctx.fillStyle = '#000000';
-      ctx.strokeStyle = themeColor(true);
-      ctx.lineWidth = 2;
-      ctx.fillRect(x - gap / 2 - lensW, y - lensH / 2, lensW, lensH);
-      ctx.fillRect(x + gap / 2, y - lensH / 2, lensW, lensH);
-      ctx.strokeRect(x - gap / 2 - lensW, y - lensH / 2, lensW, lensH);
-      ctx.strokeRect(x + gap / 2, y - lensH / 2, lensW, lensH);
-      ctx.fillRect(x - gap / 2, y - 2, gap, 4);
-      ctx.fillRect(x - lensW - 9, y - lensH / 2 + 3, 9, 3);
-      ctx.fillRect(x + lensW + gap / 2, y - lensH / 2 + 3, 9, 3);
-      ctx.fillStyle = 'rgba(255,255,255,.16)';
-      ctx.fillRect(x - gap / 2 - lensW + 4, y - lensH / 2 + 4, lensW - 8, 2);
-      ctx.fillRect(x + gap / 2 + 4, y - lensH / 2 + 4, lensW - 8, 2);
-    } else if (profile.face) {
-      /* Big eyes stay readable over the collage; the small expression label
-         remains underneath as a tiny personality cue. */
-      const blink = Math.abs(Math.sin(time * 0.7)) > 0.985 ? 0.28 : 1;
-      const eyeY = y + Math.sin(time * 2.2) * 1.5;
-      ctx.fillStyle = profile.color ? '#fff9eb' : themeColor(true);
-      ctx.beginPath();
-      ctx.ellipse(x - 10, eyeY, 7, 9 * blink, 0, 0, Math.PI * 2);
-      ctx.ellipse(x + 10, eyeY, 7, 9 * blink, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#000000';
-      ctx.beginPath();
-      ctx.arc(x - 10, eyeY + 1, 3.8, 0, Math.PI * 2);
-      ctx.arc(x + 10, eyeY + 1, 3.8, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = profile.color ? themeColor() : themeColor(true);
-      ctx.font = '700 12px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(profile.face, x, y + 22);
-    }
-    ctx.restore();
-  }
-
   /* ---------------- sim + render ---------------- */
   let frameCount = 0, lastHalo = -1;
 
@@ -608,12 +560,11 @@
         const glyph = glyphs[i];
         if (!glyph || glyph === ' ') continue;
         ctx.fillStyle = themeColor(coreCells[i] === 1);
-        ctx.globalAlpha = clamp(mixv(0.74 + intensities[i] * 0.26, 0.68 + intensities[i] * 0.32), 0.5, 1) * (1 - 0.35 * sleepy);
+        ctx.globalAlpha = clamp(mixv(0.74 + intensities[i] * 0.26, 0.86 + intensities[i] * 0.14), 0.5, 1) * (1 - 0.35 * sleepy);
         ctx.fillText(glyph, (col + 0.5) * CELL_W, (row + 0.5) * CELL_H);
       }
     }
     ctx.globalAlpha = 1;
-    drawExpression(t);
     drawParticles();
 
     // cheap soft halo (CSS filter instead of per-glyph shadowBlur)
@@ -621,9 +572,9 @@
       const haloKey = Math.round(paletteMix * 10) + ':' + Math.round(pulse * 6);
       if (haloKey !== lastHalo) {
         lastHalo = haloKey;
-        // Keep the original glow radii and pulse; paper mode uses a softer tinted maroon halo.
+        // Keep the original glow radii and pulse; paper mode keeps most of the glow so he still looks lit up.
         const k = 0.72 + 0.28 * pulse;
-        const haloScale = 1 - 0.72 * paletteMix;
+        const haloScale = 1 - 0.3 * paletteMix;
         canvas.style.filter =
           `drop-shadow(0 0 2px ${themeRgba(false, (0.95 * k * haloScale).toFixed(2))}) ` +
           `drop-shadow(0 0 9px ${themeRgba(false, (0.8 * k * haloScale).toFixed(2))}) ` +
