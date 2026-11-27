@@ -1,0 +1,33 @@
+/* Local copies of the site fonts. Keeping these beside the HTML removes the
+   Google Fonts connection and keeps the visual identity consistent offline. */
+@font-face {
+  font-family: 'Instrument Serif';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('fonts/instrument-serif-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Instrument Serif';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('fonts/instrument-serif-italic.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('fonts/inter-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('fonts/inter-medium.woff2') format('woff2');
+}
