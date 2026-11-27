@@ -29,6 +29,8 @@ Jerry is not a static image. He is generated in the browser on a canvas using an
 - night/paper theme color changes;
 - reduced-motion support; and
 - a short arrival introduction when the question page sends the visitor to the scrapbook.
+- story-aware expressions: bright eyes, curiosity, sunglasses at “Real homie,” a wave, and a dreamy finale;
+- section changes that wait for the reader to pause, so fast scrolling does not trigger a chain of tricks.
 
 The jellyfish is decorative and is marked `aria-hidden` so it does not interrupt the main reading experience.
 

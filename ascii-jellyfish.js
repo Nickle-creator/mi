@@ -431,6 +431,67 @@
     tricks[n]();
   }
 
+  /* ---------------- page-aware expressions ----------------
+     Jerry changes expression only after a reader settles on a story spread.
+     Fast scrolling updates the active spread, but deliberately does not
+     trigger a trick or expression until the reader pauses. */
+  const moodProfiles = {
+    idle: { face: '', color: false },
+    bright: { face: '*_*', color: true, trick: 'sparkle' },
+    curious: { face: 'o_o', color: false, trick: 'pulseWave' },
+    sunglasses: { face: '[■_■]', color: true, trick: 'spin' },
+    wave: { face: 'o/', color: false, trick: 'ruffle' },
+    dreamy: { face: '♡_♡', color: true, trick: 'hearts' }
+  };
+  let mood = 'idle', targetMood = 'idle', moodMix = 0;
+  let fastScrolling = false, scrollSettleTimer = 0, moodSettleTimer = 0;
+  let lastScrollY = window.scrollY, lastScrollAt = performance.now();
+  let activeSpreadMood = 'idle';
+
+  function applyMood(nextMood) {
+    if (reducedMotion || fastScrolling || nextMood === targetMood) return;
+    const profile = moodProfiles[nextMood] || moodProfiles.idle;
+    mood = targetMood;
+    targetMood = nextMood;
+    root.dataset.mood = nextMood;
+    if (profile.trick && tricks[profile.trick]) tricks[profile.trick]();
+    excite = Math.max(excite, nextMood === 'sunglasses' ? 0.9 : 0.45);
+    glow = Math.max(glow, profile.color ? 0.8 : 0.35);
+  }
+
+  function requestMood(nextMood) {
+    activeSpreadMood = nextMood || 'idle';
+    window.clearTimeout(moodSettleTimer);
+    if (reducedMotion || fastScrolling) return;
+    moodSettleTimer = window.setTimeout(() => applyMood(activeSpreadMood), 620);
+  }
+
+  const spreadMoodObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      entry.target.__jerryRatio = entry.isIntersecting ? entry.intersectionRatio : 0;
+    });
+    const visible = Array.from(document.querySelectorAll('[data-jerry]'))
+      .map((el) => ({ el, ratio: el.__jerryRatio || 0 }))
+      .sort((a, b) => b.ratio - a.ratio)[0];
+    requestMood(visible && visible.ratio > 0.34 ? visible.el.dataset.jerry : 'idle');
+  }, { threshold: [0.34, 0.55, 0.78], rootMargin: '-12% 0px -18% 0px' });
+  document.querySelectorAll('[data-jerry]').forEach((spread) => spreadMoodObserver.observe(spread));
+
+  function drawExpression(time) {
+    const profile = moodProfiles[targetMood];
+    if (!profile.face || moodMix < 0.05) return;
+    const face = project(0, 0.76, 0.92);
+    if (!face) return;
+    ctx.save();
+    ctx.globalAlpha = moodMix * (0.82 + 0.12 * Math.sin(time * 2.2));
+    ctx.fillStyle = profile.color ? themeColor() : themeColor(true);
+    ctx.font = '700 9px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(profile.face, face.col * CELL_W, face.row * CELL_H);
+    ctx.restore();
+  }
+
   /* ---------------- sim + render ---------------- */
   let frameCount = 0, lastHalo = -1;
 
@@ -446,6 +507,8 @@
     if (Math.abs(targetPaletteMix - paletteMix) < 0.005) paletteMix = targetPaletteMix;
     if (rainbowT > 0) { rainbowT -= dt; rainbow = Math.min(1, rainbow + dt * 2); }
     else rainbow = Math.max(0, rainbow - dt * 1.2);
+    const moodTarget = targetMood === 'idle' ? 0 : 1;
+    moodMix += (moodTarget - moodMix) * (1 - Math.exp(-dt * 4.5));
 
     const rate = (0.62 + 0.9 * excite + (diving ? 0.35 : 0)) * (1 - 0.6 * sleepy);
     swimPhase += rate * dt;
@@ -467,7 +530,7 @@
     }
 
     // random tricks while awake
-    if (sleepy < 0.2) {
+    if (sleepy < 0.2 && !fastScrolling) {
       nextTrick -= dt;
       if (nextTrick <= 0) { randomTrick(); nextTrick = 2.2 + Math.random() * 1.8; }
     }
@@ -514,6 +577,7 @@
       }
     }
     ctx.globalAlpha = 1;
+    drawExpression(t);
     drawParticles();
 
     // cheap soft halo (CSS filter instead of per-glyph shadowBlur)
@@ -629,12 +693,28 @@
   const wake = () => { lastActive = performance.now(); };
 
   function onScroll() {
+    const now = performance.now();
+    const elapsed = Math.max(8, now - lastScrollAt);
+    const speed = Math.abs(window.scrollY - lastScrollY) / elapsed;
+    lastScrollY = window.scrollY;
+    lastScrollAt = now;
     wake();
     if (reducedMotion) return;
+    if (speed > 1.25) {
+      fastScrolling = true;
+      root.dataset.scroll = 'fast';
+      window.clearTimeout(moodSettleTimer);
+    }
     diving = true;
     scrollDepth = depthOnPage();
     window.clearTimeout(idleTimer);
     idleTimer = window.setTimeout(() => { diving = false; readjustIdleAnchor(); }, 760);
+    window.clearTimeout(scrollSettleTimer);
+    scrollSettleTimer = window.setTimeout(() => {
+      fastScrolling = false;
+      root.dataset.scroll = 'settled';
+      requestMood(activeSpreadMood);
+    }, 480);
   }
 
   window.addEventListener('scroll', onScroll, { passive: true });

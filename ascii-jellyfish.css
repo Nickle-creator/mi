@@ -20,6 +20,16 @@
   background: transparent;
 }
 
+/* The state is also exposed for future art direction without making Jerry
+   interactive or adding a second animation layer. */
+.ascii-jellyfish[data-mood="sunglasses"] {
+  filter: saturate(1.08);
+}
+
+.ascii-jellyfish[data-scroll="fast"] {
+  opacity: .72;
+}
+
 @media (max-width: 600px) {
   .ascii-jellyfish {
     width: min(78vw, 300px);
