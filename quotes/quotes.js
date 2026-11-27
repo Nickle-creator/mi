@@ -5,12 +5,12 @@
 window.QUOTES = [
   { lines: ["O my Luve is like a red, red rose", "That’s newly sprung in June;"],
     credit: "Robert Burns — A Red, Red Rose" },
-  { lines: ["So fair art thou, my bonnie lass,", "So deep in luve am I;"],
-    credit: "Robert Burns — A Red, Red Rose" },
-  { lines: ["Till a’ the seas gang dry, my dear,", "And the rocks melt wi’ the sun;"],
-    credit: "Robert Burns — A Red, Red Rose" },
-  { lines: ["And I will come again, my luve,", "Though it were ten thousand mile."],
-    credit: "Robert Burns — A Red, Red Rose" }
+  { lines: ["I love thee with the breath,", "Smiles, tears, of all my life!"],
+    credit: "Elizabeth Barrett Browning — Sonnet 43" },
+  { lines: ["For thy sweet love remembered such wealth brings", "That then I scorn to change my state with kings."],
+    credit: "William Shakespeare — Sonnet 29" },
+  { lines: ["Love is not love", "Which alters when it alteration finds,"],
+    credit: "William Shakespeare — Sonnet 116" }
 ];
 (function(){
   (window.QUOTES || []).forEach(function(q, i){
