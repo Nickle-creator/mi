@@ -484,7 +484,8 @@
   @media (max-width:430px){ .mast .controls .music-ctl .turntable{ width:3rem; height:1.9rem; } }
 </style>
 <style id="jellyfish-arrival-style">
-  html.jellyfish-arrival body{ animation:arrive 1.2s var(--ease) both; }
+  /* no body fade on arrival: #arrivalSky lives inside <body> and must stay fully opaque so the sky from the tear carries straight across */
+  html.jellyfish-arrival body{ animation:none; }
   @keyframes arrive{ from{ opacity:0; } to{ opacity:1; } }
   .jellyfish-intro[hidden]{ display:none !important; }
   .jellyfish-intro{ position:fixed; z-index:55; top:calc(var(--bar) + 1rem); left:12px; width:min(16rem,calc(100vw - 24px)); padding:.95rem 1rem .8rem; color:var(--ink); background:var(--print); border:1px solid var(--burn); box-shadow:7px 7px 0 var(--rule); opacity:0; transform:translate3d(0,10px,0) rotate(-.8deg); transition:opacity .45s var(--ease2),transform .65s var(--ease); pointer-events:none; }

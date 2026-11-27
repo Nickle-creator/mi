@@ -88,16 +88,16 @@
   .tear-stage{display:none;position:fixed;inset:0;z-index:250;overflow:hidden;background:#07080c;pointer-events:none}
   body.leaving .tear-stage{display:block}
   .tear-sky,.tear-half{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-  .tear-sky{opacity:0;background:#07080c url('art/hero-starry.webp') center/cover no-repeat;transform:scale(1.02);animation:sky-open 1.5s .75s cubic-bezier(.2,.6,.2,1) forwards}
+  .tear-sky{opacity:0;background:#07080c url('art/hero-starry.webp') center/cover no-repeat;transform:scale(1.02);animation:sky-open 1.9s .55s cubic-bezier(.3,.5,.4,1) forwards}
   .tear-half{will-change:transform}
-  .tear-a{clip-path:polygon(0 0,100% 0,96% 7%,91% 12%,93% 17%,86% 23%,88% 29%,80% 35%,83% 41%,73% 47%,76% 52%,66% 58%,69% 64%,58% 70%,61% 75%,50% 81%,53% 86%,41% 92%,44% 96%,34% 100%,0 100%);animation:tear-a 1.5s .3s cubic-bezier(.6,0,.2,1) forwards}
-  .tear-b{clip-path:polygon(100% 0,96% 7%,91% 12%,93% 17%,86% 23%,88% 29%,80% 35%,83% 41%,73% 47%,76% 52%,66% 58%,69% 64%,58% 70%,61% 75%,50% 81%,53% 86%,41% 92%,44% 96%,34% 100%,100% 100%);animation:tear-b 1.5s .3s cubic-bezier(.6,0,.2,1) forwards}
+  .tear-a{clip-path:polygon(0 0,100% 0,96% 7%,91% 12%,93% 17%,86% 23%,88% 29%,80% 35%,83% 41%,73% 47%,76% 52%,66% 58%,69% 64%,58% 70%,61% 75%,50% 81%,53% 86%,41% 92%,44% 96%,34% 100%,0 100%);animation:tear-a 2s .3s linear forwards}
+  .tear-b{clip-path:polygon(100% 0,96% 7%,91% 12%,93% 17%,86% 23%,88% 29%,80% 35%,83% 41%,73% 47%,76% 52%,66% 58%,69% 64%,58% 70%,61% 75%,50% 81%,53% 86%,41% 92%,44% 96%,34% 100%,100% 100%);animation:tear-b 2s .3s linear forwards}
   .tear-rip,.tear-glow{position:absolute;inset:0;pointer-events:none}
   .tear-rip{background:#e8dcc6;clip-path:polygon(100% 0,96% 7%,91% 12%,93% 17%,86% 23%,88% 29%,80% 35%,83% 41%,73% 47%,76% 52%,66% 58%,69% 64%,58% 70%,61% 75%,50% 81%,53% 86%,41% 92%,44% 96%,34% 100%,31% 100%,41% 94%,38% 91%,48% 85%,46% 80%,56% 74%,54% 69%,65% 63%,62% 58%,72% 52%,70% 47%,79% 40%,77% 35%,85% 28%,83% 23%,90% 17%,88% 12%,94% 6%,97% 0);animation:rip-fade .7s 1.05s ease forwards}
   .tear-glow{background:#d29a52;clip-path:polygon(100% 0,98% 0,34% 100%,36% 100%);opacity:.8;animation:glow-fade .9s 1s ease forwards}
-  @keyframes tear-a{to{transform:translate(-6vw,-4vh) rotate(-2.5deg)}}
-  @keyframes tear-b{to{transform:translate(5vw,5vh) rotate(2deg)}}
-  @keyframes sky-open{to{opacity:1;transform:translateX(-8%) scale(1.06)}}
+  @keyframes tear-a{0%{transform:none;opacity:1;animation-timing-function:cubic-bezier(.4,0,.2,1)}38%{transform:translate(-6vw,-4vh) rotate(-2.5deg);opacity:1;animation-timing-function:cubic-bezier(.5,0,.85,.6)}85%{opacity:1}100%{transform:translate(-64vw,-48vh) rotate(-8deg);opacity:0}}
+  @keyframes tear-b{0%{transform:none;opacity:1;animation-timing-function:cubic-bezier(.4,0,.2,1)}38%{transform:translate(5vw,5vh) rotate(2deg);opacity:1;animation-timing-function:cubic-bezier(.5,0,.85,.6)}85%{opacity:1}100%{transform:translate(60vw,52vh) rotate(7deg);opacity:0}}
+  @keyframes sky-open{from{opacity:0;transform:translateX(6%) scale(1.08)}to{opacity:1;transform:translateX(0) scale(1.08)}}
   @keyframes rip-fade{to{opacity:0}} @keyframes glow-fade{to{opacity:0}}
   @media (prefers-reduced-motion:reduce){.tear-stage{display:none!important}}
 </style>
@@ -235,7 +235,7 @@ function goHome(e){
   var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   speak('christ','Finally. Mind the jellyfish.',2200);
   document.body.classList.add('leaving');
-  setTimeout(function(){ location.href='home.html'; },reduce?500:2400);
+  setTimeout(function(){ location.href='home.html'; },reduce?500:2500);
 }
 no.addEventListener('click',goHome);
 document.querySelector('.done a').addEventListener('click',goHome);
