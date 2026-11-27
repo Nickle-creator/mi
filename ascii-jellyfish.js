@@ -435,12 +435,12 @@
      Fast scrolling updates the active spread, but deliberately does not
      trigger a trick or expression until the reader pauses. */
   const moodProfiles = {
-    idle: { color: false },
-    bright: { color: true, trick: 'sparkle', follow: 'flash' },
-    curious: { color: false, trick: 'pulseCascade', follow: 'ruffle' },
-    sunglasses: { color: true, trick: 'corkscrew', follow: 'flash' },
-    wave: { color: false, trick: 'ruffle', follow: 'pulseWave' },
-    dreamy: { color: true, trick: 'hearts', follow: 'bellBloom' }
+    idle: { face: '', color: false },
+    bright: { face: '*  *', color: true, trick: 'sparkle', follow: 'flash' },
+    curious: { face: 'o  o', color: false, trick: 'pulseCascade', follow: 'ruffle' },
+    sunglasses: { face: '', color: true, trick: 'corkscrew', follow: 'flash' },
+    wave: { face: 'o/', color: false, trick: 'ruffle', follow: 'pulseWave' },
+    dreamy: { face: '♡  ♡', color: true, trick: 'hearts', follow: 'bellBloom' }
   };
   let mood = 'idle', targetMood = 'idle', moodMix = 0;
   let fastScrolling = false, scrollSettleTimer = 0, moodSettleTimer = 0;
@@ -478,6 +478,55 @@
     requestMood(visible && visible.ratio > 0.34 ? visible.el.dataset.jerry : 'idle');
   }, { threshold: [0.34, 0.55, 0.78], rootMargin: '-12% 0px -18% 0px' });
   document.querySelectorAll('[data-jerry]').forEach((spread) => spreadMoodObserver.observe(spread));
+
+  function drawExpression(time) {
+    const profile = moodProfiles[targetMood];
+    if (moodMix < 0.05) return;
+    const face = project(0, 0.76, 0.92);
+    if (!face) return;
+    const x = face.col * CELL_W, y = face.row * CELL_H;
+    ctx.save();
+    ctx.globalAlpha = Math.min(1, moodMix * 1.25);
+    if (targetMood === 'sunglasses') {
+      /* A deliberately oversized, solid-black pair: it should read even
+         when Jerry is over a bright painting or a busy photo. */
+      const lensW = 30, lensH = 19, gap = 7;
+      ctx.fillStyle = '#000000';
+      ctx.strokeStyle = themeColor(true);
+      ctx.lineWidth = 2;
+      ctx.fillRect(x - gap / 2 - lensW, y - lensH / 2, lensW, lensH);
+      ctx.fillRect(x + gap / 2, y - lensH / 2, lensW, lensH);
+      ctx.strokeRect(x - gap / 2 - lensW, y - lensH / 2, lensW, lensH);
+      ctx.strokeRect(x + gap / 2, y - lensH / 2, lensW, lensH);
+      ctx.fillRect(x - gap / 2, y - 2, gap, 4);
+      ctx.fillRect(x - lensW - 9, y - lensH / 2 + 3, 9, 3);
+      ctx.fillRect(x + lensW + gap / 2, y - lensH / 2 + 3, 9, 3);
+      ctx.fillStyle = 'rgba(255,255,255,.16)';
+      ctx.fillRect(x - gap / 2 - lensW + 4, y - lensH / 2 + 4, lensW - 8, 2);
+      ctx.fillRect(x + gap / 2 + 4, y - lensH / 2 + 4, lensW - 8, 2);
+    } else if (profile.face) {
+      /* Big eyes stay readable over the collage; the small expression label
+         remains underneath as a tiny personality cue. */
+      const blink = Math.abs(Math.sin(time * 0.7)) > 0.985 ? 0.28 : 1;
+      const eyeY = y + Math.sin(time * 2.2) * 1.5;
+      ctx.fillStyle = profile.color ? '#fff9eb' : themeColor(true);
+      ctx.beginPath();
+      ctx.ellipse(x - 10, eyeY, 7, 9 * blink, 0, 0, Math.PI * 2);
+      ctx.ellipse(x + 10, eyeY, 7, 9 * blink, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#000000';
+      ctx.beginPath();
+      ctx.arc(x - 10, eyeY + 1, 3.8, 0, Math.PI * 2);
+      ctx.arc(x + 10, eyeY + 1, 3.8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = profile.color ? themeColor() : themeColor(true);
+      ctx.font = '700 12px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(profile.face, x, y + 22);
+    }
+    ctx.restore();
+  }
 
   /* ---------------- sim + render ---------------- */
   let frameCount = 0, lastHalo = -1;
@@ -564,6 +613,7 @@
       }
     }
     ctx.globalAlpha = 1;
+    drawExpression(t);
     drawParticles();
 
     // cheap soft halo (CSS filter instead of per-glyph shadowBlur)
@@ -759,11 +809,11 @@
   scrollDepth = initialDepth;
   diving = !reducedMotion && window.scrollY > 4;
   currentX = maxX() * 0.62;
-  currentY = diving ? 48 + initialDepth * (maxY() - 48) : Math.max(26, window.innerHeight * 0.035);
+  currentY = arrivalIntro ? maxY() : (diving ? 48 + initialDepth * (maxY() - 48) : Math.max(26, window.innerHeight * 0.035));
   prevX = currentX; prevY = currentY;
   readjustIdleAnchor();
   const firstIntroProgress = introProgress(performance.now());
-  const firstIntroOffset = arrivalIntro && !reducedMotion ? (1 - firstIntroProgress) * (window.innerWidth + W * SCALE) : 0;
+  const firstIntroOffset = arrivalIntro && !reducedMotion ? -(1 - firstIntroProgress) * (W * SCALE + 24) : 0;
   setPosition(currentX + firstIntroOffset, currentY, arrivalIntro && !reducedMotion ? 0.76 + 0.24 * firstIntroProgress : 1);
   if (arrivalIntro) showIntroNote();
 
