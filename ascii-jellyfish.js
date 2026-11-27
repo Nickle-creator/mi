@@ -442,15 +442,6 @@
     wave: { color: false, trick: 'ruffle', follow: 'pulseWave' },
     dreamy: { color: true, trick: 'hearts', follow: 'bellBloom' }
   };
-  /* Plain-ASCII faces, typed in the same monospace as the rest of Jerry (no emoji, no special symbols).
-     eyes/mouth are the two text rows; `blink` swaps the eyes now and then; `hand` is an optional waving frame cycle. */
-  const FACES = {
-    bright:     { eyes: '^   ^',       blink: '-   -',       mouth: '\\___/' },
-    curious:    { eyes: 'o   O',       blink: '-   -',       mouth: '  ?  ' },
-    sunglasses: { eyes: '[###]-[###]', blink: '[###]-[###]', mouth: '\\_/' },
-    wave:       { eyes: 'o   o',       blink: '-   -',       mouth: '\\_/', hand: ['\\o', '|o', 'o/', '|o'] },
-    dreamy:     { eyes: '-   -',       blink: '-   -',       mouth: ' w ', cheeks: true }
-  };
   let mood = 'idle', targetMood = 'idle', moodMix = 0;
   let fastScrolling = false, scrollSettleTimer = 0, moodSettleTimer = 0;
   let lastScrollY = window.scrollY, lastScrollAt = performance.now();
@@ -487,42 +478,6 @@
     requestMood(visible && visible.ratio > 0.34 ? visible.el.dataset.jerry : 'idle');
   }, { threshold: [0.34, 0.55, 0.78], rootMargin: '-12% 0px -18% 0px' });
   document.querySelectorAll('[data-jerry]').forEach((spread) => spreadMoodObserver.observe(spread));
-
-  function drawExpression(time) {
-    const profile = moodProfiles[targetMood], face = FACES[targetMood];
-    if (moodMix < 0.05 || !face) return;
-    const pos = project(0, 0.76, 0.92);
-    if (!pos) return;
-    const x = pos.col * CELL_W, y = pos.row * CELL_H + Math.sin(time * 2.2) * 1.2;
-    const blinking = Math.abs(Math.sin(time * 0.7)) > 0.985;
-    const rows = [blinking ? face.blink : face.eyes, face.mouth];
-    ctx.save();
-    ctx.globalAlpha = Math.min(1, moodMix * 1.25);
-    ctx.font = '700 17px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.lineJoin = 'round';
-    ctx.lineWidth = 5;
-    ctx.strokeStyle = 'rgba(0,0,0,.88)'; /* dark outline keeps the ASCII readable over bright paintings and photos */
-    ctx.fillStyle = profile.color ? '#fff9eb' : themeColor(true);
-    const lineH = 17;
-    rows.forEach((row, i) => {
-      const yy = y + (i - 0.5) * lineH;
-      ctx.strokeText(row, x, yy);
-      ctx.fillText(row, x, yy);
-    });
-    if (face.cheeks) { /* blush marks either side of the mouth */
-      ctx.fillStyle = profile.color ? themeColor() : themeColor(true);
-      ctx.strokeText('//', x - 38, y + lineH / 2); ctx.fillText('//', x - 38, y + lineH / 2);
-      ctx.strokeText('\\\\', x + 38, y + lineH / 2); ctx.fillText('\\\\', x + 38, y + lineH / 2);
-    }
-    if (face.hand) { /* a little waving hand beside him */
-      const f = face.hand[Math.floor(time * 3) % face.hand.length];
-      ctx.fillStyle = themeColor(true);
-      ctx.strokeText(f, x + 58, y - lineH); ctx.fillText(f, x + 58, y - lineH);
-    }
-    ctx.restore();
-  }
 
   /* ---------------- sim + render ---------------- */
   let frameCount = 0, lastHalo = -1;
@@ -609,7 +564,6 @@
       }
     }
     ctx.globalAlpha = 1;
-    drawExpression(t);
     drawParticles();
 
     // cheap soft halo (CSS filter instead of per-glyph shadowBlur)
