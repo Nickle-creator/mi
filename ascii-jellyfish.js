@@ -490,23 +490,40 @@
     if (targetMood === 'sunglasses') {
       /* A deliberately oversized, solid-black pair: it should read even
          when Jerry is over a bright painting or a busy photo. */
-      const lensW = 22, lensH = 13, gap = 5;
-      ctx.fillStyle = '#050505';
-      ctx.strokeStyle = themeColor();
-      ctx.lineWidth = 1.5;
+      const lensW = 30, lensH = 19, gap = 7;
+      ctx.fillStyle = '#000000';
+      ctx.strokeStyle = themeColor(true);
+      ctx.lineWidth = 2;
       ctx.fillRect(x - gap / 2 - lensW, y - lensH / 2, lensW, lensH);
       ctx.fillRect(x + gap / 2, y - lensH / 2, lensW, lensH);
       ctx.strokeRect(x - gap / 2 - lensW, y - lensH / 2, lensW, lensH);
       ctx.strokeRect(x + gap / 2, y - lensH / 2, lensW, lensH);
-      ctx.fillRect(x - gap / 2, y - 1, gap, 2);
-      ctx.fillRect(x - lensW - 6, y - lensH / 2 + 2, 6, 2);
-      ctx.fillRect(x + lensW + gap / 2, y - lensH / 2 + 2, 6, 2);
+      ctx.fillRect(x - gap / 2, y - 2, gap, 4);
+      ctx.fillRect(x - lensW - 9, y - lensH / 2 + 3, 9, 3);
+      ctx.fillRect(x + lensW + gap / 2, y - lensH / 2 + 3, 9, 3);
+      ctx.fillStyle = 'rgba(255,255,255,.16)';
+      ctx.fillRect(x - gap / 2 - lensW + 4, y - lensH / 2 + 4, lensW - 8, 2);
+      ctx.fillRect(x + gap / 2 + 4, y - lensH / 2 + 4, lensW - 8, 2);
     } else if (profile.face) {
+      /* Big eyes stay readable over the collage; the small expression label
+         remains underneath as a tiny personality cue. */
+      const blink = Math.abs(Math.sin(time * 0.7)) > 0.985 ? 0.28 : 1;
+      const eyeY = y + Math.sin(time * 2.2) * 1.5;
+      ctx.fillStyle = profile.color ? '#fff9eb' : themeColor(true);
+      ctx.beginPath();
+      ctx.ellipse(x - 10, eyeY, 7, 9 * blink, 0, 0, Math.PI * 2);
+      ctx.ellipse(x + 10, eyeY, 7, 9 * blink, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#000000';
+      ctx.beginPath();
+      ctx.arc(x - 10, eyeY + 1, 3.8, 0, Math.PI * 2);
+      ctx.arc(x + 10, eyeY + 1, 3.8, 0, Math.PI * 2);
+      ctx.fill();
       ctx.fillStyle = profile.color ? themeColor() : themeColor(true);
-      ctx.font = '700 13px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+      ctx.font = '700 12px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(profile.face, x, y + Math.sin(time * 2.2) * 1.5);
+      ctx.fillText(profile.face, x, y + 22);
     }
     ctx.restore();
   }
