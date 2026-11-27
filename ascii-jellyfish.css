@@ -26,9 +26,6 @@
   filter: saturate(1.08);
 }
 
-.ascii-jellyfish[data-scroll="fast"] {
-  opacity: .72;
-}
 
 @media (max-width: 600px) {
   .ascii-jellyfish {

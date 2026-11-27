@@ -360,8 +360,7 @@
       const f = p.age / p.life;
       const col = Math.round(p.col), row = Math.round(p.row);
       if (col < 0 || col >= COLS - 1 || row < 0 || row >= ROWS) continue;
-      const overText = textOverlapCells[row * COLS + col] || textOverlapCells[row * COLS + col + 1];
-      ctx.globalAlpha = clamp(1 - f * f, 0, 1) * (1 - 0.35 * sleepy) * (overText ? 0.35 : 1);
+      ctx.globalAlpha = clamp(1 - f * f, 0, 1) * (1 - 0.35 * sleepy);
       if (p.kind === 'heart') {
         ctx.fillStyle = themeColor();
         ctx.fillText('<', (col + 0.5) * CELL_W, (row + 0.5) * CELL_H);
@@ -572,7 +571,7 @@
         const glyph = glyphs[i];
         if (!glyph || glyph === ' ') continue;
         ctx.fillStyle = themeColor(coreCells[i] === 1);
-        ctx.globalAlpha = clamp(mixv(0.74 + intensities[i] * 0.26, 0.68 + intensities[i] * 0.32), 0.5, 1) * (1 - 0.35 * sleepy) * (textOverlapCells[i] ? 0.35 : 1);
+        ctx.globalAlpha = clamp(mixv(0.74 + intensities[i] * 0.26, 0.68 + intensities[i] * 0.32), 0.5, 1) * (1 - 0.35 * sleepy);
         ctx.fillText(glyph, (col + 0.5) * CELL_W, (row + 0.5) * CELL_H);
       }
     }
