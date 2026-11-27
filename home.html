@@ -484,6 +484,13 @@
   @media (max-width:430px){ .mast .controls .music-ctl .turntable{ width:3rem; height:1.9rem; } }
 </style>
 <style id="jellyfish-arrival-style">
+  /* page turn (arrival): the torn paper that covered the question page lifts away to reveal the story */
+  html::before{ content:''; position:fixed; left:0; top:0; width:100%; height:114vh; z-index:300; pointer-events:none; visibility:hidden; transform:translateY(100vh);
+    background:linear-gradient(rgba(60,40,20,.16),rgba(60,40,20,0) 7%,rgba(60,40,20,0) 93%,rgba(60,40,20,.16)), url(art/paper-day.webp) 0 0/512px 512px, #efe4d2;
+    clip-path:polygon(0 3.2%,5% 1.4%,10% 4.4%,16% 2%,22% 5%,28% 2.6%,35% 5.6%,41% 1.8%,48% 4.2%,55% 1.2%,62% 4.8%,69% 2.2%,76% 5.4%,83% 1.6%,90% 4%,95% 2.2%,100% 3.4%,100% 96.6%,94% 98.4%,88% 95.4%,81% 98.2%,74% 94.8%,67% 97.8%,60% 95%,52% 98.6%,45% 95.6%,38% 98.2%,31% 94.6%,24% 97.6%,17% 95.2%,11% 98.4%,5% 95.8%,0 97.6%); will-change:transform; }
+  html.jellyfish-arrival::before{ visibility:visible; transform:translateY(-7vh); animation:wipeOut 1.15s cubic-bezier(.6,0,.2,1) .3s forwards; }
+  @keyframes wipeOut{ from{ transform:translateY(-7vh); } to{ transform:translateY(-122vh); visibility:hidden; } }
+  @media (prefers-reduced-motion:reduce){ html.jellyfish-arrival::before{ display:none; } }
   html.jellyfish-arrival body{ animation:arrive 1.2s var(--ease) both; }
   @keyframes arrive{ from{ opacity:0; } to{ opacity:1; } }
   .jellyfish-intro[hidden]{ display:none !important; }
