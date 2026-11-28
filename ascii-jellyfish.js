@@ -93,6 +93,7 @@
   let nextTrick = 1.8;
   let dialogueTimer = 0;
   let idleDialogueShown = false;
+  let idleDialogueTimer = 0;
   let zClock = 1;
   const ripples = [];
   const particles = [];
@@ -682,6 +683,17 @@
     requestAnimationFrame(() => dialogue.classList.add('is-visible'));
     dialogueTimer = window.setTimeout(hideDialogue, ms);
   }
+  function scheduleIdleDialogue() {
+    window.clearTimeout(idleDialogueTimer);
+    idleDialogueTimer = window.setTimeout(() => {
+      if (idleDialogueShown || fastScrolling || (arrivalIntro && !introNote.hidden)) {
+        if (!idleDialogueShown) scheduleIdleDialogue();
+        return;
+      }
+      idleDialogueShown = true;
+      showDialogue('You there?', 3200);
+    }, 12000);
+  }
   let introDismissTimer = 0;
   function hideIntroNote() {
     if (!arrivalIntro || introNote.hidden) return;
@@ -720,6 +732,7 @@
     lastScrollAt = now;
     idleDialogueShown = false;
     hideDialogue();
+    scheduleIdleDialogue();
     wake();
     if (reducedMotion) return;
     if (speed > 1.25) {
@@ -772,11 +785,11 @@
 
   window.addEventListener('pointerdown', (e) => {
     wake();
-    if (reducedMotion) return;
     const cx = currentX + W * SCALE * 0.5, cy = currentY + H * SCALE * 0.27;
     const dx = cx - e.clientX, dy = cy - e.clientY;
     if (Math.hypot(dx, dy) < 140 * SCALE) {
       showDialogue('Ouch!', 2200);
+      if (reducedMotion) return;
       const d = Math.hypot(dx, dy) || 1;
       excite = 1;
       dartVX = dx / d * 560; dartVY = dy / d * 560 - 120;
@@ -792,6 +805,7 @@
     readjustIdleAnchor();
     positionDialogue();
   }, { passive: true });
+  scheduleIdleDialogue();
 
   const initialDepth = depthOnPage();
   scrollDepth = initialDepth;
