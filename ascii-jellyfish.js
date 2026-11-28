@@ -71,7 +71,9 @@
   const themeRgba = (core, alpha) => `rgba(${themeRgb(core).join(', ')}, ${alpha})`;
   const mixv = (night, paper) => night + (paper - night) * paletteMix;
   const themeObserver = new MutationObserver(() => {
-    targetPaletteMix = document.documentElement.dataset.theme === 'night' ? 0 : 1;
+    const night = document.documentElement.dataset.theme === 'night';
+    targetPaletteMix = night ? 0 : 1;
+    showDialogue(night ? 'Back to the dark.' : 'Ooh. Paper.', 2200);
   });
   themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
@@ -471,7 +473,11 @@
     activeSpreadMood = nextMood || 'idle';
     window.clearTimeout(moodSettleTimer);
     if (reducedMotion || fastScrolling) return;
-    moodSettleTimer = window.setTimeout(() => applyMood(activeSpreadMood), 620);
+    moodSettleTimer = window.setTimeout(() => {
+      applyMood(activeSpreadMood);
+      const line = SECTION_LINES[activeSpreadMood];
+      if (line && !spokenSections.has(activeSpreadMood) && say(line, 2600)) spokenSections.add(activeSpreadMood);
+    }, 620);
   }
 
   const spreadMoodObserver = new IntersectionObserver((entries) => {
@@ -520,10 +526,6 @@
     if (sleepy > 0.8) {
       zClock -= dt;
       if (zClock <= 0) { addParticle('zzz'); zClock = 2; }
-    }
-    if (!reducedMotion && !fastScrolling && !idleDialogueShown && (!arrivalIntro || introNote.hidden) && performance.now() - lastScrollAt > 12000) {
-      idleDialogueShown = true;
-      showDialogue('You there?', 3200);
     }
 
     // random tricks while awake
@@ -642,6 +644,7 @@
 
   function setPosition(x, y, scale) {
     root.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) scale(${(SCALE * scale).toFixed(3)})`;
+    if (dialogue && !dialogue.hidden) positionDialogue();
   }
 
   function introProgress(now) {
@@ -658,41 +661,78 @@
     introNote.style.left = `${Math.round(clamp(r.left - noteWidth - 12, 12, maxLeft))}px`;
     introNote.style.top = `${Math.round(clamp(r.top + 46, safeTop, maxTop))}px`;
   }
+  /* ---- Jerry's speech bubble ----
+     Lines come from: a greeting, the story sections, theme switches, being poked and being left alone.
+     Automatic lines are throttled so he never talks over himself or while you scroll quickly. */
+  let hideTimer = 0, typeTimer = 0, lastSayAt = 0, pokes = 0, idleLines = 0, greeted = false;
+  const spokenSections = new Set();
+  const SECTION_LINES = { bright: 'Oh, this one is a good memory.', curious: 'Hmm. Curious.', sunglasses: 'Very cool.', wave: 'Hi there!', dreamy: 'Aww.' };
+  const POKE_LINES = ['Ouch!', 'Hey!', 'Rude.', 'That tickles.'];
+  const IDLE_LINES = ['You there?', 'Still here?', 'I will just float.'];
+  const dialogueBusy = () => !dialogue.hidden && dialogue.classList.contains('is-visible');
   function positionDialogue() {
     if (!dialogue || dialogue.hidden) return;
-    const r = root.getBoundingClientRect();
-    const w = dialogue.offsetWidth || 190, h = dialogue.offsetHeight || 70, gap = 12;
-    const maxLeft = Math.max(12, window.innerWidth - w - 12);
-    const maxTop = Math.max(12, window.innerHeight - h - 12);
-    let left = r.right + gap;
-    if (left > maxLeft) left = r.left - w - gap;
-    dialogue.style.left = `${Math.round(clamp(left, 12, maxLeft))}px`;
-    dialogue.style.top = `${Math.round(clamp(r.top + r.height * 0.18, 12, maxTop))}px`;
+    /* follow the jellyfish's body, not his (mostly empty) canvas, and point the tail at him */
+    const bx = currentX + W * SCALE * 0.5, by = currentY + H * SCALE * 0.27;
+    const w = dialogue.offsetWidth || 190, h = dialogue.offsetHeight || 70, reach = 84;
+    const safeTop = (document.querySelector('.mast')?.getBoundingClientRect().bottom || 0) + 8;
+    const maxTop = Math.max(safeTop, window.innerHeight - h - 12);
+    let left = bx + reach, side = 'right';
+    if (left + w > window.innerWidth - 12) { left = bx - reach - w; side = 'left'; }
+    left = clamp(left, 12, Math.max(12, window.innerWidth - w - 12));
+    const top = clamp(by - h * 0.5, safeTop, maxTop);
+    dialogue.style.left = `${Math.round(left)}px`;
+    dialogue.style.top = `${Math.round(top)}px`;
+    dialogue.classList.toggle('is-left', side === 'left');
+    dialogue.style.setProperty('--tail-y', `${Math.round(clamp(by - top, 16, h - 16))}px`);
   }
   function hideDialogue() {
     if (!dialogue || dialogue.hidden) return;
+    window.clearTimeout(typeTimer);
     dialogue.classList.remove('is-visible');
-    window.setTimeout(() => { dialogue.hidden = true; }, reducedMotion ? 0 : 320);
+    window.clearTimeout(hideTimer);
+    hideTimer = window.setTimeout(() => { dialogue.hidden = true; }, reducedMotion ? 0 : 320);
   }
-  function showDialogue(text, ms = 2800) {
+  function showDialogue(text, ms = 3000) {
     if (!dialogue || !dialogueCopy) return;
-    window.clearTimeout(dialogueTimer);
-    dialogueCopy.textContent = text;
+    window.clearTimeout(dialogueTimer); window.clearTimeout(hideTimer); window.clearTimeout(typeTimer);
+    lastSayAt = performance.now();
+    /* typed-out text: the rest stays in the layout (invisible) so the bubble never resizes while typing */
+    const typed = document.createElement('span'), rest = document.createElement('span');
+    rest.style.visibility = 'hidden';
+    dialogueCopy.replaceChildren(typed, rest);
     dialogue.hidden = false;
     positionDialogue();
     requestAnimationFrame(() => dialogue.classList.add('is-visible'));
-    dialogueTimer = window.setTimeout(hideDialogue, ms);
+    if (reducedMotion) { typed.textContent = text; }
+    else {
+      let n = 0; rest.textContent = text;
+      (function type() {
+        n++; typed.textContent = text.slice(0, n); rest.textContent = text.slice(n);
+        if (n < text.length) typeTimer = window.setTimeout(type, 30);
+      })();
+    }
+    dialogueTimer = window.setTimeout(hideDialogue, ms + (reducedMotion ? 0 : text.length * 30));
+  }
+  /* automatic lines: skipped while he is busy, you are scrolling fast, or the arrival note is up */
+  function say(text, ms) {
+    if (fastScrolling || dialogueBusy() || (arrivalIntro && !introNote.hidden) || performance.now() - lastSayAt < 7000) return false;
+    showDialogue(text, ms);
+    return true;
   }
   function scheduleIdleDialogue() {
     window.clearTimeout(idleDialogueTimer);
     idleDialogueTimer = window.setTimeout(() => {
-      if (idleDialogueShown || fastScrolling || (arrivalIntro && !introNote.hidden)) {
-        if (!idleDialogueShown) scheduleIdleDialogue();
-        return;
-      }
+      if (idleDialogueShown) return;
+      if (fastScrolling || (arrivalIntro && !introNote.hidden) || dialogueBusy()) { scheduleIdleDialogue(); return; }
       idleDialogueShown = true;
-      showDialogue('You there?', 3200);
+      showDialogue(IDLE_LINES[idleLines++ % IDLE_LINES.length], 3000);
     }, 12000);
+  }
+  function greet() {
+    if (greeted) return;
+    greeted = true;
+    window.setTimeout(() => showDialogue('Psst. Do not poke me.', 3200), 1400);
   }
   let introDismissTimer = 0;
   function hideIntroNote() {
@@ -702,6 +742,7 @@
     window.setTimeout(() => {
       introNote.hidden = true;
       document.documentElement.classList.remove('jellyfish-arrival');
+      greet();
     }, reducedMotion ? 30 : 500);
   }
   function showIntroNote() {
@@ -787,8 +828,8 @@
     wake();
     const cx = currentX + W * SCALE * 0.5, cy = currentY + H * SCALE * 0.27;
     const dx = cx - e.clientX, dy = cy - e.clientY;
-    if (Math.hypot(dx, dy) < 140 * SCALE) {
-      showDialogue('Ouch!', 2200);
+    if (Math.hypot(dx, dy) < 190 * SCALE) {
+      showDialogue(POKE_LINES[Math.min(pokes++, POKE_LINES.length - 1) === 0 ? 0 : 1 + Math.floor(Math.random() * (POKE_LINES.length - 1))], 1800);
       if (reducedMotion) return;
       const d = Math.hypot(dx, dy) || 1;
       excite = 1;
@@ -806,6 +847,7 @@
     positionDialogue();
   }, { passive: true });
   scheduleIdleDialogue();
+  if (!arrivalIntro) window.setTimeout(greet, 5000);
 
   const initialDepth = depthOnPage();
   scrollDepth = initialDepth;
