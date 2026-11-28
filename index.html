@@ -68,7 +68,10 @@
   .done{ display:none; position:relative; z-index:6; }
   body.won .ask,body.won #yes,body.won #no,body.won .say,body.won .lamp{ display:none; }
   body.won .done{ display:grid; gap:1.4rem; justify-items:center; padding-top:18svh; animation:in 1.4s var(--ease) both; }
+  body.preflight .ask,body.preflight #yes,body.preflight #no,body.preflight .say,body.preflight .lamp{ display:none; }
+  body.preflight .done{ display:grid; gap:1.4rem; justify-items:center; padding-top:18svh; animation:in .7s var(--ease) both; }
   body.won .top{ height:100%; background:rgba(0,0,0,.78); }
+  body.preflight .top{ height:100%; background:rgba(0,0,0,.78); }
   .done h2{ font:400 clamp(3.4rem,11vw,9.5rem)/.9 var(--serif); letter-spacing:-.045em; }
   .done p:not(.label){ font:400 clamp(1.1rem,2vw,1.5rem)/1.5 var(--serif); color:var(--ink2); }
   .done .done-note{ max-width:34ch; font:400 clamp(.95rem,1.35vw,1.15rem)/1.45 var(--serif); }
@@ -241,8 +244,11 @@ function goHome(e){
   try{ sessionStorage.setItem('mimi-jellyfish-arrival','1'); }catch(err){ }
   var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   speak('christ','Finally. Mind the jellyfish.',2200);
-  document.body.classList.add('leaving');
-  setTimeout(function(){ location.href='home.html'; },reduce?500:2500);
+  document.body.classList.add('preflight');
+  setTimeout(function(){
+    document.body.classList.add('leaving');
+    setTimeout(function(){ location.href='home.html'; },reduce?500:2400);
+  },reduce?150:1100);
 }
 no.addEventListener('click',goHome);
 document.querySelector('.done a').addEventListener('click',goHome);
