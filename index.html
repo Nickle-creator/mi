@@ -23,6 +23,7 @@
   .dim{ position:fixed; inset:0; pointer-events:none; background:radial-gradient(ellipse 85% 85% at 50% 52%, rgba(0,0,0,.34), rgba(0,0,0,.84)); }
   .lamp{ position:fixed; left:0; top:0; width:760px; height:760px; margin:-380px 0 0 -380px; pointer-events:none; opacity:0; transition:opacity 1.2s var(--ease); will-change:transform;
     background:radial-gradient(circle, rgba(255,214,160,.17) 0, rgba(255,214,160,.07) 38%, rgba(255,214,160,0) 68%); }
+  #lamp{ display:none !important; }
   html.revealed .lamp{ opacity:1; }
   .curtain{ position:fixed; inset:0; z-index:200; background:#000; pointer-events:none; opacity:1; transition:opacity 1.3s var(--ease); }
   html.open .curtain{ opacity:0; }
@@ -113,10 +114,10 @@
     <p class="count" id="count"><span id="cnt">&nbsp;</span><span class="meter" id="meter"><i id="fill"></i></span></p>
   </section>
   <section class="done" aria-live="polite">
-    <p class="label">Thought so</p>
-    <h2>I knew it.</h2>
-    <p>Yours, always.</p>
-    <p class="done-note">Your secret is safe with me. The portrait has already told three people.</p>
+    <p class="label">The truth, at last</p>
+    <h2>Only I can be Batman.</h2>
+    <p>Now you may enter.</p>
+    <p class="done-note">Your secret is safe with me. The portrait has already told three people. Jerry is waiting on the other side.</p>
     <a href="home.html">Come in</a>
   </section>
 </main>
@@ -143,7 +144,7 @@ var CFG = {
 var IW=1100, IH=782;
 var ANCHOR={ christ:[430,285], beard:[1085,420], green:[330,340], no:[925,655] };
 var yes=document.getElementById('yes'), no=document.getElementById('no'), slot=document.getElementById('slot');
-var dodges=0, caught=false, said=0, timers={}, introDone=false, leaving=false, tick=0, lx=0, ly=0;
+var dodges=0, caught=false, said=0, timers={}, introDone=false, leaving=false, tick=0, lx=0, ly=0, pressLockUntil=0;
 function map(p){ var vw=innerWidth,vh=innerHeight,s=Math.max(vw/IW,vh/IH); return [(vw-IW*s)/2+p[0]*s,(vh-IH*s)/2+p[1]*s]; }
 /* where each speaker's head sits in the 1100 x 782 painting, and which way their bubble leans */
 var HEAD={ christ:{p:[619,254],side:'right',gap:78}, beard:{p:[835,323],side:'left',gap:64}, green:{p:[335,345],side:'left',gap:70} };
@@ -223,8 +224,14 @@ addEventListener('pointermove',function(e){ lx=e.clientX; ly=e.clientY; if(!tick
 addEventListener('pointerdown',function(e){
   if(!introDone||caught||leaving) return;
   var b=yes.getBoundingClientRect(), pad=48;
-  if(e.clientX>b.left-pad&&e.clientX<b.right+pad&&e.clientY>b.top-pad&&e.clientY<b.bottom+pad){ e.preventDefault(); chatter(); if(!yes.dataset.hit) dodge(e.clientX,e.clientY,true); }
-  yes.dataset.hit='';
+  if(e.clientX>b.left-pad&&e.clientX<b.right+pad&&e.clientY>b.top-pad&&e.clientY<b.bottom+pad){
+    e.preventDefault();
+    var now=performance.now();
+    if(now<pressLockUntil) return;
+    pressLockUntil=now+260;
+    chatter();
+    dodge(e.clientX,e.clientY,true);
+  }
 });
 yes.addEventListener('click',function(e){ if(!introDone||leaving){ e.preventDefault(); return; } if(!caught&&e.detail>0){ e.preventDefault(); return; } document.body.classList.add('won'); });
 function goHome(e){
