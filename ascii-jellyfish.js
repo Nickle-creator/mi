@@ -4,6 +4,8 @@
   const ctx = canvas?.getContext('2d', { alpha: true });
   if (!root || !canvas || !ctx) return;
   const introNote = document.getElementById('jellyfishIntro');
+  const dialogue = document.getElementById('jellyfishDialogue');
+  const dialogueCopy = dialogue?.querySelector('.jellyfish-dialogue__copy');
   const arrivalIntro = !!introNote && document.documentElement.classList.contains('jellyfish-arrival');
 
   /* ------------------------------------------------------------------
@@ -89,6 +91,8 @@
   let dartVX = 0, dartVY = 0;
   let lastActive = performance.now();
   let nextTrick = 1.8;
+  let dialogueTimer = 0;
+  let idleDialogueShown = false;
   let zClock = 1;
   const ripples = [];
   const particles = [];
@@ -516,6 +520,10 @@
       zClock -= dt;
       if (zClock <= 0) { addParticle('zzz'); zClock = 2; }
     }
+    if (!reducedMotion && !fastScrolling && !idleDialogueShown && (!arrivalIntro || introNote.hidden) && performance.now() - lastScrollAt > 12000) {
+      idleDialogueShown = true;
+      showDialogue('You there?', 3200);
+    }
 
     // random tricks while awake
     if (sleepy < 0.2 && !fastScrolling) {
@@ -649,6 +657,31 @@
     introNote.style.left = `${Math.round(clamp(r.left - noteWidth - 12, 12, maxLeft))}px`;
     introNote.style.top = `${Math.round(clamp(r.top + 46, safeTop, maxTop))}px`;
   }
+  function positionDialogue() {
+    if (!dialogue || dialogue.hidden) return;
+    const r = root.getBoundingClientRect();
+    const w = dialogue.offsetWidth || 190, h = dialogue.offsetHeight || 70, gap = 12;
+    const maxLeft = Math.max(12, window.innerWidth - w - 12);
+    const maxTop = Math.max(12, window.innerHeight - h - 12);
+    let left = r.right + gap;
+    if (left > maxLeft) left = r.left - w - gap;
+    dialogue.style.left = `${Math.round(clamp(left, 12, maxLeft))}px`;
+    dialogue.style.top = `${Math.round(clamp(r.top + r.height * 0.18, 12, maxTop))}px`;
+  }
+  function hideDialogue() {
+    if (!dialogue || dialogue.hidden) return;
+    dialogue.classList.remove('is-visible');
+    window.setTimeout(() => { dialogue.hidden = true; }, reducedMotion ? 0 : 320);
+  }
+  function showDialogue(text, ms = 2800) {
+    if (!dialogue || !dialogueCopy) return;
+    window.clearTimeout(dialogueTimer);
+    dialogueCopy.textContent = text;
+    dialogue.hidden = false;
+    positionDialogue();
+    requestAnimationFrame(() => dialogue.classList.add('is-visible'));
+    dialogueTimer = window.setTimeout(hideDialogue, ms);
+  }
   let introDismissTimer = 0;
   function hideIntroNote() {
     if (!arrivalIntro || introNote.hidden) return;
@@ -685,6 +718,8 @@
     const speed = Math.abs(window.scrollY - lastScrollY) / elapsed;
     lastScrollY = window.scrollY;
     lastScrollAt = now;
+    idleDialogueShown = false;
+    hideDialogue();
     wake();
     if (reducedMotion) return;
     if (speed > 1.25) {
@@ -741,6 +776,7 @@
     const cx = currentX + W * SCALE * 0.5, cy = currentY + H * SCALE * 0.27;
     const dx = cx - e.clientX, dy = cy - e.clientY;
     if (Math.hypot(dx, dy) < 140 * SCALE) {
+      showDialogue('Ouch!', 2200);
       const d = Math.hypot(dx, dy) || 1;
       excite = 1;
       dartVX = dx / d * 560; dartVY = dy / d * 560 - 120;
@@ -754,6 +790,7 @@
     currentX = clamp(currentX, 8, maxX());
     currentY = clamp(currentY, 26, maxY());
     readjustIdleAnchor();
+    positionDialogue();
   }, { passive: true });
 
   const initialDepth = depthOnPage();

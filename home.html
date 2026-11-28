@@ -499,6 +499,11 @@
   .jellyfish-intro__dismiss:hover{ color:var(--burn); }
   @media (max-width:600px){ .jellyfish-intro{ width:min(12rem,calc(100vw - 24px)); padding:.8rem .85rem .7rem; } .jellyfish-intro__copy{ font-size:1.05rem; } }
   @media (prefers-reduced-motion:reduce){ .jellyfish-intro{ transition:none !important; } }
+  .jellyfish-dialogue{ position:fixed; z-index:56; width:min(12rem,calc(100vw - 24px)); padding:.65rem .8rem .58rem; color:var(--ink); background:var(--print); border:1px solid var(--burn); box-shadow:5px 5px 0 var(--rule); opacity:0; transform:translate3d(0,8px,0) rotate(.7deg); transition:opacity .28s var(--ease2),transform .4s var(--ease); pointer-events:none; }
+  .jellyfish-dialogue::before{ content:'Jerry · Jellyfish'; display:block; margin-bottom:.28rem; color:var(--burn); font:500 .5rem/1.2 var(--sans); letter-spacing:.14em; text-transform:uppercase; }
+  .jellyfish-dialogue__copy{ font:400 1.02rem/1.12 var(--serif); }
+  .jellyfish-dialogue.is-visible{ opacity:1; transform:none; }
+  @media (prefers-reduced-motion:reduce){ .jellyfish-dialogue{ transition:none !important; } }
   #arrivalSky{display:none}
   html.jellyfish-arrival #arrivalSky{display:block;position:fixed;inset:0;z-index:35;pointer-events:none;background:linear-gradient(rgba(210,154,82,.18),rgba(217,120,138,.08)),#07080c;animation:arrival-fade .55s .12s ease forwards}
   #arrivalSky div{position:absolute;inset:-4%;background:url('art/hero-starry.webp') center/cover no-repeat;animation:arrival-drift 1.8s linear forwards}
@@ -517,6 +522,9 @@
   <p class="jellyfish-intro__label">Jerry · Jellyfish</p>
   <p class="jellyfish-intro__copy">Meet Jerry. He dims when he drifts past your words, sometimes backflips, and naps if left alone.</p>
   <button class="jellyfish-intro__dismiss" type="button">Hi, Jerry</button>
+</aside>
+<aside id="jellyfishDialogue" class="jellyfish-dialogue" role="status" aria-live="polite" hidden>
+  <p class="jellyfish-dialogue__copy"></p>
 </aside>
 <header class="mast">
   <div class="brand">For You <i>Mimi</i></div>
